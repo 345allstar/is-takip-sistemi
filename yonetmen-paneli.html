@@ -56,89 +56,84 @@
           
             
             <div id="form-container" class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg mb-8">
-                <div class="collapsible-trigger flex justify-between items-center cursor-pointer">
-                    <h2 class="text-xl font-bold text-gray-800 flex items-center"><i class="fas fa-user-edit mr-3 text-indigo-500"></i><span id="form-title">Çekim Detayları ve Atama</span></h2>
-                    <i class="fas fa-chevron-down transform transition-transform text-gray-500"></i>
-                </div>
-               <div class="collapsible-content mt-4">
-    <form id="cek-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5 items-start">
-    <input type="hidden" id="editing-row-id">
-
-    <div>
-        <label for="yonetmen" class="block text-sm font-medium text-gray-600">Yönetmen <span class="text-red-500">*</span></label>
-        <select id="yonetmen" name="yonetmen" class="searchable-select" required>
-            <option value="">Seçiniz...</option>
-        </select>
+    <div class="collapsible-trigger flex justify-between items-center cursor-pointer">
+        <h2 class="text-xl font-bold text-gray-800 flex items-center"><i class="fas fa-user-edit mr-3 text-indigo-500"></i><span id="form-title">Çekim Detayları ve Atama</span></h2>
+        <i class="fas fa-chevron-down transform transition-transform text-gray-500"></i>
     </div>
-
-    <div>
-        <label for="akademik-dinleyici" class="block text-sm font-medium text-gray-600">Akademik Dinleyici</label>
-        <select id="akademik-dinleyici" name="akademik-dinleyici" class="searchable-select">
-            <option value="">Seçiniz...</option>
-        </select>
+    <div class="collapsible-content mt-4">
+        <form id="cek-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5 items-start">
+            <input type="hidden" id="editing-row-id">
+            <div>
+                <label for="yonetmen" class="block text-sm font-medium text-gray-600">Yönetmen <span class="text-red-500">*</span></label>
+                <select id="yonetmen" name="yonetmen" class="searchable-select" required="">
+                    <option value="">Seçiniz...</option>
+                </select>
+            </div>
+            <div>
+                <label for="akademik-dinleyici" class="block text-sm font-medium text-gray-600">Akademik Dinleyici</label>
+                <select id="akademik-dinleyici" name="akademik-dinleyici" class="searchable-select">
+                    <option value="">Seçiniz...</option>
+                </select>
+            </div>
+            <div class="md:col-span-2 flex justify-end pt-4 mt-4 border-t">
+                <button type="submit" id="submit-button" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">
+                    <i class="fas fa-save mr-2"></i>Güncelle
+                </button>
+            </div>
+        </form>
     </div>
-
-    <div class="md:col-span-2 flex justify-end pt-4 mt-4 border-t">
-        <button type="submit" id="submit-button" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">
-            <i class="fas fa-save mr-2"></i>Güncelle
-        </button>
-    </div>
-</form>
 </div>
 
-            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg">
-                <div class="collapsible-trigger flex justify-between items-center cursor-pointer">
-                    <h2 class="text-xl font-bold text-gray-800 flex items-center"><i class="fas fa-list-ul mr-3 text-indigo-500"></i>Atama Bekleyen Çekimler</h2>
-                    <i class="fas fa-chevron-down transform transition-transform text-gray-500"></i>
-                </div>
-                <div class="collapsible-content open mt-4">
-                    <div id="table-container" class="overflow-x-auto">
-                        <table id="cekim-tablosu" class="w-full whitespace-nowrap">
-                            <thead class="bg-gray-100">
-                                <tr>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">ÇEKİM TARİHİ</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">SİNAV TÜRÜ</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">ANLATIM TÜRÜ</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">VİDEO KODU</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">BRANŞ</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">ÜNİTE</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">BÖLÜM</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">TEST ADI</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">SORU SAYISI</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">ANLATICI ÖĞRETMEN</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">YÖNETMEN</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">AKADEMİK DİNLEYİCİ</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">İŞLEMLER</th>
-                                </tr>
-                                <tr>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="0"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="1"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="2"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="3"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="4"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="5"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="6"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="7"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="8"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="9"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="10"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="11"></th>
-                                    <th class="p-2"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="cekim-tablosu-body">
-                                <!-- Data rows will be inserted here by JS -->
-                            </tbody>
-                        </table>
-                        <div id="no-data" class="text-center py-8 text-gray-500 hidden">
-                            <i class="fas fa-folder-open fa-3x mb-2"></i>
-                            <p>Atama bekleyen çekim bulunmuyor.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+<div class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg">
+    <div class="collapsible-trigger flex justify-between items-center cursor-pointer">
+        <h2 class="text-xl font-bold text-gray-800 flex items-center"><i class="fas fa-list-ul mr-3 text-indigo-500"></i>Atama Bekleyen Çekimler</h2>
+        <i class="fas fa-chevron-down transform transition-transform text-gray-500"></i>
     </div>
+    <div class="collapsible-content mt-4">
+        <div id="table-container" class="overflow-x-auto">
+            <table id="cekim-tablosu" class="w-full whitespace-nowrap">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="p-3 text-sm font-semibold tracking-wide">ÇEKİM TARİHİ</th>
+                        <th class="p-3 text-sm font-semibold tracking-wide">SİNAV TÜRÜ</th>
+                        <th class="p-3 text-sm font-semibold tracking-wide">ANLATIM TÜRÜ</th>
+                        <th class="p-3 text-sm font-semibold tracking-wide">VİDEO KODU</th>
+                        <th class="p-3 text-sm font-semibold tracking-wide">BRANŞ</th>
+                        <th class="p-3 text-sm font-semibold tracking-wide">ÜNİTE</th>
+                        <th class="p-3 text-sm font-semibold tracking-wide">BÖLÜM</th>
+                        <th class="p-3 text-sm font-semibold tracking-wide">TEST ADI</th>
+                        <th class="p-3 text-sm font-semibold tracking-wide">SORU SAYISI</th>
+                        <th class="p-3 text-sm font-semibold tracking-wide">ANLATICI ÖĞRETMEN</th>
+                        <th class="p-3 text-sm font-semibold tracking-wide">YÖNETMEN</th>
+                        <th class="p-3 text-sm font-semibold tracking-wide">AKADEMİK DİNLEYİCİ</th>
+                        <th class="p-3 text-sm font-semibold tracking-wide">İŞLEMLER</th>
+                    </tr>
+                    <tr>
+                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="0"></th>
+                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="1"></th>
+                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="2"></th>
+                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="3"></th>
+                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="4"></th>
+                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="5"></th>
+                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="6"></th>
+                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="7"></th>
+                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="8"></th>
+                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="9"></th>
+                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="10"></th>
+                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="11"></th>
+                        <th class="p-2"></th>
+                    </tr>
+                </thead>
+                <tbody id="cekim-tablosu-body">
+                    </tbody>
+            </table>
+            <div id="no-data" class="text-center py-8 text-gray-500 hidden">
+                <i class="fas fa-folder-open fa-3x mb-2"></i>
+                <p>Atama bekleyen çekim bulunmuyor.</p>
+            </div>
+        </div>
+    </div>
+</div>
     
     <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -425,6 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
 
 
