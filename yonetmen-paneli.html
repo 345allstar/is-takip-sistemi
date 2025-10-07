@@ -283,23 +283,150 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateSelectDisplay = (selectElement) => { /* ... kod aynı ... */ };
 
     // --- VERİ YÖNETİMİ VE TABLO İŞLEMLERİ ---
-    function getCekimlerFromStorage() { /* ... kod aynı ... */ }
-    function saveCekimlerToStorage(cek_kayitlari) { /* ... kod aynı ... */ }
-    function loadAndDisplayCekimler() { /* ... kod aynı ... */ }
-    cekForm.addEventListener('submit', function(e) { /* ... kod aynı ... */ });
-    tableBody.addEventListener('click', function(e) { /* ... kod aynı ... */ });
+    function getCekimlerFromStorage() {
+        return JSON.parse(localStorage.getItem('cekimListesi') || '[]');
+    }
+
+    function saveCekimlerToStorage(cek_kayitlari) {
+        localStorage.setItem('cekimListesi', JSON.stringify(cek_kayitlari));
+    }
+    
+    function loadAndDisplayCekimler() {
+        const cek_kayitlari = getCekimlerFromStorage();
+        
+        // Filtreleme: Sadece çekim tarihi girilmiş olanları listele
+        const listelenecekKayitlar = cek_kayitlari.filter(kayit => kayit.cekimTarihi);
+        
+        tableBody.innerHTML = '';
+
+        if (listelenecekKayitlar.length === 0) {
+            noDataMessage.classList.remove('hidden');
+            document.getElementById('cekim-tablosu').classList.add('hidden');
+        } else {
+            noDataMessage.classList.add('hidden');
+            document.getElementById('cekim-tablosu').classList.remove('hidden');
+            
+            // Tarihe göre en yeniden eskiye sırala
+            listelenecekKayitlar.sort((a, b) => new Date(b.cekimTarihi) - new Date(a.cekimTarihi));
+
+            listelenecekKayitlar.forEach(kayit => {
+                const row = tableBody.insertRow();
+                row.dataset.id = kayit.id;
+
+                // Tarih formatlama
+                const date = new Date(kayit.cekimTarihi + 'T00:00:00');
+                const formattedDate = kayit.cekimTarihi ? `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}` : '';
+
+                // Yönetmen ve Akademik Dinleyici atanmış mı kontrol et
+                const yonetmenDurum = kayit.yonetmen 
+                    ? `<td class="p-3 text-sm font-semibold text-green-600">${kayit.yonetmen}</td>`
+                    : `<td class="p-3 text-sm font-semibold text-gray-500">Atanmadı</td>`;
+
+                const akademikDinleyiciDurum = kayit.akademikDinleyici 
+                    ? `<td class="p-3 text-sm font-semibold text-green-600">${kayit.akademikDinleyici}</td>`
+                    : `<td class="p-3 text-sm font-semibold text-gray-500">Atanmadı</td>`;
+                
+                // Buton başlığını değiştir
+                const buttonTitle = kayit.yonetmen ? "Düzenle" : "Ata";
+
+                row.innerHTML = `
+                    <td class="p-3 text-sm">${formattedDate || ''}</td>
+                    <td class="p-3 text-sm">${kayit.sinavTuru || ''}</td>
+                    <td class="p-3 text-sm">${kayit.anlatimTuru || ''}</td>
+                    <td class="p-3 text-sm">${kayit.videoKodu || ''}</td>
+                    <td class="p-3 text-sm">${kayit.brans || ''}</td>
+                    <td class="p-3 text-sm">${kayit.unite || ''}</td>
+                    <td class="p-3 text-sm">${kayit.bolum || ''}</td>
+                    <td class="p-3 text-sm">${kayit.testAdi || ''}</td>
+                    <td class="p-3 text-sm">${kayit.soruSayisi || ''}</td>
+                    <td class="p-3 text-sm">${kayit.anlaticiOgretmen || ''}</td>
+                    ${yonetmenDurum}
+                    ${akademikDinleyiciDurum}
+                    <td class="p-3 text-sm">
+                        <button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="${buttonTitle}">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                    </td>
+                `;
+            });
+        }
+        applyFilters();
+    }
+
+    cekForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const id = editingIdInput.value;
+        if (!id) return;
+
+        let cek_kayitlari = getCekimlerFromStorage();
+        const kayitIndex = cek_kayitlari.findIndex(k => k.id == id);
+
+        if (kayitIndex > -1) {
+            cek_kayitlari[kayitIndex].yonetmen = document.getElementById('yonetmen').value;
+            cek_kayitlari[kayitIndex].akademikDinleyici = document.getElementById('akademik-dinleyici').value;
+            saveCekimlerToStorage(cek_kayitlari);
+            loadAndDisplayCekimler();
+            cekForm.reset();
+            editingIdInput.value = '';
+            updateSelectDisplay(document.getElementById('yonetmen'));
+            updateSelectDisplay(document.getElementById('akademik-dinleyici'));
+            alert('Atama başarıyla güncellendi!');
+        }
+    });
+    
+    tableBody.addEventListener('click', function(e) {
+        const editButton = e.target.closest('.edit-row');
+        if (editButton) {
+            e.preventDefault();
+            const row = editButton.closest('tr');
+            const id = row.dataset.id;
+            const cek_kayitlari = getCekimlerFromStorage();
+            const kayit = cek_kayitlari.find(k => k.id == id);
+
+            if (kayit) {
+                editingIdInput.value = kayit.id;
+                document.getElementById('yonetmen').value = kayit.yonetmen || '';
+                document.getElementById('akademik-dinleyici').value = kayit.akademikDinleyici || '';
+                updateSelectDisplay(document.getElementById('yonetmen'));
+                updateSelectDisplay(document.getElementById('akademik-dinleyici'));
+                document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    });
 
     // --- TABLO FİLTRELEME ---
-    function applyFilters() { /* ... kod aynı ... */ }
-    document.querySelectorAll('.filter-input').forEach(input => { /* ... kod aynı ... */ });
+    function applyFilters() {
+        const rows = tableBody.querySelectorAll('tr');
+        const filterInputs = document.querySelectorAll('.filter-input');
+        const filterValues = Array.from(filterInputs).map(input => input.value.toLowerCase());
+
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            let isVisible = true;
+            filterValues.forEach((filterValue, index) => {
+                if (filterValue !== '') {
+                    const cell = cells[index];
+                    if (cell) {
+                        const cellText = cell.textContent.toLowerCase();
+                        if (!cellText.includes(filterValue)) {
+                            isVisible = false;
+                        }
+                    }
+                }
+            });
+            row.style.display = isVisible ? '' : 'none';
+        });
+    }
+
+    document.querySelectorAll('.filter-input').forEach(input => {
+        input.addEventListener('keyup', applyFilters);
+    });
 
     // --- SAYFA YÜKLENDİĞİNDE BAŞLAT ---
     loadAndDisplayCekimler();
 });
 </script>
 
-</body>
-</html>
 
 
 
