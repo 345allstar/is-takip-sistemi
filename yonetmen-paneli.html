@@ -161,8 +161,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (content) {
                 if (content.style.maxHeight) {
                     content.style.maxHeight = null;
+                    content.style.overflow = 'hidden'; // YENİ EKLENEN SATIR
                 } else {
                     content.style.maxHeight = content.scrollHeight + "px";
+                    content.style.overflow = 'visible'; // YENİ EKLENEN SATIR
                 }
             }
         });
@@ -175,6 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (content) {
             content.style.maxHeight = content.scrollHeight + "px";
+            content.style.overflow = 'visible'; // YENİ EKLENEN SATIR
         }
         if (icon) {
             icon.classList.add('rotate-180');
@@ -301,7 +304,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function loadAndDisplayCekimler() {
         const cek_kayitlari = getCekimlerFromStorage();
-        // Yönetmeni atanmamış olanları filtrele
         const atamaBekleyenler = cek_kayitlari.filter(kayit => !kayit.yonetmen);
         tableBody.innerHTML = '';
 
@@ -311,10 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             noDataMessage.classList.add('hidden');
             document.getElementById('cekim-tablosu').classList.remove('hidden');
-            
-            // Tarihe göre en yeniden eskiye sırala
             atamaBekleyenler.sort((a, b) => new Date(b.cekimTarihi) - new Date(a.cekimTarihi));
-
             atamaBekleyenler.forEach(kayit => {
                 const row = tableBody.insertRow();
                 row.dataset.id = kayit.id;
@@ -417,9 +416,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-
 </body>
 </html>
+
 
 
 
