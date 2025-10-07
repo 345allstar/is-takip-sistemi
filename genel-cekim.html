@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genel Çekim Takip - ÜçDörtBeş All Star</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .nav-link.active {
+            background-color: #4f46e5; /* indigo-600 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+        .form-input:focus, .search-input:focus {
+            border-color: #818cf8; /* indigo-400 */
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+            outline: none;
+        }
+        .searchable-select-container {
+            position: relative;
+        }
+        .searchable-select-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800">
+
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-white shadow-sm w-full p-4 flex items-center justify-between sticky top-0 z-50">
+            <div class="flex items-center">
+                <img src="https://placehold.co/50x50/4f46e5/ffffff?text=UDB" alt="Logo" class="rounded-lg mr-4">
+                <h1 class="text-xl md:text-2xl font-bold text-gray-700">ÜçDörtBeş All Star <span class="text-indigo-600">İş Takip Programı</span></h1>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto p-4 md:p-6">
+            <!-- Sayfa Linkleri -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
+                <a href="genel-cekim.html" class="nav-link active flex items-center justify-center text-center p-4 bg-white rounded-lg shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                    <i class="fas fa-camera-retro mr-2"></i><span class="font-semibold">Genel Çekim Takip</span>
+                </a>
+                <a href="yonetmen-paneli.html" class="nav-link flex items-center justify-center text-center p-4 bg-white rounded-lg shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                    <i class="fas fa-clapperboard mr-2"></i><span class="font-semibold">Yönetmen Paneli</span>
+                </a>
+                <a href="kurgu-kontrol.html" class="nav-link flex items-center justify-center text-center p-4 bg-white rounded-lg shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                    <i class="fas fa-cut mr-2"></i><span class="font-semibold">Kurgu Kontrol</span>
+                </a>
+                <a href="teknik-izleme.html" class="nav-link flex items-center justify-center text-center p-4 bg-white rounded-lg shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                    <i class="fas fa-cogs mr-2"></i><span class="font-semibold">Teknik İzleme</span>
+                </a>
+                <a href="akademik-izleme.html" class="nav-link flex items-center justify-center text-center p-4 bg-white rounded-lg shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                    <i class="fas fa-graduation-cap mr-2"></i><span class="font-semibold">Akademik İzleme</span>
+                </a>
+                <a href="yazilim-yukleme.html" class="nav-link flex items-center justify-center text-center p-4 bg-white rounded-lg shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                    <i class="fas fa-upload mr-2"></i><span class="font-semibold">Yazılım Yükleme</span>
+                </a>
+                <a href="istatistik.html" class="nav-link flex items-center justify-center text-center p-4 bg-white rounded-lg shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                    <i class="fas fa-chart-pie mr-2"></i><span class="font-semibold">İstatistik Paneli</span>
+                </a>
+            </div>
+
+            <!-- Sayfa İçeriği -->
+            <div class="space-y-8">
+                <!-- 1. Alan: Çekim Ekle/Düzenle -->
+                <div id="form-container" class="bg-white rounded-xl shadow-lg border border-gray-200/80">
+                    <button class="collapsible-trigger w-full p-5 text-left font-bold text-lg text-indigo-700 flex justify-between items-center hover:bg-gray-50 rounded-t-xl transition-colors duration-200" data-target="cekim-ekle-form">
+                        <span id="form-title" class="flex items-center"><i class="fas fa-plus-circle mr-3 text-indigo-500"></i>Çekim Ekle</span>
+                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                    </button>
+                    <div id="cekim-ekle-form" class="collapsible-content">
+                        <div class="p-6 border-t border-gray-200">
+                             <form id="cek-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5">
+                                <input type="hidden" id="editing-row-index">
+                                <!-- Form Alanları -->
+                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Çekim Tarihi</label><input name="cekimTarihi" type="date" class="form-input mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 shadow-sm transition duration-300"></div>
+                                
+                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Sınav Türü</label>
+                                    <select name="sinavTuru" id="sinav-turu-select" class="searchable-select">
+                                        <option value="">Seçiniz...</option><option>TYT</option><option>AYT</option><option>LGS</option>
+                                    </select>
+                                </div>
+                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Anlatım Türü</label>
+                                    <select name="anlatimTuru" class="searchable-select">
+                                        <option value="">Seçiniz...</option><option>GGÇK</option><option>SORU PRATİĞİ</option><option>TABLET ANLATIM</option><option>AKILLI TAHTA ANLATIM</option><option>ÖZET ANLATIM</option><option>DERECE ANLATIM</option><option>EĞLENCELİ ANLATIM</option><option>İSPATLI ANLATIM</option><option>SÜREÇ İZLEME SINAVI</option><option>ENDENEME</option><option>TÜRKİYE GENELİ DENEME</option><option>TIPKI PROVA</option>
+                                    </select>
+                                </div>
+
+                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Video Kodu</label><input name="videoKodu" type="text" class="form-input mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 shadow-sm transition duration-300"></div>
+                                
+                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Branş</label>
+                                    <select name="brans" id="brans-select" class="searchable-select" disabled><option value="">Önce sınav türü seçiniz...</option></select>
+                                </div>
+                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Ünite</label>
+                                    <select name="unite" id="unite-select" class="searchable-select" disabled><option value="">Önce branş seçiniz...</option></select>
+                                </div>
+
+                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Bölüm</label>
+                                    <select name="bolum" class="searchable-select">
+                                        <option value="">Seçiniz...</option><option>1.BÖLÜM</option><option>2. BÖLÜM</option><option>3. BÖLÜM</option><option>4. BÖLÜM</option><option>5. BÖLÜM</option><option>6. BÖLÜM</option><option>7. BÖLÜM</option><option>8. BÖLÜM</option><option>9. BÖLÜM</option><option>10. BÖLÜM</option><option>11. BÖLÜM</option><option>12. BÖLÜM</option><option>13. BÖLÜM</option><option>14. BÖLÜM</option><option>15. BÖLÜM</option><option>16. BÖLÜM</option><option>17. BÖLÜM</option><option>18. BÖLÜM</option><option>19. BÖLÜM</option><option>20. BÖLÜM</option><option>21. BÖLÜM</option><option>22. BÖLÜM</option><option>23. BÖLÜM</option><option>24. BÖLÜM</option><option>25. BÖLÜM</option><option>26. BÖLÜM</option><option>27. BÖLÜM</option><option>28. BÖLÜM</option><option>29. BÖLÜM</option><option>30. BÖLÜM</option><option>31. BÖLÜM</option><option>32. BÖLÜM</option><option>33. BÖLÜM</option><option>34. BÖLÜM</option><option>35. BÖLÜM</option><option>36. BÖLÜM</option><option>37. BÖLÜM</option><option>38. BÖLÜM</option><option>39. BÖLÜM</option><option>40. BÖLÜM</option><option>41. BÖLÜM</option><option>42. BÖLÜM</option><option>43. BÖLÜM</option><option>44. BÖLÜM</option><option>45. BÖLÜM</option><option>46. BÖLÜM</option><option>47. BÖLÜM</option><option>48. BÖLÜM</option><option>49. BÖLÜM</option><option>50. BÖLÜM</option><option>MODULE A</option><option>MODULE B</option><option>MODULE C</option><option>MODULE D</option><option>MODULE E</option><option>MODULE F</option><option>MODULE G</option><option>MODULE H</option>
+                                    </select>
+                                </div>
+                                 <div><label class="block text-sm font-semibold text-gray-600 mb-1">Ders</label>
+                                    <select name="ders" class="searchable-select">
+                                        <option value="">Seçiniz...</option><option>1. DERS</option><option>2. DERS</option><option>3. DERS</option><option>4. DERS</option><option>5. DERS</option><option>6. DERS</option><option>7. DERS</option><option>8. DERS</option><option>9. DERS</option><option>10. DERS</option><option>11. DERS</option><option>12. DERS</option><option>13. DERS</option><option>14. DERS</option><option>15. DERS</option><option>16. DERS</option><option>17. DERS</option><option>18. DERS</option><option>19. DERS</option><option>20. DERS</option><option>21. DERS</option><option>22. DERS</option><option>23. DERS</option><option>24. DERS</option><option>25. DERS</option><option>26. DERS</option><option>27. DERS</option><option>28. DERS</option><option>29. DERS</option><option>30. DERS</option><option>31. DERS</option><option>32. DERS</option><option>33. DERS</option><option>34. DERS</option><option>35. DERS</option><option>36. DERS</option><option>37. DERS</option><option>38. DERS</option><option>39. DERS</option><option>40. DERS</option><option>41. DERS</option><option>42. DERS</option><option>43. DERS</option><option>44. DERS</option><option>45. DERS</option><option>46. DERS</option><option>47. DERS</option><option>48. DERS</option><option>49. DERS</option><option>50. DERS</option><option>SINAV 1</option><option>SINAV 2</option><option>SINAV 3</option><option>SINAV 4</option><option>SINAV 5</option><option>SINAV 6</option><option>SINAV 7</option><option>SINAV 8</option>
+                                    </select>
+                                </div>
+                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Test Adı</label>
+                                    <input name="testAdi" type="text" list="test-adi-list" class="form-input mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 shadow-sm transition duration-300">
+                                    <datalist id="test-adi-list">
+                                        <option value="LGS TADINDA 1"></option><option value="LGS TADINDA 2"></option><option value="LGS TADINDA 3"></option><option value="LGS TADINDA 4"></option><option value="LGS TADINDA 5"></option><option value="LGS TADINDA 6"></option><option value="LGS TADINDA 7"></option><option value="LGS TADINDA 8"></option><option value="LGS TADINDA 9"></option><option value="LGS TADINDA 10"></option><option value="LGS TADINDA 1-A"></option><option value="LGS TADINDA 1-B"></option><option value="LGS TADINDA 1-C"></option><option value="LGS TADINDA 1-D"></option><option value="LGS TADINDA 2-A"></option><option value="LGS TADINDA 2-B"></option><option value="LGS TADINDA 2-C"></option><option value="LGS TADINDA 2-D"></option><option value="LGS TADINDA 3-A"></option><option value="LGS TADINDA 3-B"></option><option value="LGS TADINDA 3-C"></option><option value="LGS TADINDA 3-D"></option><option value="LGS TADINDA 4-A"></option><option value="LGS TADINDA 4-B"></option><option value="LGS TADINDA 4-C"></option><option value="LGS TADINDA 4-D"></option><option value="LGS TADINDA 5-A"></option><option value="LGS TADINDA 5-B"></option><option value="LGS TADINDA 5-C"></option><option value="LGS TADINDA 5-D"></option><option value="LGS TADINDA 6-A"></option><option value="LGS TADINDA 6-B"></option><option value="LGS TADINDA 6-C"></option><option value="LGS TADINDA 6-D"></option><option value="LGS TADINDA 7-A"></option><option value="LGS TADINDA 7-B"></option><option value="LGS TADINDA 7-C"></option><option value="LGS TADINDA 7-D"></option><option value="LGS TADINDA 8-A"></option><option value="LGS TADINDA 8-B"></option><option value="LGS TADINDA 8-C"></option><option value="LGS TADINDA 8-D"></option><option value="SINAV TADINDA 1"></option><option value="SINAV TADINDA 1-A"></option><option value="SINAV TADINDA 1-B"></option><option value="SINAV TADINDA 2"></option><option value="SINAV TADINDA 2-A"></option><option value="SINAV TADINDA 2-B"></option><option value="SINAV TADINDA 3"></option><option value="SINAV TADINDA 3-A"></option><option value="SINAV TADINDA 3-B"></option><option value="SINAV TADINDA 3-C"></option><option value="SINAV TADINDA 4"></option><option value="SINAV TADINDA 4-A"></option><option value="SINAV TADINDA 4-B"></option><option value="SINAV TADINDA 5"></option><option value="SINAV TADINDA 5-A"></option><option value="SINAV TADINDA 5-B"></option><option value="SINAV TADINDA 5-C"></option><option value="SINAV TADINDA 6"></option><option value="SINAV TADINDA 6-A"></option><option value="SINAV TADINDA 6-B"></option><option value="SINAV TADINDA 7"></option><option value="SINAV TADINDA 7-A"></option><option value="SINAV TADINDA 7-B"></option><option value="SINAV TADINDA 8"></option><option value="SINAV TADINDA 8-A"></option><option value="SINAV TADINDA 8-B"></option><option value="SINAV TADINDA 9"></option><option value="SINAV TADINDA 9-A"></option><option value="SINAV TADINDA 9-B"></option><option value="SINAV TADINDA 10"></option><option value="SINAV TADINDA 10-A"></option><option value="SINAV TADINDA 10-B"></option><option value="YENİ NESİL ISINDIRMA 1"></option><option value="YENİ NESİL ISINDIRMA 1-A"></option><option value="YENİ NESİL ISINDIRMA 1-B"></option><option value="YENİ NESİL ISINDIRMA 1-C"></option><option value="YENİ NESİL ISINDIRMA 1-D"></option><option value="YENİ NESİL ISINDIRMA 1-E"></option><option value="YENİ NESİL ISINDIRMA 2"></option><option value="YENİ NESİL ISINDIRMA 2-A"></option><option value="YENİ NESİL ISINDIRMA 2-B"></option><option value="YENİ NESİL ISINDIRMA 2-C"></option><option value="YENİ NESİL ISINDIRMA 2-D"></option><option value="YENİ NESİL ISINDIRMA 2-E"></option><option value="YENİ NESİL ISINDIRMA 3"></option><option value="YENİ NESİL ISINDIRMA 3-A"></option><option value="YENİ NESİL ISINDIRMA 3-B"></option><option value="YENİ NESİL ISINDIRMA 3-C"></option><option value="YENİ NESİL ISINDIRMA 3-D"></option><option value="YENİ NESİL ISINDIRMA 3-E"></option><option value="YENİ NESİL ISINDIRMA 4"></option><option value="YENİ NESİL ISINDIRMA 4-A"></option><option value="YENİ NESİL ISINDIRMA 4-B"></option><option value="YENİ NESİL ISINDIRMA 4-C"></option><option value="YENİ NESİL ISINDIRMA 4-D"></option><option value="YENİ NESİL ISINDIRMA 4-E"></option><option value="YENİ NESİL ISINDIRMA 5"></option><option value="YENİ NESİL ISINDIRMA 5-A"></option><option value="YENİ NESİL ISINDIRMA 5-B"></option><option value="YENİ NESİL ISINDIRMA 5-C"></option><option value="YENİ NESİL ISINDIRMA 5-D"></option><option value="YENİ NESİL ISINDIRMA 5-E"></option><option value="YENİ NESİL ISINDIRMA 6"></option><option value="YENİ NESİL ISINDIRMA 6-A"></option><option value="YENİ NESİL ISINDIRMA 6-B"></option><option value="YENİ NESİL ISINDIRMA 6-C"></option><option value="YENİ NESİL ISINDIRMA 7"></option><option value="YENİ NESİL ISINDIRMA 7-A"></option><option value="YENİ NESİL ISINDIRMA 7-B"></option><option value="YENİ NESİL ISINDIRMA 8"></option><option value="YENİ NESİL ISINDIRMA 8-A"></option><option value="YENİ NESİL ISINDIRMA 8-B"></option><option value="YENİ NESİL ISINDIRMA 9"></option><option value="YENİ NESİL ISINDIRMA 9-A"></option><option value="YENİ NESİL ISINDIRMA 9-B"></option><option value="YENİ NESİL ISINDIRMA 10"></option><option value="YENİ NESİL ISINDIRMA 10-A"></option><option value="YENİ NESİL ISINDIRMA 10-B"></option><option value="YENİ NESLE GEÇİŞ 1"></option><option value="YENİ NESLE GEÇİŞ 1-A"></option><option value="YENİ NESLE GEÇİŞ 1-B"></option><option value="YENİ NESLE GEÇİŞ 1-C"></option><option value="YENİ NESLE GEÇİŞ 1-D"></option><option value="YENİ NESLE GEÇİŞ 1-E"></option><option value="YENİ NESLE GEÇİŞ 2"></option><option value="YENİ NESLE GEÇİŞ 2-A"></option><option value="YENİ NESLE GEÇİŞ 2-B"></option><option value="YENİ NESLE GEÇİŞ 2-C"></option><option value="YENİ NESLE GEÇİŞ 2-D"></option><option value="YENİ NESLE GEÇİŞ 2-E"></option><option value="YENİ NESLE GEÇİŞ 3"></option><option value="YENİ NESLE GEÇİŞ 3-A"></option><option value="YENİ NESLE GEÇİŞ 3-B"></option><option value="YENİ NESLE GEÇİŞ 3-C"></option><option value="YENİ NESLE GEÇİŞ 3-D"></option><option value="YENİ NESLE GEÇİŞ 3-E"></option><option value="YENİ NESLE GEÇİŞ 4"></option><option value="YENİ NESLE GEÇİŞ 4-A"></option><option value="YENİ NESLE GEÇİŞ 4-B"></option><option value="YENİ NESLE GEÇİŞ 4-C"></option><option value="YENİ NESLE GEÇİŞ 4-D"></option><option value="YENİ NESLE GEÇİŞ 4-E"></option><option value="YENİ NESLE GEÇİŞ 5"></option><option value="YENİ NESLE GEÇİŞ 5-A"></option><option value="YENİ NESLE GEÇİŞ 5-B"></option><option value="YENİ NESLE GEÇİŞ 5-C"></option><option value="YENİ NESLE GEÇİŞ 5-D"></option><option value="YENİ NESLE GEÇİŞ 5-E"></option><option value="YENİ NESLE GEÇİŞ 6"></option><option value="YENİ NESLE GEÇİŞ 6-A"></option><option value="YENİ NESLE GEÇİŞ 6-B"></option><option value="YENİ NESLE GEÇİŞ 6-C"></option><option value="YENİ NESLE GEÇİŞ 7"></option><option value="YENİ NESLE GEÇİŞ 7-A"></option><option value="YENİ NESLE GEÇİŞ 7-B"></option><option value="YENİ NESLE GEÇİŞ 8"></option><option value="YENİ NESLE GEÇİŞ 8-A"></option><option value="YENİ NESLE GEÇİŞ 8-B"></option><option value="YENİ NESLE GEÇİŞ 9"></option><option value="YENİ NESLE GEÇİŞ 9-A"></option><option value="YENİ NESLE GEÇİŞ 9-B"></option><option value="YENİ NESLE GEÇİŞ 10"></option><option value="YENİ NESLE GEÇİŞ 10-A"></option><option value="YENİ NESLE GEÇİŞ 10-B"></option><option value="MODULE A"></option><option value="MODULE B"></option><option value="MODULAR CHECK 1"></option><option value="MODULE C"></option><option value="MODULE D"></option><option value="MODULAR CHECK 2"></option><option value="MODULE E"></option><option value="MODULE F"></option><option value="MODULAR CHECK 3"></option><option value="MODULE G"></option><option value="MODULE H"></option><option value="LGS EXPLORER"></option><option value="LGS EXPLORER 1"></option><option value="LGS EXPLORER 2"></option><option value="EXIT TEST 1"></option><option value="EXIT TEST 2"></option><option value="EXIT TEST 3"></option><option value="LGS MASTER"></option><option value="MODULE TEST 1"></option><option value="MODULE TEST 2"></option><option value="MODULE TEST 3"></option><option value="MODULE TEST 4"></option><option value="MODULE TEST 5"></option><option value="MODULE TEST 6"></option><option value="MODULE TEST 7"></option><option value="MODULE TEST 8"></option><option value="MODULE TEST 9"></option><option value="MODULE TEST 10"></option><option value="FINAL TEST"></option><option value="KONU TESTİ 1"></option><option value="KONU TESTİ 1-A"></option><option value="KONU TESTİ 1-B"></option><option value="KONU TESTİ 2"></option><option value="KONU TESTİ 2-A"></option><option value="KONU TESTİ 2-B"></option><option value="KONU TESTİ 3"></option><option value="KONU TESTİ 3-A"></option><option value="KONU TESTİ 3-B"></option><option value="KONU TESTİ 4"></option><option value="KONU TESTİ 4-A"></option><option value="KONU TESTİ 4-B"></option><option value="KONU TESTİ 5"></option><option value="KONU TESTİ 5-A"></option><option value="KONU TESTİ 5-B"></option><option value="KONU TESTİ 6"></option><option value="KONU TESTİ 6-A"></option><option value="KONU TESTİ 6-B"></option><option value="KONU TESTİ 7"></option><option value="KONU TESTİ 8"></option><option value="KONU TESTİ 9"></option><option value="KONU TESTİ 10"></option><option value="KONU TESTİ 11"></option><option value="KONU TESTİ 12"></option><option value="KONU TESTİ 13"></option><option value="KONU TESTİ 14"></option><option value="KONU TESTİ 15"></option><option value="KONU TESTİ 16"></option><option value="KONU TOPARLAMA"></option><option value="SEÇİCİ 1"></option><option value="SEÇİCİ 2"></option><option value="SEÇİCİ 3"></option><option value="SEÇİCİ 4"></option><option value="SEÇİCİ 5"></option><option value="SEÇİCİ 6"></option><option value="SEÇİCİ 7"></option><option value="SEÇİCİ 8"></option><option value="SEÇİCİ 9"></option><option value="SEÇİCİ 10"></option><option value="ÖDEV 1"></option><option value="ÖDEV 2"></option><option value="ÖDEV 3"></option><option value="ÖDEV 4"></option><option value="ÖDEV 5"></option><option value="ÖDEV 6"></option><option value="ÖDEV 7"></option><option value="ÖDEV 8"></option><option value="ÖDEV 9"></option><option value="ÖDEV 10"></option><option value="ÖDEV 1-A"></option><option value="ÖDEV 1-B"></option><option value="ÖDEV 1-C"></option><option value="ÖDEV 1-D"></option><option value="ÖDEV 2-A"></option><option value="ÖDEV 2-B"></option><option value="ÖDEV 2-C"></option><option value="ÖDEV 2-D"></option><option value="ÖDEV 3-A"></option><option value="ÖDEV 3-B"></option><option value="ÖDEV 3-C"></option><option value="ÖDEV 3-D"></option><option value="ÖDEV 4-A"></option><option value="ÖDEV 4-B"></option><option value="ÖDEV 4-C"></option><option value="ÖDEV 4-D"></option><option value="ÖDEV 5-A"></option><option value="ÖDEV 5-B"></option><option value="ÖDEV 5-C"></option><option value="ÖDEV 5-D"></option><option value="ÖDEV 6-A"></option><option value="ÖDEV 6-B"></option><option value="ÖDEV 6-C"></option><option value="ÖDEV 6-D"></option><option value="ÖDEV 7-A"></option><option value="ÖDEV 7-B"></option><option value="ÖDEV 7-C"></option><option value="ÖDEV 7-D"></option><option value="ÖDEV 8-A"></option><option value="ÖDEV 8-B"></option><option value="ÖDEV 8-C"></option><option value="ÖDEV 8-D"></option><option value="ÖDEV 9-A"></option><option value="ÖDEV 9-B"></option><option value="ÖDEV 9-C"></option><option value="ÖDEV 9-D"></option><option value="ÖDEV 10-A"></option><option value="ÖDEV 10-B"></option><option value="ÖDEV 10-C"></option><option value="ÖDEV 10-D"></option>
+                                    </datalist>
+                                </div>
+                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Soru Sayısı</label>
+                                    <input name="soruSayisi" type="number" min="1" max="50" class="form-input mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 shadow-sm transition duration-300">
+                                </div>
+                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Anlatıcı Öğretmen</label>
+                                    <select name="anlaticiOgretmen" class="searchable-select">
+                                        <option value="">Seçiniz...</option><option>Ali Saçan</option><option>Altuğ Güneş</option><option>Anıl Gül</option><option>Bayram Meral</option><option>Betül Büyükkalaycı</option><option>Buğra Arslan</option><option>Burak Onay</option><option>Büşra Altınok</option><option>Cebrail Karaoğlan</option><option>Celal Gündüz</option><option>Deniz Bozkurt</option><option>Didar Baskın</option><option>Emrah Karcı</option><option>Enes Avcı</option><option>Erdal Aydemir</option><option>Erkan Ayrancı</option><option>Erkan Özaslan</option><option>Erkan Tunçer</option><option>Ersen Örenler</option><option>Eyüp Boncuk</option><option>Fatih Demirkaya</option><option>Fatih Sefi</option><option>Görkem Şahin</option><option>Gülhan Şen</option><option>Hale Karataş</option><option>İbrahim Taş</option><option>İbrahim Ulaş Baldemir</option><option>İlayda Gültekin</option><option>İlhan Aslan</option><option>İlyas Güneş</option><option>İsmail Kocabaş</option><option>İsmail Tolga Aktaş</option><option>Kader Altınel</option><option>Kadir Gümüş</option><option>Kadir Sefi</option><option>Kemal Coşkun</option><option>Kenan Kara</option><option>Mahsum Öztürk</option><option>Mehmet Celal Özyıldız</option><option>Mehmet Dural</option><option>Mehmet Durmuş</option><option>Mehmet Özalp</option><option>Melih Akgündüz</option><option>Mesut Uğurdoğan</option><option>Murat Namlı</option><option>Mustafa Öztürk</option><option>Mustafa Yağcı</option><option>Nagihan Damargüç</option><option>Nurtaç Kozak</option><option>Nurten Aydın</option><option>Onur Soğuk</option><option>Önay Çepe</option><option>Özcan Aykın</option><option>Özer Akgümüş</option><option>Öznur Saat Yıldırım</option><option>Rahim Ural</option><option>Recep Üstünel</option><option>Rıdvan Çelebi</option><option>Rümeysa Enise Özdemir</option><option>Rüştü Bayındır</option><option>Salih Yıldırır</option><option>Selim Yüksel</option><option>Semih Akpınar</option><option>Sercan Dural</option><option>Serkan Yeşilkan</option><option>Sinan Aydın</option><option>Şenol Aydın</option><option>Sinem Şentürk</option><option>Şükrü Akkoyun</option><option>Tuncay Ateş</option><option>Umut Öncül</option><option>Uzay Arslantürk</option><option>Veysel Boynueğri</option><option>Yaşar Aslan</option><option>Yavuz Tuna</option><option>Yunus Turan</option>
+                                    </select>
+                                </div>
+                                <div class="lg:col-span-2"><label class="block text-sm font-semibold text-gray-600 mb-1">Not</label><textarea name="not" rows="3" class="form-input mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 shadow-sm transition duration-300"></textarea></div>
+                                
+                                <div class="md:col-span-2 lg:col-span-3 text-right pt-4">
+                                    <button id="submit-button" type="submit" class="inline-flex items-center justify-center py-2.5 px-6 border border-transparent shadow-lg text-sm font-medium rounded-lg text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform hover:scale-105 transition-all duration-300">
+                                        <i id="submit-icon" class="fas fa-check mr-2"></i><span id="submit-text">Kaydet</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Alan: Liste Tablo Alanı -->
+                <div class="bg-white rounded-xl shadow-lg border border-gray-200/80">
+                    <button class="collapsible-trigger w-full p-5 text-left font-bold text-lg text-indigo-700 flex justify-between items-center hover:bg-gray-50 rounded-t-xl transition-colors duration-200" data-target="liste-tablo-alani">
+                         <span class="flex items-center"><i class="fas fa-list-ul mr-3 text-indigo-500"></i>Çekim Listesi</span>
+                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                    </button>
+                    <div id="liste-tablo-alani" class="collapsible-content">
+                         <div class="p-2 sm:p-4 border-t border-gray-200">
+                            <div class="overflow-x-auto">
+                                <table id="cekim-tablosu" class="min-w-full border-collapse">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">Çekim Tarihi</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">Sınav Türü</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">Anlatım Türü</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">Video Kodu</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">Branş</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">Ünite</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">Bölüm</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">Ders</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">Test Adı</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">Soru Sayısı</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">Not</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">Anlatıcı Öğretmen</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">Yönetmen</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">Akademik Dinleyici</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">İşlemler</th>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-1 border border-gray-200"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-sm rounded-md border-gray-200 focus:ring-0 focus:border-indigo-300" data-column="0"></td>
+                                            <td class="p-1 border border-gray-200"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-sm rounded-md border-gray-200 focus:ring-0 focus:border-indigo-300" data-column="1"></td>
+                                            <td class="p-1 border border-gray-200"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-sm rounded-md border-gray-200 focus:ring-0 focus:border-indigo-300" data-column="2"></td>
+                                            <td class="p-1 border border-gray-200"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-sm rounded-md border-gray-200 focus:ring-0 focus:border-indigo-300" data-column="3"></td>
+                                            <td class="p-1 border border-gray-200"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-sm rounded-md border-gray-200 focus:ring-0 focus:border-indigo-300" data-column="4"></td>
+                                            <td class="p-1 border border-gray-200"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-sm rounded-md border-gray-200 focus:ring-0 focus:border-indigo-300" data-column="5"></td>
+                                            <td class="p-1 border border-gray-200"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-sm rounded-md border-gray-200 focus:ring-0 focus:border-indigo-300" data-column="6"></td>
+                                            <td class="p-1 border border-gray-200"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-sm rounded-md border-gray-200 focus:ring-0 focus:border-indigo-300" data-column="7"></td>
+                                            <td class="p-1 border border-gray-200"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-sm rounded-md border-gray-200 focus:ring-0 focus:border-indigo-300" data-column="8"></td>
+                                            <td class="p-1 border border-gray-200"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-sm rounded-md border-gray-200 focus:ring-0 focus:border-indigo-300" data-column="9"></td>
+                                            <td class="p-1 border border-gray-200"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-sm rounded-md border-gray-200 focus:ring-0 focus:border-indigo-300" data-column="10"></td>
+                                            <td class="p-1 border border-gray-200"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-sm rounded-md border-gray-200 focus:ring-0 focus:border-indigo-300" data-column="11"></td>
+                                            <td class="p-1 border border-gray-200"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-sm rounded-md border-gray-200 focus:ring-0 focus:border-indigo-300" data-column="12"></td>
+                                            <td class="p-1 border border-gray-200"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-sm rounded-md border-gray-200 focus:ring-0 focus:border-indigo-300" data-column="13"></td>
+                                            <td class="p-1 border border-gray-200"></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cekim-tablosu-body" class="bg-white divide-y divide-gray-200">
+                                        <!-- Örnek Veri Satırı -->
+                                        <!-- Veriler LocalStorage'dan yüklenecek -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Veri listeleri
+    const bransListeleri = {
+        'TYT': ['TYT TÜRKÇE', 'TYT MATEMATİK', 'TYT FİZİK', 'TYT KİMYA', 'TYT BİYOLOJİ', 'TYT COĞRAFYA', 'TYT DİN KÜLTÜRÜ', 'TYT-AYT GEOMETRİ', 'TYT-AYT TARİH', 'TYT-AYT FELSEFE'],
+        'AYT': ['AYT EDEBİYAT', 'AYT MATEMATİK', 'AYT FİZİK', 'AYT KİMYA', 'AYT BİYOLOJİ', 'AYT COĞRAFYA', 'AYT SOSYOLOJİ-PSİKOLOJİ-MANTIK', 'TYT-AYT GEOMETRİ', 'TYT-AYT TARİH', 'TYT-AYT FELSEFE'],
+        'LGS': ['LGS TÜRKÇE', 'LGS MATEMATİK', 'LGS FEN BİLİMLERİ', 'LGS İNKILAP TARİHİ', 'LGS İNGİLİZCE', 'LGS DİN KÜLTÜRÜ']
+    };
+    const uniteListeleri = {
+        'TYT TÜRKÇE': ['SÖZCÜKTE VE SÖZ ÖBEĞİNDE ANLAM', 'CÜMLEDE ANLAM', 'PARAGRAFTA ANLAM', 'SES-YAZIM-NOKTALAMA', 'SÖZCÜK YAPISI', 'İSİM SOYLU SÖZCÜKLER', 'FİİLLER', 'SÖZCÜK GRUPLARI VE CÜMLE BİLGİSİ', 'ANLATIM BOZUKLUKLARI'],
+        'TYT MATEMATİK': ['TEMEL KAVRAMLAR', 'BÖLME BÖLÜNEBİLME', 'RASYONEL SAYILAR', 'I VE II BİLİNMEYENLİ DENKLEMLER', 'I VE II BİLİNMEYENLİ EŞİTSİZLİKLER', 'MUTLAK DEĞER', 'ÜSLÜ SAYILAR', 'KÖKLÜ SAYILAR', 'ORAN-ORANTI', 'ÇARPANLARA AYIRMA', 'SAYI PROBLEMLERİ', 'KESİR PROBLEMLERİ', 'YAŞ PROBLEMLERİ', 'YÜZDE PROBLEMLERİ', 'KARIŞIM PROBLEMLERİ', 'HIZ PROBLEMLERİ', 'EMEK PROBLEMLERİ', 'GRAFİK PROBLEMLERİ', 'TANIM VE FORMÜL KULLANABİLME', 'ÖRÜNTÜLÜ SAYI GRUPLARI', 'MANTIK', 'KÜMELER', 'SAYMA OLASILIK', 'GÖRSEL ZEKA'],
+        'TYT FİZİK': ['FİZİK BİLİMİNE GİRİŞ', 'MADDE VE ÖZELLİKLERİ', 'HAREKET', 'KUVVET', 'İŞ, GÜÇ VE ENERJİ', 'ISI VE SICAKLIK', 'ELEKTROSTATİK', 'ELEKTRİK', 'MANYETİZMA', 'BASINÇ', 'KALDIRMA KUVVETİ', 'DALGA HAREKETİ VE YAY DALGASI', 'SU DALGALARI', 'SES VE DEPREM DALGALARI', 'AYDINLANMA VE GÖLGE', 'IŞIĞIN YANSIMASI VE DÜZLEM AYNALAR', 'IŞIĞIN YANSIMASI VE KÜRESEL AYNALAR', 'IŞIĞIN KIRILMASI', 'MERCEKLER, PRİZMALAR VE RENK'],
+        'TYT KİMYA': ['KİMYA BİLİMİ', 'ATOM VE PERİYODİK SİSTEM', 'KİMYASAL TÜRLER ARASI ETKİLEŞİMLER', 'MADDENİN HALLERİ', 'DOĞA VE KİMYA', 'KİMYANIN TEMEL KANUNLARI VE KİMYASAL HESAPLAMALAR', 'KARIŞIMLAR', 'ASİTLER, BAZLAR VE TUZLAR', 'KİMYA HER YERDE'],
+        'TYT BİYOLOJİ': ['YAŞAM BİLİMİ BİYOLOJİ', 'CANLI YAPISINDAKİ BİLEŞİKLER', 'HÜCRE', 'CANLILARIN SINIFLANDIRILMASI', 'CANLI ALEMLERİ', 'HÜCRE BÖLÜNMELERİ VE ÜREME', 'KALITIM', 'EKOSİSTEM EKOLOJİSİ VE GÜNCEL ÇEVRE SORUNLARI'],
+        'TYT COĞRAFYA': ["DOĞA, İNSAN VE COĞRAFYA", "DÜNYA'NIN ŞEKLİ HAREKETLERİ", 'COĞRAFİ KONUM', 'HARİTA BİLGİSİ', 'İKLİM BİLGİSİ', 'İÇ VE DIŞ KUVVETLER', 'SU-TOPRAK-BİTKİ', "DÜNYA'DA VE TÜRKİYE'DE NÜFUS", 'EKONOMİK FAALİYETLER', 'BÖLGE KAVRAMI', 'BÖLGELER VE ÜLKELER', 'ÇEVRE VE TOPLUM'],
+        'TYT DİN KÜLTÜRÜ': ['BİLGİ VE İNANÇ', 'DİN VE İSLAM', 'İSLAM VE İBADET', 'GENÇLİK VE DEĞERLER', 'GÖNÜL COĞRAFYA', 'ALLAH VE İNSAN İLİŞKİSİ', 'HZ.MUHAMMED (S.A.V)', 'DİN VE HAYAT', 'AHLAKİ TUTUM VE DAVRANİşLAR', 'İSLAM DÜŞÜNCESİNDE İTİKADİ, SİYASİ VE FIKHİ YORUMLAR', 'DÜNYA VE AHİRET', "KUR'AN'A GÖRE HZ.MUHAMMED (S.A.V)", "KUR'AN'DA BAZI KAVRAMLAR", 'İNANÇLA İLGİLİ MESELELER', 'YAHUDİLİK VE HRİSTİYANLIK', 'İSLAM VE BİLİM', "ANADOLU'DA İSLAM", 'İSLAM DÜŞÜNCESİNDE TASAVVUFİ YORUMLAR', 'GÜNCEL DİNİ MESELELER', 'HİNT VE ÇİN DİNLERİ'],
+        'TYT-AYT GEOMETRİ': ['AÇILAR', 'ÖZEL ÜÇGENLER', 'ALAN', 'AÇIORTAY', 'KENARORTAY', 'BENZERLİK', 'AÇI-KENAR BAĞINTILARI', 'ÇOKGENLER', 'GENEL DÖRTGENLER VE DELTOİD', 'PARALELKENAR', 'EŞKENAR DÖRTGEN', 'DİKDÖRTGEN', 'KARE', 'YAMUK', 'ÇEMBERDE AÇI', 'ÇEMBERDE UZUNLUK', 'DAİREDE ALAN', 'NOKTA ANALİTİĞİ', 'DOĞRU ANALİTİĞİ', 'DÖNÜŞÜMLER', 'ÇEMBER ANALİTİĞİ', 'KATI CİSİMLER'],
+        'TYT-AYT TARİH': ['TARİH VE ZAMAN', 'İNSANLIĞIN İLK DÖNEMLERİ', "ORTA ÇAĞ'DA DÜNYA", 'İLK VE ORTA ÇAĞLARDA TÜRK DÜNYASI', 'İSLAM MEDENİYETİNİN DOĞUŞU', 'TÜRKLERİN İSLAMİYETİ KABULÜ', 'YERLEŞME VE DEVLETLEŞME SÜRECİNDE SELÇUKLU', 'BEYLİKTEN DEVLETE OSMANLI SİYASETİ', 'DEVLETLEŞME SÜRECİNDE SAVAŞÇILAR VE ASKERLER', 'BEYLİKTEN DEVLETE OSMANLI MEDENİYETİ', 'DÜNYA GÜCÜ OSMANLI', 'SULTAN VE OSMANLI MERKEZ TEŞKİLATI', "KLASİK ÇAĞ'DA OSMANLI TOPLUM DÜZENİ", 'DEĞİŞEN DÜNYA DENGELERİ KARŞISINDA OSMANLI', 'DEĞİŞİM ÇAĞINDA AVRUPA VE OSMANLI', 'DEVRİMLER ÇAĞINDA DEĞİŞEN DEVLET-TOPLUM İLİŞKİLERİ', 'ULUSLARARASI İLİŞKİLERDE DENGE STRATEJİSİ', 'XIX. VE XX.YÜZYILDA DEĞİŞEN SOSYO-EKONOMİK HAYAT', 'XX.YÜZYIL BAŞLARINDA OSMANLI DEVLETİ VE DÜNYA', 'MİLLİ MÜCADELE', 'ATATÜRKÇÜLÜK VE TÜRK İNKILABI', 'İKİ SAVAŞ ARASINDAKİ DÖNEMDE TÜRKİYE VE DÜNYA', 'II.DÜNYA SAVAŞI SÜRECİNDE TÜRKİYE VE DÜNYA', 'II.DÜNYA SAVAŞI SONRASINDA TÜRKİYE VE DÜNYA', 'TOPLUMSAL DEVRİM ÇAĞINDA DÜNYA VE TÜRKİYE', '21.YÜZYIL EŞİĞİNDE TÜRKİYE VE DÜNYA'],
+        'TYT-AYT FELSEFE': ['FELSEFEYİ TANIMA', 'FELSEFE İLE DÜŞÜNME', 'FELSEFENİN TEMEL KONULARI VE PROBLEMLERİ', 'FELSEFİ OKUMA VE YAZMA', 'MÖ 6.YÜZYIL-MS 2.YÜZYIL FELSEFESİ', 'MS. 2.YÜZYIL-15.YÜZYIL FELSEFESİ', '15.YÜZYIL-17.YÜZYIL FELSEFESİ', '18.YÜZYIL-19.YÜZYIL FELSEFESİ', '20.YÜZYIL FELSEFESİ'],
+        'AYT EDEBİYAT': ['TÜRK DİLİ VE EDEBİYATINA GİRİŞ', 'COŞKU VE HEYECANI DİLE GETİREN METİNLER', 'İSLAMİYET ÖNCESİ VE İSLAMİ DÖNEM TÜRK ŞİİRİ', 'TANZİMATTA MİLLİ EDEBİYATA TÜRK ŞİİRİ', 'CUMHURİYET DÖNEMİ TÜRK ŞİİRİ', 'TANZİMATTAN CUMHURİYETE HİKAYE', 'TANZİMATTAN CUMHURİYETE ROMAN', 'TANZİMATTAN CUMHURİYETE TİYATRO', 'BATI EDEBİYATI VE EDEBİ AKIMLAR'],
+        'AYT MATEMATİK': ['FONKSİYONLAR', 'POLİNOMLAR', 'II.DERECEDEN DENKLEMLER', 'PARABOL', 'EŞİTSİZLİKLER', 'LOGARİTMA', 'DİZİLER', 'TRİGONOMETRİ', 'LİMİT', 'TÜREV', 'İNTEGRAL'],
+        'AYT FİZİK': ['VEKTÖRLER', 'BAĞIL HAREKET', "NEWTON'IN HAREKET YASALARI", 'BİR BOYUTTA SABİT İVMELİ HAREKET', 'BİR VE İKİ BOYUTTA HAREKET', 'ENERJİ', 'İTME VE ÇİZGİSEL MOMENTUM', 'DENGE VE DENGE ŞARTLARI', 'BASİT MAKİNELER', 'ELEKTRİK', 'MANYETİZMA', 'ALTERNATİF AKIM', 'ÇEMBERSEL HAREKET', 'BASİT HARMONİK HAREKET', 'DALGA MEKANİĞİ', 'ATOM FİZİĞİNE GİRİŞ', 'MODERN FİZİK', 'MODERN FİZİĞİN TEKNOLOJİDEKİ UYGULAMALARI'],
+        'AYT KİMYA': ['KARBON KİMYASINA GİRİŞ', 'ENERJİ KAYNAKLARI', 'MODERN ATOM TEORİSİ', 'GAZLAR', 'SIVI ÇÖZELTİLER', 'KİMYASAL TEPKİMELERDE HIZ', 'KİMYASAL TEPKİMELERDE ENERJİ', 'KİMYASAL TEPKİMELERDE DENGE', 'KİMYA VE ELEKTRİK'],
+        'AYT BİYOLOJİ': ['İNSAN FİZYOLOJİSİ', 'KOMÜNİTE VE POPÜLASYON EKOLOJİSİ', 'GENDEN PROTEİNE', 'CANLILARDA ENERJİ DÖNÜŞÜMLERİ', 'BİTKİ BİYOLOJİSİ'],
+        'AYT COĞRAFYA': ['BİYOÇEŞİTLİLİK', 'EKSTREM DOĞA OLAYLARI', 'NÜFUS POLİTİKALARI', 'DOĞAL KAYNAKLAR', "TÜRKİYE'DE EKONOMİ, TARIM, HAYVANCILIK VE ORMANCILIK", "TÜRKİYE'DE MADENLER VE ENERJİ KAYNAKLARI", "TÜRKİYE'DE ULAŞIM, TİCARET VE TURİZM", "TÜRKİYE'NİN İŞLEVSEL BÖLGELERİ VE BÖLGESEL KALKINMA PROJELERİ", 'İLK KÜLTÜR MERKEZLERİ', 'DOĞAL KAYNAKLARIN ETKİLERİ, ÜLKELER ARASI ETKİLEŞİM', 'ULUSLARARASI ÖRGÜTLER', 'ÇEVRE VE TOPLUM'],
+        'AYT SOSYOLOJİ-PSİKOLOJİ-MANTIK': ['SOSYOLOJİYE GİRİŞ', 'BİREY VE TOPLUM', 'TOPLUMSAL YAPI', 'TOPLUMSAL DEĞİŞME VE GELİŞME', 'TOPLUM VE KÜLTÜR', 'TOPLUMSAL KURUMLAR', 'PSİKOLOJİ BİLİMİNİ TANIYALIM', 'PSKİLOJİNİN TEMEL SÜREÇLERİ', 'ÖĞRENME-BELLEK-DÜŞÜNME', 'RUH SAĞLIĞININ TEMELLERİ', 'MANTIĞA GİRİŞ', 'KLASİK MANTIK', 'MANTIK VE DİL', 'SEMBOLİK MANTIK'],
+        'LGS TÜRKÇE': ['SÖZCÜKTE ANLAM', 'CÜMLEDE ANLAM', 'METİNDE ANLAM', 'SÖZEL MANTIK', 'FİİLİMSİLER', 'CÜMLENİN ÖGELERİ', 'FİİİLDE ÇATI', 'CÜMLE TÜRLERİ', 'ANLATIM BOZUKLUKLARI', 'YAZIM KURALLARI', 'NOKTALAMA İŞARETLERİ'],
+        'LGS MATEMATİK': ['ÇARPANLAR VE KATLAR', 'ÜSLÜ İFADELER', 'KAREKÖKLÜ İFADELER', 'VERİ ANALİZİ', 'OLASILIK', 'CEBİRSEL İFADELER', 'DENKLEMLER', 'EŞİTSİZLİKLER', 'ÜÇGENLER', 'BENZERLİK', 'DÖNÜŞÜM GEOMETRİSİ', 'GEOMETRİK CİSİMLER'],
+        'LGS İNKILAP TARİHİ': ['BİR KAHRAMAN DOĞUYOR', 'MİLLİ UYANIŞ', 'MİLLİ BİR DESTAN', 'ATATÜRKÇÜLÜK VE ÇAĞDAŞLAŞAN TÜRKİYE', 'DEMOKRATİKLEŞME ÇABALARI', 'ATATÜRK DÖNEMİ DIŞ POLİTİKA', "ATATÜRK'ÜN ÖLÜMÜ VE SONRASI"],
+        'LGS FEN BİLİMLERİ': ['MEVSİMLER VE İKLİM', 'DNA VE GENETİK KOD', 'BASINÇ', 'MADDE VE ENDÜSTRİ', 'BASİT MAKİNELER', 'ENERJİ DÖNÜŞÜMLERİ', 'ELEKTRİK YÜKLERİ'],
+        'LGS DİN KÜLTÜRÜ': ['KAZA VE KADER İNANCI', 'ZEKAT VE SADAKA', 'DİN VE HAYAT', "HZ.MUHAMMED'İN ÖRNEKLİĞİ", 'KUR\'AN-I KERİM VE ÖZELLİKLERİ'],
+        'LGS İNGİLİZCE': ['FRIENDSHIP', 'TEEN LIFE', 'IN THE KITCHEN', 'ON THE PHONE', 'THE INTERNET', 'ADVENTURES', 'TOURISM', 'CHORES', 'SCIENCE', 'NATURAL FORCES'],
+    };
+
+    const sinavTuruSelect = document.getElementById('sinav-turu-select');
+    const bransSelect = document.getElementById('brans-select');
+    const uniteSelect = document.getElementById('unite-select');
+    const cekForm = document.getElementById('cek-form');
+    const tableBody = document.getElementById('cekim-tablosu-body');
+
+    // ARAMA YAPILABİLİR DROPDOWN FONKSİYONU
+    function createSearchableDropdown(selectElement) {
+        const container = document.createElement('div');
+        container.className = 'searchable-select-container relative';
+        selectElement.parentNode.insertBefore(container, selectElement);
+        selectElement.style.display = 'none';
+        container.appendChild(selectElement);
+
+        const displayButton = document.createElement('button');
+        displayButton.type = 'button';
+        displayButton.className = 'form-input mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 shadow-sm text-left flex justify-between items-center';
+        
+        const displaySpan = document.createElement('span');
+        displaySpan.className = 'truncate p-2';
+        displayButton.appendChild(displaySpan);
+
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-chevron-down text-gray-400 mr-2';
+        displayButton.appendChild(icon);
+        container.appendChild(displayButton);
+
+        const dropdown = document.createElement('div');
+        dropdown.className = 'searchable-select-dropdown hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg';
+        
+        const searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.placeholder = 'Ara...';
+        searchInput.className = 'search-input block w-full p-2 border-b border-gray-200';
+        dropdown.appendChild(searchInput);
+
+        const optionsList = document.createElement('div');
+        optionsList.className = 'p-1';
+        dropdown.appendChild(optionsList);
+        container.appendChild(dropdown);
+
+        const updateOptions = () => {
+            optionsList.innerHTML = '';
+            Array.from(selectElement.options).forEach(option => {
+                if (option.value === "" && option.textContent.includes('Seçiniz')) return;
+                const optionDiv = document.createElement('div');
+                optionDiv.textContent = option.textContent;
+                optionDiv.dataset.value = option.value;
+                optionDiv.className = 'p-2 cursor-pointer hover:bg-indigo-100 rounded text-sm';
+                optionDiv.addEventListener('click', () => {
+                    selectElement.value = option.value;
+                    displaySpan.textContent = option.textContent;
+                    displaySpan.classList.remove('text-gray-400');
+                    dropdown.classList.add('hidden');
+                    selectElement.dispatchEvent(new Event('change'));
+                });
+                optionsList.appendChild(optionDiv);
+            });
+            const selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`) || selectElement.options[0];
+            if (selectedOption) {
+                displaySpan.textContent = selectedOption.textContent;
+                if(selectedOption.value === "") displaySpan.classList.add('text-gray-400');
+                else displaySpan.classList.remove('text-gray-400');
+            }
+        };
+
+        searchInput.addEventListener('input', () => {
+            const filter = searchInput.value.toLowerCase();
+            optionsList.querySelectorAll('div').forEach(optionDiv => {
+                const text = optionDiv.textContent.toLowerCase();
+                optionDiv.style.display = text.includes(filter) ? '' : 'none';
+            });
+        });
+
+        displayButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+             if(selectElement.disabled) return;
+            document.querySelectorAll('.searchable-select-dropdown').forEach(d => {
+                if(d !== dropdown) d.classList.add('hidden');
+            });
+            dropdown.classList.toggle('hidden');
+            if(!dropdown.classList.contains('hidden')) {
+                searchInput.value = '';
+                searchInput.dispatchEvent(new Event('input'));
+                searchInput.focus();
+            }
+        });
+        
+        selectElement.updateDropdown = updateOptions;
+        updateOptions();
+    }
+
+    document.querySelectorAll('.searchable-select').forEach(createSearchableDropdown);
+
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.searchable-select-dropdown').forEach(d => d.classList.add('hidden'));
+    });
+
+    const updateSelectDisplay = (selectElement) => {
+        if(selectElement.updateDropdown) {
+           selectElement.updateDropdown();
+        }
+    }
+
+    sinavTuruSelect.addEventListener('change', () => {
+        const secilenSinavTuru = sinavTuruSelect.value;
+        const branslar = bransListeleri[secilenSinavTuru] || [];
+
+        bransSelect.innerHTML = '<option value="" selected>Seçiniz...</option>';
+        uniteSelect.innerHTML = '<option value="" selected>Önce branş seçiniz...</option>';
+        bransSelect.disabled = branslar.length === 0;
+        uniteSelect.disabled = true;
+
+        branslar.forEach(brans => {
+            const option = document.createElement('option');
+            option.value = brans;
+            option.textContent = brans;
+            bransSelect.appendChild(option);
+        });
+        
+        updateSelectDisplay(bransSelect);
+        updateSelectDisplay(uniteSelect);
+    });
+
+    bransSelect.addEventListener('change', () => {
+        const secilenBrans = bransSelect.value;
+        const uniteler = uniteListeleri[secilenBrans] || [];
+        
+        uniteSelect.innerHTML = '<option value="" selected>Seçiniz...</option>';
+        uniteSelect.disabled = uniteler.length === 0;
+
+        uniteler.forEach(unite => {
+            const option = document.createElement('option');
+            option.value = unite;
+            option.textContent = unite;
+            uniteSelect.appendChild(option);
+        });
+        updateSelectDisplay(uniteSelect);
+    });
+
+
+    // Kısaltılabilir alanlar için fonksiyon
+    const triggers = document.querySelectorAll('.collapsible-trigger');
+    triggers.forEach(trigger => {
+        trigger.addEventListener('click', () => {
+            const content = document.getElementById(trigger.dataset.target);
+            const icon = trigger.querySelector('i.fas');
+            
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+                icon.classList.remove('rotate-180');
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+                icon.classList.add('rotate-180');
+            } 
+        });
+    });
+
+    // Tablo filtreleme fonksiyonu
+    const filterInputs = document.querySelectorAll('.filter-input');
+    filterInputs.forEach(input => {
+        input.addEventListener('keyup', () => {
+            const table = document.getElementById('cekim-tablosu');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            const filters = Array.from(filterInputs).map(i => i.value.toLowerCase());
+
+            for (let i = 0; i < rows.length; i++) {
+                let display = true;
+                for (let j = 0; j < filters.length; j++) {
+                    if (filters[j]) {
+                        const cell = rows[i].getElementsByTagName('td')[j];
+                        if (cell) {
+                            const cellText = (cell.querySelector('div')?.title || cell.innerText).toLowerCase();
+                            if (cellText.indexOf(filters[j]) === -1) {
+                                display = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                rows[i].style.display = display ? '' : 'none';
+            }
+        });
+    });
+    
+    // FORM İŞLEMLERİ (EKLEME/GÜNCELLEME)
+    cekForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const editingId = document.getElementById('editing-row-index').value;
+        const formData = new FormData(cekForm);
+        const data = Object.fromEntries(formData.entries());
+
+        const cekimler = JSON.parse(localStorage.getItem('cekimListesi')) || [];
+
+        if (editingId) {
+            // GÜNCELLEME MODU
+            const cekimIndex = cekimler.findIndex(c => c.id === editingId);
+            if (cekimIndex > -1) {
+                // Sadece bu formdaki alanları güncelle, yönetmen ve akademik dinleyiciyi koru
+                const mevcutCekim = cekimler[cekimIndex];
+                cekimler[cekimIndex] = { ...mevcutCekim, ...data, id: editingId };
+            }
+        } else {
+            // EKLEME MODU
+            const newCekim = { 
+                ...data, 
+                id: crypto.randomUUID(), 
+                yonetmen: '', 
+                akademikDinleyici: '' 
+            };
+            cekimler.push(newCekim);
+        }
+        
+        localStorage.setItem('cekimListesi', JSON.stringify(cekimler));
+        renderTable();
+        resetForm();
+    });
+
+    function renderTable() {
+        const cekimler = JSON.parse(localStorage.getItem('cekimListesi')) || [];
+        tableBody.innerHTML = ''; // Tabloyu temizle
+
+        // Verileri en yeniden eskiye sırala
+        cekimler.sort((a, b) => new Date(b.cekimTarihi) - new Date(a.cekimTarihi));
+
+        cekimler.forEach(data => {
+            const newRow = tableBody.insertRow();
+            newRow.className = 'hover:bg-indigo-50 transition-colors duration-200';
+            const date = new Date(data.cekimTarihi + 'T00:00:00');
+            const formattedDate = data.cekimTarihi ? `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}` : '';
+
+            newRow.innerHTML = `
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-center align-middle border border-gray-200">${formattedDate}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-center align-middle border border-gray-200">${data.sinavTuru || ''}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-center align-middle border border-gray-200">${data.anlatimTuru || ''}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-center align-middle border border-gray-200">${data.videoKodu || ''}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-center align-middle border border-gray-200">${data.brans || ''}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-center align-middle border border-gray-200">${data.unite || ''}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-center align-middle border border-gray-200">${data.bolum || ''}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-center align-middle border border-gray-200">${data.ders || ''}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-center align-middle border border-gray-200">${data.testAdi || ''}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-center align-middle border border-gray-200">${data.soruSayisi || ''}</td>
+                <td class="px-4 py-4 text-sm text-center align-middle border border-gray-200"><div class="max-w-[150px] mx-auto whitespace-nowrap overflow-hidden text-ellipsis" title="${data.not || ''}">${(data.not || '').substring(0,25)}${(data.not || '').length > 25 ? '...' : ''}</div></td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-center align-middle border border-gray-200">${data.anlaticiOgretmen || ''}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-center align-middle border border-gray-200">${data.yonetmen || ''}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-center align-middle border border-gray-200">${data.akademikDinleyici || ''}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-center align-middle border border-gray-200">
+                    <div class="flex items-center justify-center space-x-2">
+                        <button title="Düzenle" class="text-indigo-600 hover:text-indigo-900 p-2 rounded-full hover:bg-indigo-100 transition-colors duration-200 edit-row" data-id="${data.id}"><i class="fas fa-edit"></i></button>
+                        <button title="Sil" class="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-100 transition-colors duration-200 delete-row" data-id="${data.id}"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            `;
+        });
+    }
+
+    function resetForm() {
+        cekForm.reset();
+        document.getElementById('editing-row-index').value = '';
+
+        // Form başlığını ve butonunu sıfırla
+        document.getElementById('form-title').innerHTML = '<i class="fas fa-plus-circle mr-3 text-indigo-500"></i>Çekim Ekle';
+        document.getElementById('submit-text').textContent = 'Kaydet';
+        document.getElementById('submit-icon').className = 'fas fa-check mr-2';
+
+        // Arama yapılabilir select'leri sıfırla
+        cekForm.querySelectorAll('.searchable-select').forEach(sel => {
+            sel.value = '';
+            updateSelectDisplay(sel);
+        });
+
+        // Bağımlı select'leri sıfırla
+        bransSelect.disabled = true;
+        uniteSelect.disabled = true;
+        updateSelectDisplay(bransSelect);
+        updateSelectDisplay(uniteSelect);
+    }
+
+    // TABLO İŞLEMLERİ (SİLME/DÜZENLEME)
+    tableBody.addEventListener('click', function(e) {
+        const deleteButton = e.target.closest('.delete-row');
+        const editButton = e.target.closest('.edit-row');
+
+        if (deleteButton) {
+            e.preventDefault();
+            const id = deleteButton.dataset.id;
+            let cekimler = JSON.parse(localStorage.getItem('cekimListesi')) || [];
+            cekimler = cekimler.filter(c => c.id !== id);
+            localStorage.setItem('cekimListesi', JSON.stringify(cekimler));
+            renderTable();
+        }
+
+        if (editButton) {
+            e.preventDefault();
+            const id = editButton.dataset.id;
+            const cekimler = JSON.parse(localStorage.getItem('cekimListesi')) || [];
+            const cekim = cekimler.find(c => c.id === id);
+            if (!cekim) return;
+            
+            // Verileri forma doldur
+            cekForm.elements.cekimTarihi.value = cekim.cekimTarihi;
+            cekForm.elements.videoKodu.value = cekim.videoKodu;
+            cekForm.elements.testAdi.value = cekim.testAdi;
+            cekForm.elements.soruSayisi.value = cekim.soruSayisi;
+            cekForm.elements.not.value = cekim.not;
+
+            // Select'leri doldur
+            function setSelectValue(selectName, value) {
+                const select = cekForm.elements[selectName];
+                select.value = value;
+                select.dispatchEvent(new Event('change'));
+                updateSelectDisplay(select);
+            }
+
+            setSelectValue('sinavTuru', cekim.sinavTuru);
+            
+            // Bağımlı select'ler için verinin yüklenmesini beklemek gerekebilir
+            setTimeout(() => {
+                setSelectValue('brans', cekim.brans);
+                setTimeout(() => {
+                    setSelectValue('unite', cekim.unite);
+                }, 100);
+            }, 100);
+
+            setSelectValue('anlatimTuru', cekim.anlatimTuru);
+            setSelectValue('bolum', cekim.bolum);
+            setSelectValue('ders', cekim.ders);
+            setSelectValue('anlaticiOgretmen', cekim.anlaticiOgretmen);
+            
+            // Formu düzenleme moduna geçir
+            document.getElementById('editing-row-index').value = id;
+            document.getElementById('form-title').innerHTML = '<i class="fas fa-edit mr-3 text-indigo-500"></i>Kaydı Düzenle';
+            document.getElementById('submit-text').textContent = 'Güncelle';
+            document.getElementById('submit-icon').className = 'fas fa-sync-alt mr-2';
+
+            // Formu aç ve yukarı kaydır
+            const formContent = document.getElementById('cekim-ekle-form');
+            if (!formContent.style.maxHeight) {
+                formContent.parentElement.querySelector('.collapsible-trigger').click();
+            }
+            document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+
+    renderTable(); // Sayfa ilk yüklendiğinde verileri yükle
+    window.addEventListener('storage', renderTable); // Başka bir sekmede veri değişirse yenile
+
+});
+</script>
+
+</body>
+</html>
