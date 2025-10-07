@@ -318,12 +318,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
-    function getCekimlerFromStorage() {
-        return JSON.parse(localStorage.getItem('cek_kayitlari_udb') || '[]');
+   function getCekimlerFromStorage() {
+        // 'cek_kayitlari_udb' ismini 'cekimListesi' olarak değiştirin
+        return JSON.parse(localStorage.getItem('cekimListesi') || '[]');
     }
 
     function saveCekimlerToStorage(cek_kayitlari) {
-        localStorage.setItem('cek_kayitlari_udb', JSON.stringify(cek_kayitlari));
+        // 'cek_kayitlari_udb' ismini 'cekimListesi' olarak değiştirin
+        localStorage.setItem('cekimListesi', JSON.stringify(cek_kayitlari));
     }
     
     function loadAndDisplayCekimler() {
@@ -442,4 +444,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
