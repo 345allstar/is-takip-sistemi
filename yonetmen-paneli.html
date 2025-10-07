@@ -12,7 +12,6 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
-        .collapsible-content.open { max-height: 1000px; /* İçeriğe yetecek kadar büyük bir değer */ }
         .searchable-select-container { position: relative; }
         .searchable-select-dropdown {
             position: absolute;
@@ -61,7 +60,7 @@
                     <h2 class="text-xl font-bold text-gray-800 flex items-center"><i class="fas fa-user-edit mr-3 text-indigo-500"></i><span id="form-title">Çekim Detayları ve Atama</span></h2>
                     <i class="fas fa-chevron-down transform transition-transform text-gray-500"></i>
                 </div>
-                <div class="collapsible-content open mt-4">
+                <div class="collapsible-content mt-4">
     <form id="cek-form" class="space-y-6">
         </form>
 </div>
@@ -146,6 +145,7 @@
     
     <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // --- GEREKLİ ELEMENTLER VE VERİLER ---
     const cekForm = document.getElementById('cek-form');
     const tableBody = document.getElementById('cekim-tablosu-body');
     const editingIdInput = document.getElementById('editing-row-id');
@@ -155,6 +155,42 @@ document.addEventListener('DOMContentLoaded', () => {
     const yonetmenler = ["Sait Eralkan", "Anıl Kolay", "Batuhan Gültekin", "Nurdan Özveren", "Merve Çoklar", "Gözde Bulut", "Ali Yıldırım", "Raşit Güngör"];
     const akademikDinleyiciler = ["Ali Yıldırım", "İsmail Tolga Aktaş", "Rahim Ural", "Burak Onay", "Betül Çiçek", "Sinem Şentürk", "Ahmet Ölmez", "Barış Özcan", "Cem Oğuz Büke", "Cihat Çiçek", "Didem Özbay Sarıaydın", "Eda Güney", "Edip İçli", "Elif Bozkurt", "Emine Bolat Kırbıyık", "Esra Dindar", "Esra Şahin", "Esra Yurttaş", "Firdevs Bozkurt", "Fuat Ses", "Hülya Güçkan Taşkın", "İbrahim Atakuru", "İbrahim Halil Kesici", "Koray Dindar", "Mehmet Bademli", "Mehmet Kırbıyık", "Muharrem Akbaş", "Özcan Kulaksız", "Raziye İnal", "Sabri Bingöl", "Semih Sunucuoğlu", "Serkan Yıldız", "Serpil Tunç İçli", "Suat Emre", "Tuğba Bostancı", "Yasin Baş", "Yavuz Selim Yıldız", "Yok"];
 
+    // --- AÇILIR/KAPANIR ALANLARIN YÖNETİMİ ---
+    // 1. Tıklama olayını yöneten kod
+    document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
+        trigger.addEventListener('click', () => {
+            const content = trigger.nextElementSibling;
+            const icon = trigger.querySelector('i:last-child');
+
+            if (icon) {
+                icon.classList.toggle('rotate-180');
+            }
+
+            if (content) {
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }
+            }
+        });
+    });
+
+    // 2. Sayfa ilk yüklendiğinde tüm alanları açık hale getiren kod
+    document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
+        const content = trigger.nextElementSibling;
+        const icon = trigger.querySelector('i:last-child');
+        
+        if (content) {
+            content.style.maxHeight = content.scrollHeight + "px";
+        }
+        if (icon) {
+            icon.classList.add('rotate-180');
+        }
+    });
+
+
+    // --- ARAMA YAPILABİLİR DROPDOWN FONKSİYONLARI ---
     function populateSelect(selectId, data) {
         const select = document.getElementById(selectId);
         data.forEach(item => {
@@ -169,16 +205,8 @@ document.addEventListener('DOMContentLoaded', () => {
     populateSelect('akademik-dinleyici', akademikDinleyiciler);
 
     function closeAllDropdowns() {
-        document.querySelectorAll('.searchable-select-dropdown').forEach(d => {
-            d.classList.add('hidden');
-            const collapsible = d.closest('.collapsible-content');
-            if (collapsible) {
-                collapsible.style.overflow = 'hidden';
-            }
-        });
-        if (formContainer) {
-            formContainer.classList.remove('is-active');
-        }
+        document.querySelectorAll('.searchable-select-dropdown').forEach(d => d.classList.add('hidden'));
+        if (formContainer) formContainer.classList.remove('is-active');
     }
 
     document.addEventListener('click', closeAllDropdowns);
@@ -210,11 +238,8 @@ document.addEventListener('DOMContentLoaded', () => {
         optionsList.className = 'p-1';
         dropdown.appendChild(optionsList);
         container.appendChild(dropdown);
-        const collapsibleParent = selectElement.closest('.collapsible-content');
-
-        dropdown.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
+        
+        dropdown.addEventListener('click', (e) => e.stopPropagation());
 
         const updateOptions = () => {
             optionsList.innerHTML = '';
@@ -253,21 +278,15 @@ document.addEventListener('DOMContentLoaded', () => {
             e.stopPropagation();
             if (selectElement.disabled) return;
             const isCurrentlyHidden = dropdown.classList.contains('hidden');
-            
             closeAllDropdowns();
-
             if (isCurrentlyHidden) {
                 dropdown.classList.remove('hidden');
-                if (collapsibleParent) {
-                    collapsibleParent.style.overflow = 'visible';
-                }
                 if(formContainer) formContainer.classList.add('is-active');
                 searchInput.value = '';
                 searchInput.dispatchEvent(new Event('input'));
                 searchInput.focus();
             }
         });
-
         selectElement.updateDropdown = updateOptions;
         updateOptions();
     }
@@ -279,27 +298,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
-        trigger.addEventListener('click', () => {
-            const content = trigger.nextElementSibling;
-            content.classList.toggle('open');
-            trigger.querySelector('i:last-child').classList.toggle('rotate-180');
-        });
-    });
-    
-   function getCekimlerFromStorage() {
-        // 'cek_kayitlari_udb' ismini 'cekimListesi' olarak değiştirin
+    // --- VERİ YÖNETİMİ VE TABLO İŞLEMLERİ ---
+    function getCekimlerFromStorage() {
         return JSON.parse(localStorage.getItem('cekimListesi') || '[]');
     }
 
     function saveCekimlerToStorage(cek_kayitlari) {
-        // 'cek_kayitlari_udb' ismini 'cekimListesi' olarak değiştirin
         localStorage.setItem('cekimListesi', JSON.stringify(cek_kayitlari));
     }
     
     function loadAndDisplayCekimler() {
         const cek_kayitlari = getCekimlerFromStorage();
-        const atamaBekleyenler = cek_kayitlari.filter(kayit => kayit.tarih);
+        // Yönetmeni atanmamış olanları filtrele
+        const atamaBekleyenler = cek_kayitlari.filter(kayit => !kayit.yonetmen);
         tableBody.innerHTML = '';
 
         if (atamaBekleyenler.length === 0) {
@@ -308,11 +319,18 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             noDataMessage.classList.add('hidden');
             document.getElementById('cekim-tablosu').classList.remove('hidden');
+            
+            // Tarihe göre en yeniden eskiye sırala
+            atamaBekleyenler.sort((a, b) => new Date(b.cekimTarihi) - new Date(a.cekimTarihi));
+
             atamaBekleyenler.forEach(kayit => {
                 const row = tableBody.insertRow();
                 row.dataset.id = kayit.id;
+                const date = new Date(kayit.cekimTarihi + 'T00:00:00');
+                const formattedDate = kayit.cekimTarihi ? `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}` : '';
+
                 row.innerHTML = `
-                    <td class="p-3 text-sm">${kayit.tarih || ''}</td>
+                    <td class="p-3 text-sm">${formattedDate || ''}</td>
                     <td class="p-3 text-sm">${kayit.sinavTuru || ''}</td>
                     <td class="p-3 text-sm">${kayit.anlatimTuru || ''}</td>
                     <td class="p-3 text-sm">${kayit.videoKodu || ''}</td>
@@ -321,11 +339,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="p-3 text-sm">${kayit.bolum || ''}</td>
                     <td class="p-3 text-sm">${kayit.testAdi || ''}</td>
                     <td class="p-3 text-sm">${kayit.soruSayisi || ''}</td>
-                    <td class="p-3 text-sm">${kayit.anlatici || ''}</td>
-                    <td class="p-3 text-sm font-semibold ${kayit.yonetmen ? 'text-green-600' : 'text-gray-500'}">${kayit.yonetmen || 'Atanmadı'}</td>
-                    <td class="p-3 text-sm font-semibold ${kayit.akademikDinleyici ? 'text-green-600' : 'text-gray-500'}">${kayit.akademikDinleyici || 'Atanmadı'}</td>
+                    <td class="p-3 text-sm">${kayit.anlaticiOgretmen || ''}</td>
+                    <td class="p-3 text-sm font-semibold text-gray-500">Atanmadı</td>
+                    <td class="p-3 text-sm font-semibold text-gray-500">Atanmadı</td>
                     <td class="p-3 text-sm">
-                        <button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="Düzenle"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="Ata"><i class="fas fa-pencil-alt"></i></button>
                     </td>
                 `;
             });
@@ -350,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
             editingIdInput.value = '';
             updateSelectDisplay(document.getElementById('yonetmen'));
             updateSelectDisplay(document.getElementById('akademik-dinleyici'));
-            alert('Kayıt başarıyla güncellendi!');
+            alert('Atama başarıyla güncellendi!');
         }
     });
     
@@ -369,16 +387,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('akademik-dinleyici').value = kayit.akademikDinleyici || '';
                 updateSelectDisplay(document.getElementById('yonetmen'));
                 updateSelectDisplay(document.getElementById('akademik-dinleyici'));
-                window.scrollTo(0, 0);
-                const formCollapsible = document.querySelector('#form-container .collapsible-content');
-                if(!formCollapsible.classList.contains('open')){
-                     formCollapsible.classList.add('open');
-                     formCollapsible.previousElementSibling.querySelector('i:last-child').classList.add('rotate-180');
-                }
+                document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
             }
         }
     });
 
+    // --- TABLO FİLTRELEME ---
     function applyFilters() {
         const rows = tableBody.querySelectorAll('tr');
         const filterInputs = document.querySelectorAll('.filter-input');
@@ -406,6 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('keyup', applyFilters);
     });
 
+    // --- SAYFA YÜKLENDİĞİNDE BAŞLAT ---
     loadAndDisplayCekimler();
 });
 </script>
@@ -413,6 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
 
 
