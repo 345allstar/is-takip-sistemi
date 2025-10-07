@@ -10,472 +10,428 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-    body { 
-        font-family: 'Inter', sans-serif; 
-    }
-
-    /* Açılır/kapanır alanlar için temel stil */
-    .collapsible-content { 
-        max-height: 0; 
-        overflow: hidden; 
-        transition: max-height 0.3s ease-out; 
-    }
-
-    /* Arama yapılabilir liste için ana kapsayıcı */
-    .searchable-select-container { 
-        position: relative; 
-    }
-
-    /* Açılır listenin alttaki içeriği iterek açılmasını sağlayan stil */
-    .searchable-select-dropdown {
-        width: 100%;
-        max-height: 200px;
-        overflow-y: auto;
-    }
-
-    #form-container.is-active {
-        position: relative;
-        z-index: 60;
-    }
-
-    .disabled-field { 
-        background-color: #f3f4f6; 
-        cursor: not-allowed; 
-        border-color: #e5e7eb; 
-    }
-    
-    /* Tablonun daha düzenli görünmesini sağlayan stil */
-    #cekim-tablosu {
-        table-layout: fixed;
-        width: 100%;
-    }
-
-    /* Tablo hücreleri için ortalama ve çizgi stilleri */
-    #cekim-tablosu th, #cekim-tablosu td {
-    text-align: center;
-    vertical-align: middle;
-    border-left: 1px solid #e5e7eb;
-    /* border-bottom kaldırıldı */
-}
-
-    #cekim-tablosu th:first-child, #cekim-tablosu td:first-child { 
-        border-left: 0; 
-    }
-
-    #cekim-tablosu thead tr:last-child th { 
-        border-bottom: 2px solid #d1d5db; 
-    }
-</style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+        }
+        .collapsible-content { 
+            max-height: 0; 
+            overflow: hidden; 
+            transition: max-height 0.3s ease-out; 
+        }
+        .searchable-select-container { 
+            position: relative; 
+        }
+        .searchable-select-dropdown {
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        #form-container.is-active {
+            position: relative;
+            z-index: 60;
+        }
+        #cekim-tablosu {
+            table-layout: fixed;
+            width: 100%;
+        }
+        #cekim-tablosu th, #cekim-tablosu td {
+            text-align: center;
+            vertical-align: middle;
+            border-left: 1px solid #e5e7eb;
+        }
+        #cekim-tablosu th:first-child, #cekim-tablosu td:first-child { 
+            border-left: 0; 
+        }
+        #cekim-tablosu thead tr:last-child th { 
+            border-bottom: 2px solid #d1d5db; 
+        }
+    </style>
 </head>
 <body class="bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800">
 
     <div class="min-h-screen flex flex-col">
-       <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-40">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16">
-            <a href="index.html" class="flex items-center space-x-2">
-                 <span class="text-xl font-bold bg-indigo-600 text-white px-2 py-1 rounded-lg">ÜDB</span>
-                <span class="text-lg font-semibold text-gray-700">All Star İş Takip Programı</span>
-            </a>
-        </div>
-    </div>
-</header>
+        <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-40">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <a href="index.html" class="flex items-center space-x-2">
+                        <span class="text-xl font-bold bg-indigo-600 text-white px-2 py-1 rounded-lg">ÜDB</span>
+                        <span class="text-lg font-semibold text-gray-700">All Star İş Takip Programı</span>
+                    </a>
+                </div>
+            </div>
+        </header>
         
         <main class="flex-grow p-4 sm:p-6 lg:p-8">
-          
-            
             <div id="form-container" class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg mb-8">
-    <div class="collapsible-trigger flex justify-between items-center cursor-pointer">
-        <h2 class="text-xl font-bold text-gray-800 flex items-center"><i class="fas fa-user-edit mr-3 text-indigo-500"></i><span id="form-title">Çekim Detayları ve Atama</span></h2>
-        <i class="fas fa-chevron-down transform transition-transform text-gray-500"></i>
-    </div>
-    <div class="collapsible-content mt-4">
-        <form id="cek-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5 items-start">
-    <input type="hidden" id="editing-row-id">
-    <div>
-                <label for="yonetmen" class="block text-sm font-medium text-gray-600">Yönetmen <span class="text-red-500">*</span></label>
-                <select id="yonetmen" name="yonetmen" class="searchable-select" required="">
-                    <option value="">Seçiniz...</option>
-                </select>
+                <div class="collapsible-trigger flex justify-between items-center cursor-pointer">
+                    <h2 class="text-xl font-bold text-gray-800 flex items-center"><i class="fas fa-user-edit mr-3 text-indigo-500"></i><span id="form-title">Çekim Detayları ve Atama</span></h2>
+                    <i class="fas fa-chevron-down transform transition-transform text-gray-500"></i>
+                </div>
+                <div class="collapsible-content mt-4">
+                    <form id="cek-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5 items-start">
+                        <input type="hidden" id="editing-row-id">
+                        <div>
+                            <label for="yonetmen" class="block text-sm font-medium text-gray-600">Yönetmen <span class="text-red-500">*</span></label>
+                            <select id="yonetmen" name="yonetmen" class="searchable-select" required>
+                                <option value="">Seçiniz...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="akademik-dinleyici" class="block text-sm font-medium text-gray-600">Akademik Dinleyici</label>
+                            <select id="akademik-dinleyici" name="akademik-dinleyici" class="searchable-select">
+                                <option value="">Seçiniz...</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2 flex justify-end pt-4 mt-4 border-t">
+                            <button type="submit" id="submit-button" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">
+                                <i class="fas fa-save mr-2"></i>Güncelle
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div>
-                <label for="akademik-dinleyici" class="block text-sm font-medium text-gray-600">Akademik Dinleyici</label>
-                <select id="akademik-dinleyici" name="akademik-dinleyici" class="searchable-select">
-                    <option value="">Seçiniz...</option>
-                </select>
-            </div>
-            <div class="md:col-span-2 flex justify-end pt-4 mt-4 border-t">
-                <button type="submit" id="submit-button" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">
-                    <i class="fas fa-save mr-2"></i>Güncelle
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
 
-<div class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg">
-    <div class="collapsible-trigger flex justify-between items-center cursor-pointer">
-        <h2 class="text-xl font-bold text-gray-800 flex items-center"><i class="fas fa-list-ul mr-3 text-indigo-500"></i>Atama Bekleyen Çekimler</h2>
-        <i class="fas fa-chevron-down transform transition-transform text-gray-500"></i>
-    </div>
-    <div class="collapsible-content mt-4">
-        <div id="table-container" class="overflow-x-auto">
-            <table id="cekim-tablosu" class="w-full whitespace-nowrap">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="p-3 text-sm font-semibold tracking-wide">ÇEKİM TARİHİ</th>
-                        <th class="p-3 text-sm font-semibold tracking-wide">SINAV TÜRÜ</th>
-                        <th class="p-3 text-sm font-semibold tracking-wide">ANLATIM TÜRÜ</th>
-                        <th class="p-3 text-sm font-semibold tracking-wide">VİDEO KODU</th>
-                        <th class="p-3 text-sm font-semibold tracking-wide">BRANŞ</th>
-                        <th class="p-3 text-sm font-semibold tracking-wide">ÜNİTE</th>
-                        <th class="p-3 text-sm font-semibold tracking-wide">BÖLÜM</th>
-                        <th class="p-3 text-sm font-semibold tracking-wide">TEST ADI</th>
-                        <th class="p-3 text-sm font-semibold tracking-wide">SORU SAYISI</th>
-                        <th class="p-3 text-sm font-semibold tracking-wide">ANLATICI ÖĞRETMEN</th>
-                        <th class="p-3 text-sm font-semibold tracking-wide">YÖNETMEN</th>
-                        <th class="p-3 text-sm font-semibold tracking-wide">AKADEMİK DİNLEYİCİ</th>
-                        <th class="p-3 text-sm font-semibold tracking-wide">İŞLEMLER</th>
-                    </tr>
-                    <tr>
-                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="0"></th>
-                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="1"></th>
-                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="2"></th>
-                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="3"></th>
-                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="4"></th>
-                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="5"></th>
-                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="6"></th>
-                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="7"></th>
-                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="8"></th>
-                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="9"></th>
-                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="10"></th>
-                        <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="11"></th>
-                        <th class="p-2"></th>
-                    </tr>
-                </thead>
-                <tbody id="cekim-tablosu-body" class="divide-y divide-gray-200">
-                    </tbody>
-            </table>
-            <div id="no-data" class="text-center py-8 text-gray-500 hidden">
-                <i class="fas fa-folder-open fa-3x mb-2"></i>
-                <p>Atama bekleyen çekim bulunmuyor.</p>
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg">
+                <div class="collapsible-trigger flex justify-between items-center cursor-pointer">
+                    <h2 class="text-xl font-bold text-gray-800 flex items-center"><i class="fas fa-list-ul mr-3 text-indigo-500"></i>Atama Bekleyen Çekimler</h2>
+                    <i class="fas fa-chevron-down transform transition-transform text-gray-500"></i>
+                </div>
+                <div class="collapsible-content mt-4">
+                    <div id="table-container" class="overflow-x-auto">
+                        <table id="cekim-tablosu" class="w-full whitespace-nowrap">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="p-3 text-sm font-semibold tracking-wide">ÇEKİM TARİHİ</th>
+                                    <th class="p-3 text-sm font-semibold tracking-wide">SINAV TÜRÜ</th>
+                                    <th class="p-3 text-sm font-semibold tracking-wide">ANLATIM TÜRÜ</th>
+                                    <th class="p-3 text-sm font-semibold tracking-wide">VİDEO KODU</th>
+                                    <th class="p-3 text-sm font-semibold tracking-wide">BRANŞ</th>
+                                    <th class="p-3 text-sm font-semibold tracking-wide">ÜNİTE</th>
+                                    <th class="p-3 text-sm font-semibold tracking-wide">BÖLÜM</th>
+                                    <th class="p-3 text-sm font-semibold tracking-wide">TEST ADI</th>
+                                    <th class="p-3 text-sm font-semibold tracking-wide">SORU SAYISI</th>
+                                    <th class="p-3 text-sm font-semibold tracking-wide">ANLATICI ÖĞRETMEN</th>
+                                    <th class="p-3 text-sm font-semibold tracking-wide">YÖNETMEN</th>
+                                    <th class="p-3 text-sm font-semibold tracking-wide">AKADEMİK DİNLEYİCİ</th>
+                                    <th class="p-3 text-sm font-semibold tracking-wide">İŞLEMLER</th>
+                                </tr>
+                                <tr>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="0"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="1"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="2"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="3"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="4"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="5"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="6"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="7"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="8"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="9"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="10"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="11"></th>
+                                    <th class="p-2"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="cekim-tablosu-body" class="divide-y divide-gray-200">
+                            </tbody>
+                        </table>
+                        <div id="no-data" class="text-center py-8 text-gray-500 hidden">
+                            <i class="fas fa-folder-open fa-3x mb-2"></i>
+                            <p>Atama bekleyen çekim bulunmuyor.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </main>
     </div>
-</div>
     
     <script>
-document.addEventListener('DOMContentLoaded', () => {
-    // --- GEREKLİ ELEMENTLER VE VERİLER ---
-    const cekForm = document.getElementById('cek-form');
-    const tableBody = document.getElementById('cekim-tablosu-body');
-    const editingIdInput = document.getElementById('editing-row-id');
-    const formContainer = document.getElementById('form-container');
-    const noDataMessage = document.getElementById('no-data');
+    document.addEventListener('DOMContentLoaded', () => {
+        const cekForm = document.getElementById('cek-form');
+        const tableBody = document.getElementById('cekim-tablosu-body');
+        const editingIdInput = document.getElementById('editing-row-id');
+        const formContainer = document.getElementById('form-container');
+        const noDataMessage = document.getElementById('no-data');
 
-    const yonetmenler = ["Sait Eralkan", "Anıl Kolay", "Batuhan Gültekin", "Nurdan Özveren", "Merve Çoklar", "Gözde Bulut", "Ali Yıldırım", "Raşit Güngör"];
-    const akademikDinleyiciler = ["Ali Yıldırım", "İsmail Tolga Aktaş", "Rahim Ural", "Burak Onay", "Betül Çiçek", "Sinem Şentürk", "Ahmet Ölmez", "Barış Özcan", "Cem Oğuz Büke", "Cihat Çiçek", "Didem Özbay Sarıaydın", "Eda Güney", "Edip İçli", "Elif Bozkurt", "Emine Bolat Kırbıyık", "Esra Dindar", "Esra Şahin", "Esra Yurttaş", "Firdevs Bozkurt", "Fuat Ses", "Hülya Güçkan Taşkın", "İbrahim Atakuru", "İbrahim Halil Kesici", "Koray Dindar", "Mehmet Bademli", "Mehmet Kırbıyık", "Muharrem Akbaş", "Özcan Kulaksız", "Raziye İnal", "Sabri Bingöl", "Semih Sunucuoğlu", "Serkan Yıldız", "Serpil Tunç İçli", "Suat Emre", "Tuğba Bostancı", "Yasin Baş", "Yavuz Selim Yıldız", "Yok"];
+        const yonetmenler = ["Sait Eralkan", "Anıl Kolay", "Batuhan Gültekin", "Nurdan Özveren", "Merve Çoklar", "Gözde Bulut", "Ali Yıldırım", "Raşit Güngör"];
+        const akademikDinleyiciler = ["Ali Yıldırım", "İsmail Tolga Aktaş", "Rahim Ural", "Burak Onay", "Betül Çiçek", "Sinem Şentürk", "Ahmet Ölmez", "Barış Özcan", "Cem Oğuz Büke", "Cihat Çiçek", "Didem Özbay Sarıaydın", "Eda Güney", "Edip İçli", "Elif Bozkurt", "Emine Bolat Kırbıyık", "Esra Dindar", "Esra Şahin", "Esra Yurttaş", "Firdevs Bozkurt", "Fuat Ses", "Hülya Güçkan Taşkın", "İbrahim Atakuru", "İbrahim Halil Kesici", "Koray Dindar", "Mehmet Bademli", "Mehmet Kırbıyık", "Muharrem Akbaş", "Özcan Kulaksız", "Raziye İnal", "Sabri Bingöl", "Semih Sunucuoğlu", "Serkan Yıldız", "Serpil Tunç İçli", "Suat Emre", "Tuğba Bostancı", "Yasin Baş", "Yavuz Selim Yıldız", "Yok"];
 
-    // YENİ EKLENEN FONKSİYON: Açılır alanın yüksekliğini yeniden hesaplar
-    function re_calculate_collapsible_height(element) {
-        setTimeout(() => {
-            const parentCollapsible = element.closest('.collapsible-content');
-            if (parentCollapsible && parentCollapsible.style.maxHeight) {
-                parentCollapsible.style.maxHeight = parentCollapsible.scrollHeight + "px";
-            }
-        }, 10); // DOM'un güncellenmesi için küçük bir gecikme
-    }
-
-    // --- AÇILIR/KAPANIR ALANLARIN YÖNETİMİ ---
-    document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
-        trigger.addEventListener('click', () => {
-            const content = trigger.nextElementSibling;
-            const icon = trigger.querySelector('i:last-child');
-            if (icon) icon.classList.toggle('rotate-180');
-            if (content) {
-                if (content.style.maxHeight) {
-                    content.style.maxHeight = null;
-                    content.style.overflow = 'hidden';
-                } else {
-                    content.style.maxHeight = content.scrollHeight + "px";
-                    content.style.overflow = 'visible';
+        function re_calculate_collapsible_height(element) {
+            setTimeout(() => {
+                const parentCollapsible = element.closest('.collapsible-content');
+                if (parentCollapsible && parentCollapsible.style.maxHeight && parentCollapsible.style.maxHeight !== '0px') {
+                    parentCollapsible.style.maxHeight = parentCollapsible.scrollHeight + "px";
                 }
-            }
-        });
-    });
-
-    document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
-        const content = trigger.nextElementSibling;
-        const icon = trigger.querySelector('i:last-child');
-        if (content) {
-            content.style.maxHeight = content.scrollHeight + "px";
-            content.style.overflow = 'visible';
+            }, 10);
         }
-        if (icon) icon.classList.add('rotate-180');
-    });
 
-    // --- ARAMA YAPILABİLİR DROPDOWN FONKSİYONLARI ---
-    function populateSelect(selectId, data) {
-        const select = document.getElementById(selectId);
-        data.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item;
-            option.textContent = item;
-            select.appendChild(option);
-        });
-    }
-
-    populateSelect('yonetmen', yonetmenler);
-    populateSelect('akademik-dinleyici', akademikDinleyiciler);
-
-    function closeAllDropdowns() {
-        document.querySelectorAll('.searchable-select-dropdown').forEach(d => d.classList.add('hidden'));
-        if (formContainer) formContainer.classList.remove('is-active');
-    }
-
-    document.addEventListener('click', closeAllDropdowns);
-
-    function createSearchableDropdown(selectElement) {
-        const container = document.createElement('div');
-        container.className = 'searchable-select-container relative';
-        selectElement.parentNode.insertBefore(container, selectElement);
-        selectElement.style.display = 'none';
-        container.appendChild(selectElement);
-        const displayButton = document.createElement('button');
-        displayButton.type = 'button';
-        displayButton.className = 'form-input mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 shadow-sm text-left flex justify-between items-center';
-        const displaySpan = document.createElement('span');
-        displaySpan.className = 'truncate p-2';
-        displayButton.appendChild(displaySpan);
-        const icon = document.createElement('i');
-        icon.className = 'fas fa-chevron-down text-gray-400 mr-2';
-        displayButton.appendChild(icon);
-        container.appendChild(displayButton);
-        const dropdown = document.createElement('div');
-        dropdown.className = 'searchable-select-dropdown hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg';
-        const searchInput = document.createElement('input');
-        searchInput.type = 'text';
-        searchInput.placeholder = 'Ara...';
-        searchInput.className = 'search-input block w-full p-2 border-b border-gray-200';
-        dropdown.appendChild(searchInput);
-        const optionsList = document.createElement('div');
-        optionsList.className = 'p-1';
-        dropdown.appendChild(optionsList);
-        container.appendChild(dropdown);
-        
-        dropdown.addEventListener('click', (e) => e.stopPropagation());
-
-        const updateOptions = () => {
-            optionsList.innerHTML = '';
-            Array.from(selectElement.options).forEach(option => {
-                if (option.value === "" && option.textContent.includes('Seçiniz')) return;
-                const optionDiv = document.createElement('div');
-                optionDiv.textContent = option.textContent;
-                optionDiv.dataset.value = option.value;
-                optionDiv.className = 'p-2 cursor-pointer hover:bg-indigo-100 rounded text-sm';
-                optionDiv.addEventListener('click', () => {
-                    selectElement.value = option.value;
-                    displaySpan.textContent = option.textContent;
-                    displaySpan.classList.remove('text-gray-400');
-                    closeAllDropdowns();
-                    selectElement.dispatchEvent(new Event('change'));
-                    re_calculate_collapsible_height(optionDiv); // YENİ EKLENEN SATIR
-                });
-                optionsList.appendChild(optionDiv);
-            });
-            const selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`) || selectElement.options[0];
-            if (selectedOption) {
-                displaySpan.textContent = selectedOption.textContent;
-                if(selectedOption.value === "") displaySpan.classList.add('text-gray-400');
-                else displaySpan.classList.remove('text-gray-400');
-            }
-        };
-
-        searchInput.addEventListener('input', () => { /* ... kod aynı ... */ });
-
-        displayButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (selectElement.disabled) return;
-            const isCurrentlyHidden = dropdown.classList.contains('hidden');
-            closeAllDropdowns();
-            if (isCurrentlyHidden) {
-                dropdown.classList.remove('hidden');
-                if(formContainer) formContainer.classList.add('is-active');
-                searchInput.value = '';
-                searchInput.dispatchEvent(new Event('input'));
-                searchInput.focus();
-            }
-            re_calculate_collapsible_height(displayButton); // YENİ EKLENEN SATIR
-        });
-        selectElement.updateDropdown = updateOptions;
-        updateOptions();
-    }
-    document.querySelectorAll('.searchable-select').forEach(createSearchableDropdown);
-
-    const updateSelectDisplay = (selectElement) => { /* ... kod aynı ... */ };
-
-    // --- VERİ YÖNETİMİ VE TABLO İŞLEMLERİ ---
-    function getCekimlerFromStorage() {
-        return JSON.parse(localStorage.getItem('cekimListesi') || '[]');
-    }
-
-    function saveCekimlerToStorage(cek_kayitlari) {
-        localStorage.setItem('cekimListesi', JSON.stringify(cek_kayitlari));
-    }
-    
-    function loadAndDisplayCekimler() {
-    const cek_kayitlari = getCekimlerFromStorage();
-    
-    // Filtreleme: Sadece çekim tarihi girilmiş olanları listele
-    const listelenecekKayitlar = cek_kayitlari.filter(kayit => kayit.cekimTarihi);
-    
-    tableBody.innerHTML = '';
-
-    if (listelenecekKayitlar.length === 0) {
-        noDataMessage.classList.remove('hidden');
-        document.getElementById('cekim-tablosu').classList.add('hidden');
-    } else {
-        noDataMessage.classList.add('hidden');
-        document.getElementById('cekim-tablosu').classList.remove('hidden');
-        
-        // Tarihe göre en yeniden eskiye sırala
-        listelenecekKayitlar.sort((a, b) => new Date(b.cekimTarihi) - new Date(a.cekimTarihi));
-
-        listelenecekKayitlar.forEach(kayit => {
-            const row = tableBody.insertRow();
-            row.dataset.id = kayit.id;
-
-            // Tarih formatlama
-            const date = new Date(kayit.cekimTarihi + 'T00:00:00');
-            const formattedDate = kayit.cekimTarihi ? `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}` : '';
-
-            // Yönetmen ve Akademik Dinleyici atanmış mı kontrol et
-            const yonetmenDurum = kayit.yonetmen 
-                ? `<td class="p-3 text-sm font-semibold text-green-600 align-middle">${kayit.yonetmen}</td>`
-                : `<td class="p-3 text-sm font-semibold text-gray-500 align-middle">Atanmadı</td>`;
-
-            const akademikDinleyiciDurum = kayit.akademikDinleyici 
-                ? `<td class="p-3 text-sm font-semibold text-green-600 align-middle">${kayit.akademikDinleyici}</td>`
-                : `<td class="p-3 text-sm font-semibold text-gray-500 align-middle">Atanmadı</td>`;
-            
-            // Buton başlığını değiştir
-            const buttonTitle = kayit.yonetmen ? "Düzenle" : "Ata";
-
-            row.innerHTML = `
-                <td class="p-3 text-sm align-middle">${formattedDate || ''}</td>
-                <td class="p-3 text-sm align-middle">${kayit.sinavTuru || ''}</td>
-                <td class="p-3 text-sm align-middle">${kayit.anlatimTuru || ''}</td>
-                <td class="p-3 text-sm align-middle">${kayit.videoKodu || ''}</td>
-                <td class="p-3 text-sm align-middle">${kayit.brans || ''}</td>
-                <td class="p-3 text-sm align-middle">${kayit.unite || ''}</td>
-                <td class="p-3 text-sm align-middle">${kayit.bolum || ''}</td>
-                <td class="p-3 text-sm align-middle">${kayit.testAdi || ''}</td>
-                <td class="p-3 text-sm align-middle">${kayit.soruSayisi || ''}</td>
-                <td class="p-3 text-sm align-middle">${kayit.anlaticiOgretmen || ''}</td>
-                ${yonetmenDurum}
-                ${akademikDinleyiciDurum}
-                <td class="p-3 text-sm align-middle">
-                    <button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="${buttonTitle}">
-                        <i class="fas fa-pencil-alt"></i>
-                    </button>
-                </td>
-            `;
-        });
-    }
-    applyFilters();
-}
-
-    cekForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const id = editingIdInput.value;
-        if (!id) return;
-
-        let cek_kayitlari = getCekimlerFromStorage();
-        const kayitIndex = cek_kayitlari.findIndex(k => k.id == id);
-
-        if (kayitIndex > -1) {
-            cek_kayitlari[kayitIndex].yonetmen = document.getElementById('yonetmen').value;
-            cek_kayitlari[kayitIndex].akademikDinleyici = document.getElementById('akademik-dinleyici').value;
-            saveCekimlerToStorage(cek_kayitlari);
-            loadAndDisplayCekimler();
-            cekForm.reset();
-            editingIdInput.value = '';
-            updateSelectDisplay(document.getElementById('yonetmen'));
-            updateSelectDisplay(document.getElementById('akademik-dinleyici'));
-            alert('Atama başarıyla güncellendi!');
-        }
-    });
-    
-    tableBody.addEventListener('click', function(e) {
-        const editButton = e.target.closest('.edit-row');
-        if (editButton) {
-            e.preventDefault();
-            const row = editButton.closest('tr');
-            const id = row.dataset.id;
-            const cek_kayitlari = getCekimlerFromStorage();
-            const kayit = cek_kayitlari.find(k => k.id == id);
-
-            if (kayit) {
-                editingIdInput.value = kayit.id;
-                document.getElementById('yonetmen').value = kayit.yonetmen || '';
-                document.getElementById('akademik-dinleyici').value = kayit.akademikDinleyici || '';
-                updateSelectDisplay(document.getElementById('yonetmen'));
-                updateSelectDisplay(document.getElementById('akademik-dinleyici'));
-                document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-    });
-
-    // --- TABLO FİLTRELEME ---
-    function applyFilters() {
-        const rows = tableBody.querySelectorAll('tr');
-        const filterInputs = document.querySelectorAll('.filter-input');
-        const filterValues = Array.from(filterInputs).map(input => input.value.toLowerCase());
-
-        rows.forEach(row => {
-            const cells = row.querySelectorAll('td');
-            let isVisible = true;
-            filterValues.forEach((filterValue, index) => {
-                if (filterValue !== '') {
-                    const cell = cells[index];
-                    if (cell) {
-                        const cellText = cell.textContent.toLowerCase();
-                        if (!cellText.includes(filterValue)) {
-                            isVisible = false;
-                        }
+        document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
+            trigger.addEventListener('click', () => {
+                const content = trigger.nextElementSibling;
+                const icon = trigger.querySelector('i:last-child');
+                if (icon) icon.classList.toggle('rotate-180');
+                if (content) {
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        content.style.overflow = 'hidden';
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        content.style.overflow = 'visible';
                     }
                 }
             });
-            row.style.display = isVisible ? '' : 'none';
         });
-    }
 
-    document.querySelectorAll('.filter-input').forEach(input => {
-        input.addEventListener('keyup', applyFilters);
+        document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
+            const content = trigger.nextElementSibling;
+            const icon = trigger.querySelector('i:last-child');
+            if (content) {
+                content.style.maxHeight = content.scrollHeight + "px";
+                content.style.overflow = 'visible';
+            }
+            if (icon) icon.classList.add('rotate-180');
+        });
+
+        function populateSelect(selectId, data) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item;
+                option.textContent = item;
+                select.appendChild(option);
+            });
+        }
+
+        populateSelect('yonetmen', yonetmenler);
+        populateSelect('akademik-dinleyici', akademikDinleyiciler);
+
+        function closeAllDropdowns() {
+            document.querySelectorAll('.searchable-select-dropdown').forEach(d => {
+                d.classList.add('hidden');
+                re_calculate_collapsible_height(d); 
+            });
+            if (formContainer) formContainer.classList.remove('is-active');
+        }
+
+        document.addEventListener('click', closeAllDropdowns);
+
+        function createSearchableDropdown(selectElement) {
+            const container = document.createElement('div');
+            container.className = 'searchable-select-container relative';
+            selectElement.parentNode.insertBefore(container, selectElement);
+            selectElement.style.display = 'none';
+            container.appendChild(selectElement);
+            const displayButton = document.createElement('button');
+            displayButton.type = 'button';
+            displayButton.className = 'mt-1 block w-full rounded-lg border border-gray-300 bg-gray-50 shadow-sm text-left flex justify-between items-center p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500';
+            const displaySpan = document.createElement('span');
+            displaySpan.className = 'truncate';
+            displayButton.appendChild(displaySpan);
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-chevron-down text-gray-400 ml-2';
+            displayButton.appendChild(icon);
+            container.appendChild(displayButton);
+            const dropdown = document.createElement('div');
+            dropdown.className = 'searchable-select-dropdown hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg';
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.placeholder = 'Ara...';
+            searchInput.className = 'block w-full p-2 border-b border-gray-200 focus:outline-none';
+            dropdown.appendChild(searchInput);
+            const optionsList = document.createElement('div');
+            optionsList.className = 'p-1';
+            dropdown.appendChild(optionsList);
+            container.appendChild(dropdown);
+            
+            dropdown.addEventListener('click', (e) => e.stopPropagation());
+
+            const updateOptions = () => {
+                optionsList.innerHTML = '';
+                Array.from(selectElement.options).forEach(option => {
+                    if (option.value === "" && option.textContent.includes('Seçiniz')) return;
+                    const optionDiv = document.createElement('div');
+                    optionDiv.textContent = option.textContent;
+                    optionDiv.dataset.value = option.value;
+                    optionDiv.className = 'p-2 cursor-pointer hover:bg-indigo-100 rounded text-sm';
+                    optionDiv.addEventListener('click', () => {
+                        selectElement.value = option.value;
+                        displaySpan.textContent = option.textContent;
+                        displaySpan.classList.remove('text-gray-400');
+                        closeAllDropdowns();
+                        selectElement.dispatchEvent(new Event('change'));
+                    });
+                    optionsList.appendChild(optionDiv);
+                });
+                const selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`) || selectElement.options[0];
+                if (selectedOption) {
+                    displaySpan.textContent = selectedOption.textContent;
+                    if(selectedOption.value === "") displaySpan.classList.add('text-gray-400');
+                    else displaySpan.classList.remove('text-gray-400');
+                }
+            };
+
+            searchInput.addEventListener('input', () => {
+                const filter = searchInput.value.toLowerCase();
+                optionsList.querySelectorAll('div').forEach(optionDiv => {
+                    const text = optionDiv.textContent.toLowerCase();
+                    optionDiv.style.display = text.includes(filter) ? '' : 'none';
+                });
+            });
+
+            displayButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (selectElement.disabled) return;
+                const isCurrentlyHidden = dropdown.classList.contains('hidden');
+                closeAllDropdowns();
+                if (isCurrentlyHidden) {
+                    dropdown.classList.remove('hidden');
+                    if(formContainer) formContainer.classList.add('is-active');
+                    searchInput.value = '';
+                    searchInput.dispatchEvent(new Event('input'));
+                    searchInput.focus();
+                }
+                re_calculate_collapsible_height(displayButton);
+            });
+            selectElement.updateDropdown = updateOptions;
+            updateOptions();
+        }
+        document.querySelectorAll('.searchable-select').forEach(createSearchableDropdown);
+
+        const updateSelectDisplay = (selectElement) => {
+            if(selectElement && selectElement.updateDropdown) {
+               selectElement.updateDropdown();
+            }
+        }
+
+        function getCekimlerFromStorage() {
+            return JSON.parse(localStorage.getItem('cekimListesi') || '[]');
+        }
+
+        function saveCekimlerToStorage(cek_kayitlari) {
+            localStorage.setItem('cekimListesi', JSON.stringify(cek_kayitlari));
+        }
+        
+        function loadAndDisplayCekimler() {
+            const cek_kayitlari = getCekimlerFromStorage();
+            const listelenecekKayitlar = cek_kayitlari.filter(kayit => kayit.cekimTarihi);
+            tableBody.innerHTML = '';
+
+            if (listelenecekKayitlar.length === 0) {
+                noDataMessage.classList.remove('hidden');
+                document.getElementById('cekim-tablosu').classList.add('hidden');
+            } else {
+                noDataMessage.classList.add('hidden');
+                document.getElementById('cekim-tablosu').classList.remove('hidden');
+                listelenecekKayitlar.sort((a, b) => new Date(b.cekimTarihi) - new Date(a.cekimTarihi));
+
+                listelenecekKayitlar.forEach(kayit => {
+                    const row = tableBody.insertRow();
+                    row.dataset.id = kayit.id;
+                    const date = new Date(kayit.cekimTarihi + 'T00:00:00');
+                    const formattedDate = kayit.cekimTarihi ? `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}` : '';
+
+                    const yonetmenDurum = kayit.yonetmen 
+                        ? `<td class="p-3 text-sm font-semibold text-green-600 align-middle">${kayit.yonetmen}</td>`
+                        : `<td class="p-3 text-sm font-semibold text-gray-500 align-middle">Atanmadı</td>`;
+                    const akademikDinleyiciDurum = kayit.akademikDinleyici 
+                        ? `<td class="p-3 text-sm font-semibold text-green-600 align-middle">${kayit.akademikDinleyici}</td>`
+                        : `<td class="p-3 text-sm font-semibold text-gray-500 align-middle">Atanmadı</td>`;
+                    const buttonTitle = kayit.yonetmen ? "Düzenle" : "Ata";
+
+                    row.innerHTML = `
+                        <td class="p-3 text-sm align-middle">${formattedDate || ''}</td>
+                        <td class="p-3 text-sm align-middle">${kayit.sinavTuru || ''}</td>
+                        <td class="p-3 text-sm align-middle">${kayit.anlatimTuru || ''}</td>
+                        <td class="p-3 text-sm align-middle">${kayit.videoKodu || ''}</td>
+                        <td class="p-3 text-sm align-middle">${kayit.brans || ''}</td>
+                        <td class="p-3 text-sm align-middle">${kayit.unite || ''}</td>
+                        <td class="p-3 text-sm align-middle">${kayit.bolum || ''}</td>
+                        <td class="p-3 text-sm align-middle">${kayit.testAdi || ''}</td>
+                        <td class="p-3 text-sm align-middle">${kayit.soruSayisi || ''}</td>
+                        <td class="p-3 text-sm align-middle">${kayit.anlaticiOgretmen || ''}</td>
+                        ${yonetmenDurum}
+                        ${akademikDinleyiciDurum}
+                        <td class="p-3 text-sm align-middle">
+                            <button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="${buttonTitle}">
+                                <i class="fas fa-pencil-alt"></i>
+                            </button>
+                        </td>
+                    `;
+                });
+            }
+            applyFilters();
+        }
+
+        cekForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = editingIdInput.value;
+            if (!id) {
+                alert("Lütfen düzenlemek için bir çekim seçin.");
+                return;
+            }
+            let cek_kayitlari = getCekimlerFromStorage();
+            const kayitIndex = cek_kayitlari.findIndex(k => k.id == id);
+            if (kayitIndex > -1) {
+                cek_kayitlari[kayitIndex].yonetmen = document.getElementById('yonetmen').value;
+                cek_kayitlari[kayitIndex].akademikDinleyici = document.getElementById('akademik-dinleyici').value;
+                saveCekimlerToStorage(cek_kayitlari);
+                loadAndDisplayCekimler();
+                cekForm.reset();
+                editingIdInput.value = '';
+                updateSelectDisplay(document.getElementById('yonetmen'));
+                updateSelectDisplay(document.getElementById('akademik-dinleyici'));
+                alert('Atama başarıyla güncellendi!');
+            }
+        });
+        
+        tableBody.addEventListener('click', function(e) {
+            const editButton = e.target.closest('.edit-row');
+            if (editButton) {
+                e.preventDefault();
+                const row = editButton.closest('tr');
+                const id = row.dataset.id;
+                const cek_kayitlari = getCekimlerFromStorage();
+                const kayit = cek_kayitlari.find(k => k.id == id);
+                if (kayit) {
+                    editingIdInput.value = kayit.id;
+                    document.getElementById('yonetmen').value = kayit.yonetmen || '';
+                    document.getElementById('akademik-dinleyici').value = kayit.akademikDinleyici || '';
+                    updateSelectDisplay(document.getElementById('yonetmen'));
+                    updateSelectDisplay(document.getElementById('akademik-dinleyici'));
+                    document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        });
+
+        function applyFilters() {
+            const rows = tableBody.querySelectorAll('tr');
+            const filterInputs = document.querySelectorAll('.filter-input');
+            const filterValues = Array.from(filterInputs).map(input => input.value.toLowerCase());
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                let isVisible = true;
+                filterValues.forEach((filterValue, index) => {
+                    if (filterValue !== '') {
+                        const cell = cells[index];
+                        if (cell) {
+                            const cellText = cell.textContent.toLowerCase();
+                            if (!cellText.includes(filterValue)) {
+                                isVisible = false;
+                            }
+                        }
+                    }
+                });
+                row.style.display = isVisible ? '' : 'none';
+            });
+        }
+
+        document.querySelectorAll('.filter-input').forEach(input => {
+            input.addEventListener('keyup', applyFilters);
+        });
+
+        loadAndDisplayCekimler();
     });
+    </script>
 
-    // --- SAYFA YÜKLENDİĞİNDE BAŞLAT ---
-    loadAndDisplayCekimler();
-});
-</script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+</body>
+</html>
