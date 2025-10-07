@@ -52,11 +52,11 @@
 
     /* Tablo hücreleri için ortalama ve çizgi stilleri */
     #cekim-tablosu th, #cekim-tablosu td {
-        text-align: center;
-        vertical-align: middle;
-        border-left: 1px solid #e5e7eb;
-        border-bottom: 1px solid #e5e7eb;
-    }
+    text-align: center;
+    vertical-align: middle;
+    border-left: 1px solid #e5e7eb;
+    /* border-bottom kaldırıldı */
+}
 
     #cekim-tablosu th:first-child, #cekim-tablosu td:first-child { 
         border-left: 0; 
@@ -91,8 +91,7 @@
     </div>
     <div class="collapsible-content mt-4">
         <form id="cek-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5 items-start">
-            <input type="hidden" id="editing-row-id">
-            <div>
+    <input type="hidden" id="editing-row-id"> <div>
                 <label for="yonetmen" class="block text-sm font-medium text-gray-600">Yönetmen <span class="text-red-500">*</span></label>
                 <select id="yonetmen" name="yonetmen" class="searchable-select" required="">
                     <option value="">Seçiniz...</option>
@@ -153,7 +152,7 @@
                         <th class="p-2"></th>
                     </tr>
                 </thead>
-                <tbody id="cekim-tablosu-body">
+                <tbody id="cekim-tablosu-body" class="divide-y divide-gray-200">
                     </tbody>
             </table>
             <div id="no-data" class="text-center py-8 text-gray-500 hidden">
@@ -458,6 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadAndDisplayCekimler();
 });
 </script>
+
 
 
 
