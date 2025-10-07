@@ -573,7 +573,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 </script>
-
+<script>
+    // Sayfa yüklendiğinde tüm alanları varsayılan olarak açık hale getiren kod
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.collapsible-content').forEach(content => {
+            // Alanı aç
+            content.style.maxHeight = content.scrollHeight + "px";
+            
+            // Ok ikonunu çevir
+            const trigger = content.parentElement.querySelector('.collapsible-trigger');
+            if (trigger) {
+                const icon = trigger.querySelector('.fa-chevron-down');
+                if (icon) {
+                    icon.classList.add('rotate-180');
+                }
+            }
+        });
+    });
+    </script>
+    </body>
+</html>
 </body>
 </html>
+
 
