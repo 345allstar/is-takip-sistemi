@@ -324,66 +324,66 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function loadAndDisplayCekimler() {
-        const cek_kayitlari = getCekimlerFromStorage();
-        
-        // Filtreleme: Sadece çekim tarihi girilmiş olanları listele
-        const listelenecekKayitlar = cek_kayitlari.filter(kayit => kayit.cekimTarihi);
-        
-        tableBody.innerHTML = '';
+    const cek_kayitlari = getCekimlerFromStorage();
+    
+    // Filtreleme: Sadece çekim tarihi girilmiş olanları listele
+    const listelenecekKayitlar = cek_kayitlari.filter(kayit => kayit.cekimTarihi);
+    
+    tableBody.innerHTML = '';
 
-        if (listelenecekKayitlar.length === 0) {
-            noDataMessage.classList.remove('hidden');
-            document.getElementById('cekim-tablosu').classList.add('hidden');
-        } else {
-            noDataMessage.classList.add('hidden');
-            document.getElementById('cekim-tablosu').classList.remove('hidden');
+    if (listelenecekKayitlar.length === 0) {
+        noDataMessage.classList.remove('hidden');
+        document.getElementById('cekim-tablosu').classList.add('hidden');
+    } else {
+        noDataMessage.classList.add('hidden');
+        document.getElementById('cekim-tablosu').classList.remove('hidden');
+        
+        // Tarihe göre en yeniden eskiye sırala
+        listelenecekKayitlar.sort((a, b) => new Date(b.cekimTarihi) - new Date(a.cekimTarihi));
+
+        listelenecekKayitlar.forEach(kayit => {
+            const row = tableBody.insertRow();
+            row.dataset.id = kayit.id;
+
+            // Tarih formatlama
+            const date = new Date(kayit.cekimTarihi + 'T00:00:00');
+            const formattedDate = kayit.cekimTarihi ? `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}` : '';
+
+            // Yönetmen ve Akademik Dinleyici atanmış mı kontrol et
+            const yonetmenDurum = kayit.yonetmen 
+                ? `<td class="p-3 text-sm font-semibold text-green-600 align-middle">${kayit.yonetmen}</td>`
+                : `<td class="p-3 text-sm font-semibold text-gray-500 align-middle">Atanmadı</td>`;
+
+            const akademikDinleyiciDurum = kayit.akademikDinleyici 
+                ? `<td class="p-3 text-sm font-semibold text-green-600 align-middle">${kayit.akademikDinleyici}</td>`
+                : `<td class="p-3 text-sm font-semibold text-gray-500 align-middle">Atanmadı</td>`;
             
-            // Tarihe göre en yeniden eskiye sırala
-            listelenecekKayitlar.sort((a, b) => new Date(b.cekimTarihi) - new Date(a.cekimTarihi));
+            // Buton başlığını değiştir
+            const buttonTitle = kayit.yonetmen ? "Düzenle" : "Ata";
 
-            listelenecekKayitlar.forEach(kayit => {
-                const row = tableBody.insertRow();
-                row.dataset.id = kayit.id;
-
-                // Tarih formatlama
-                const date = new Date(kayit.cekimTarihi + 'T00:00:00');
-                const formattedDate = kayit.cekimTarihi ? `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}` : '';
-
-                // Yönetmen ve Akademik Dinleyici atanmış mı kontrol et
-                const yonetmenDurum = kayit.yonetmen 
-                    ? `<td class="p-3 text-sm font-semibold text-green-600">${kayit.yonetmen}</td>`
-                    : `<td class="p-3 text-sm font-semibold text-gray-500">Atanmadı</td>`;
-
-                const akademikDinleyiciDurum = kayit.akademikDinleyici 
-                    ? `<td class="p-3 text-sm font-semibold text-green-600">${kayit.akademikDinleyici}</td>`
-                    : `<td class="p-3 text-sm font-semibold text-gray-500">Atanmadı</td>`;
-                
-                // Buton başlığını değiştir
-                const buttonTitle = kayit.yonetmen ? "Düzenle" : "Ata";
-
-                row.innerHTML = `
-                    <td class="p-3 text-sm">${formattedDate || ''}</td>
-                    <td class="p-3 text-sm">${kayit.sinavTuru || ''}</td>
-                    <td class="p-3 text-sm">${kayit.anlatimTuru || ''}</td>
-                    <td class="p-3 text-sm">${kayit.videoKodu || ''}</td>
-                    <td class="p-3 text-sm">${kayit.brans || ''}</td>
-                    <td class="p-3 text-sm">${kayit.unite || ''}</td>
-                    <td class="p-3 text-sm">${kayit.bolum || ''}</td>
-                    <td class="p-3 text-sm">${kayit.testAdi || ''}</td>
-                    <td class="p-3 text-sm">${kayit.soruSayisi || ''}</td>
-                    <td class="p-3 text-sm">${kayit.anlaticiOgretmen || ''}</td>
-                    ${yonetmenDurum}
-                    ${akademikDinleyiciDurum}
-                    <td class="p-3 text-sm">
-                        <button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="${buttonTitle}">
-                            <i class="fas fa-pencil-alt"></i>
-                        </button>
-                    </td>
-                `;
-            });
-        }
-        applyFilters();
+            row.innerHTML = `
+                <td class="p-3 text-sm align-middle">${formattedDate || ''}</td>
+                <td class="p-3 text-sm align-middle">${kayit.sinavTuru || ''}</td>
+                <td class="p-3 text-sm align-middle">${kayit.anlatimTuru || ''}</td>
+                <td class="p-3 text-sm align-middle">${kayit.videoKodu || ''}</td>
+                <td class="p-3 text-sm align-middle">${kayit.brans || ''}</td>
+                <td class="p-3 text-sm align-middle">${kayit.unite || ''}</td>
+                <td class="p-3 text-sm align-middle">${kayit.bolum || ''}</td>
+                <td class="p-3 text-sm align-middle">${kayit.testAdi || ''}</td>
+                <td class="p-3 text-sm align-middle">${kayit.soruSayisi || ''}</td>
+                <td class="p-3 text-sm align-middle">${kayit.anlaticiOgretmen || ''}</td>
+                ${yonetmenDurum}
+                ${akademikDinleyiciDurum}
+                <td class="p-3 text-sm align-middle">
+                    <button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="${buttonTitle}">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                </td>
+            `;
+        });
     }
+    applyFilters();
+}
 
     cekForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -458,6 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadAndDisplayCekimler();
 });
 </script>
+
 
 
 
