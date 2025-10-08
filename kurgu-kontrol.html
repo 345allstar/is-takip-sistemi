@@ -422,41 +422,59 @@ document.addEventListener('DOMContentLoaded', () => {
         const end = start + rowsPerPage;
         const paginatedItems = items.slice(start, end);
 
+        const formatDate = (dateString) => {
+            if (!dateString) return '';
+            const date = new Date(dateString + 'T00:00:00');
+            return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+        };
+
         paginatedItems.forEach(kayit => {
             const row = tableBody.insertRow();
             row.dataset.id = kayit.id;
-            
-            const formatDate = (dateString) => {
-                if (!dateString) return '';
-                const date = new Date(dateString + 'T00:00:00');
-                return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-            };
+            row.className = 'hover:bg-indigo-50 transition-colors duration-200';
 
-            let statusClass = '';
-            switch(kayit.kurguDurumu) {
-                case 'Sırada': statusClass = 'status-sirada'; break;
-                case 'Kurguda': statusClass = 'status-kurguda'; break;
-                case 'Tamamlandı': statusClass = 'status-tamamlandi'; break;
-                case 'Revize': statusClass = 'status-revize'; break;
-            }
+            // Her hücreyi tek tek oluşturuyoruz
+            const cells = [
+                formatDate(kayit.cekimTarihi),
+                kayit.sinavTuru || '',
+                kayit.anlatimTuru || '',
+                kayit.videoKodu || '',
+                kayit.anlaticiOgretmen || '',
+                kayit.yonetmen || '',
+                formatDate(kayit.kurguBaslamaTarihi),
+                formatDate(kayit.kurguBitisTarihi),
+                kayit.kurguOperatoru || '',
+                kayit.kurguDurumu || 'Belirtilmedi',
+                '' // İşlemler için boş hücre
+            ];
 
-           row.innerHTML = `
-                <td class="align-middle">${formatDate(kayit.cekimTarihi)}</td>
-                <td class="align-middle">${kayit.sinavTuru || ''}</td>
-                <td class="align-middle">${kayit.anlatimTuru || ''}</td>
-                <td class="align-middle">${kayit.videoKodu || ''}</td>
-                <td class="align-middle">${kayit.anlaticiOgretmen || ''}</td>
-                <td class="align-middle">${kayit.yonetmen || ''}${fileIcon}</td>
-                <td class="align-middle">${formatDate(kayit.kurguBaslamaTarihi)}</td>
-                <td class="align-middle">${formatDate(kayit.kurguBitisTarihi)}</td>
-                <td class="align-middle">${kayit.kurguOperatoru || ''}</td>
-                <td class="align-middle"><span class="status-badge ${statusClass}">${kayit.kurguDurumu || 'Belirtilmedi'}</span></td>
-                <td class="align-middle">
-                    <button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="Düzenle">
-                        <i class="fas fa-pencil-alt"></i>
-                    </button>
-                </td>
-            `;
+            cells.forEach((cellContent, index) => {
+                const cell = row.insertCell();
+                cell.className = 'align-middle';
+
+                // Özel durumlar için hücre içeriğini ayrıca ayarlıyoruz
+                if (index === 5) { // Yönetmen Sütunu
+                    const fileIcon = (kayit.timecodeFileData && kayit.timecodeFileName)
+                        ? `<a href="${kayit.timecodeFileData}" download="${kayit.timecodeFileName}" class="ml-2 text-indigo-500 hover:text-indigo-700" title="Time Code Dosyasını İndir"><i class="fas fa-download"></i></a>`
+                        : '';
+                    cell.innerHTML = `${cellContent}${fileIcon}`;
+                } else if (index === 9) { // Kurgu Durumu Sütunu
+                    let statusClass = '';
+                    switch(kayit.kurguDurumu) {
+                        case 'Sırada': statusClass = 'status-sirada'; break;
+                        case 'Kurguda': statusClass = 'status-kurguda'; break;
+                        case 'Tamamlandı': statusClass = 'status-tamamlandi'; break;
+                        case 'Revize': statusClass = 'status-revize'; break;
+                    }
+                    cell.innerHTML = `<span class="status-badge ${statusClass}">${cellContent}</span>`;
+                } else if (index === 10) { // İşlemler Sütunu
+                    cell.innerHTML = `<button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="Düzenle">
+                                        <i class="fas fa-pencil-alt"></i>
+                                      </button>`;
+                } else {
+                    cell.textContent = cellContent;
+                }
+            });
         });
     }
     function setupPagination(items) {
