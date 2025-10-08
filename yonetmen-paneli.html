@@ -12,7 +12,7 @@
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
-            background-color: #f8fafc; /* bg-slate-50 */
+            background-color: #f8fafc;
         }
         .collapsible-content { 
             max-height: 0; 
@@ -45,14 +45,14 @@
             text-align: center;
             vertical-align: middle;
             border-left: 1px solid #e5e7eb;
-            padding: 0.5rem; /* Yazı boyutu küçüldüğü için padding azaltıldı */
+            padding: 0.5rem;
             word-break: break-word; 
-            font-size: 0.75rem; /* text-xs - YAZI BOYUTU KÜÇÜLTÜLDÜ */
+            font-size: 0.75rem;
             line-height: 1rem;
         }
         #cekim-tablosu th {
             white-space: nowrap;
-            font-weight: 600; /* font-semibold */
+            font-weight: 600;
         }
         #cekim-tablosu th:first-child, #cekim-tablosu td:first-child { 
             border-left: 0; 
@@ -125,6 +125,16 @@
             border-color: #6366f1;
             box-shadow: 0 0 0 1px #6366f1;
         }
+        .form-file-input {
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+        .form-file-input::-webkit-file-upload-button {
+            margin-right: 0.75rem; padding: 0.5rem 1rem; border-radius: 9999px; border-width: 0; font-size: 0.875rem; font-weight: 600; background-color: #eef2ff; color: #4338ca; cursor: pointer;
+        }
+        .form-file-input::-webkit-file-upload-button:hover {
+            background-color: #e0e7ff;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
@@ -160,9 +170,14 @@
                         </div>
                         <div>
                             <label for="akademik-dinleyici" class="form-label">Akademik Dinleyici</label>
-                            <select id="akademik-dinleyici" name="akademik-dinleyici" class="searchable-select">
+                            <select id="akademik-dinleyici" name="akademikDinleyici" class="searchable-select">
                                 <option value="">Seçiniz...</option>
                             </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="timecode-file" class="form-label">Time Code Dosyası Ekle</label>
+                            <input id="timecode-file" type="file" class="form-input-base form-file-input">
+                            <span id="current-file-display" class="text-xs text-gray-500 mt-1 block"></span>
                         </div>
                         <div class="md:col-span-2 flex justify-end pt-4 mt-4 border-t">
                             <button type="submit" id="submit-button" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">
@@ -234,6 +249,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     let currentPage = 1;
     const rowsPerPage = 10;
+    
     function showNotification(message, type = 'success') {
         const container = document.getElementById('notification-container');
         if (!container) return;
@@ -252,6 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 500);
         }, 3000);
     }
+
     const cekForm = document.getElementById('cek-form');
     const tableBody = document.getElementById('cekim-tablosu-body');
     const editingIdInput = document.getElementById('editing-row-id');
@@ -305,11 +322,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     populateSelect('yonetmen', yonetmenler);
     populateSelect('akademik-dinleyici', akademikDinleyiciler);
+
     function closeAllDropdowns() {
         document.querySelectorAll('.searchable-select-dropdown').forEach(d => d.classList.add('hidden'));
         if (formContainer) formContainer.classList.remove('is-active');
     }
     document.addEventListener('click', closeAllDropdowns);
+
     function createSearchableDropdown(selectElement) {
         const container = document.createElement('div');
         container.className = 'searchable-select-container relative';
@@ -407,13 +426,19 @@ document.addEventListener('DOMContentLoaded', () => {
             row.dataset.id = kayit.id;
             const date = new Date(kayit.cekimTarihi + 'T00:00:00');
             const formattedDate = kayit.cekimTarihi ? `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}` : '';
+            
+            const fileIcon = (kayit.timecodeFileData && kayit.timecodeFileName)
+                ? `<a href="${kayit.timecodeFileData}" download="${kayit.timecodeFileName}" class="ml-2 text-indigo-500 hover:text-indigo-700" title="Time Code Dosyasını İndir"><i class="fas fa-download"></i></a>`
+                : '';
+
             const yonetmenDurum = kayit.yonetmen 
-                ? `<td class="font-semibold text-green-600 align-middle">${kayit.yonetmen}</td>`
+                ? `<td class="font-semibold text-green-600 align-middle">${kayit.yonetmen}${fileIcon}</td>`
                 : `<td class="font-semibold text-gray-500 align-middle">Atanmadı</td>`;
             const akademikDinleyiciDurum = kayit.akademikDinleyici 
                 ? `<td class="font-semibold text-green-600 align-middle">${kayit.akademikDinleyici}</td>`
                 : `<td class="font-semibold text-gray-500 align-middle">Atanmadı</td>`;
             const buttonTitle = kayit.yonetmen ? "Düzenle" : "Ata";
+
             row.innerHTML = `
                 <td class="align-middle">${formattedDate || ''}</td>
                 <td class="align-middle">${kayit.sinavTuru || ''}</td>
@@ -435,6 +460,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         });
     }
+
     function setupPagination(items) {
         paginationControlsEl.innerHTML = '';
         const pageCount = Math.ceil(items.length / rowsPerPage);
@@ -452,23 +478,15 @@ document.addEventListener('DOMContentLoaded', () => {
         prevButton.className = 'pagination-button';
         prevButton.disabled = currentPage === 1;
         prevButton.addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                loadAndDisplayCekimler();
-            }
+            if (currentPage > 1) { currentPage--; loadAndDisplayCekimler(); }
         });
         paginationControlsEl.appendChild(prevButton);
         for (let i = 1; i <= pageCount; i++) {
             const btn = document.createElement('button');
             btn.innerText = i;
             btn.className = 'pagination-button';
-            if (i === currentPage) {
-                btn.classList.add('active');
-            }
-            btn.addEventListener('click', () => {
-                currentPage = i;
-                loadAndDisplayCekimler();
-            });
+            if (i === currentPage) { btn.classList.add('active'); }
+            btn.addEventListener('click', () => { currentPage = i; loadAndDisplayCekimler(); });
             paginationControlsEl.appendChild(btn);
         }
         const nextButton = document.createElement('button');
@@ -476,13 +494,11 @@ document.addEventListener('DOMContentLoaded', () => {
         nextButton.className = 'pagination-button';
         nextButton.disabled = currentPage === pageCount;
         nextButton.addEventListener('click', () => {
-            if (currentPage < pageCount) {
-                currentPage++;
-                loadAndDisplayCekimler();
-            }
+            if (currentPage < pageCount) { currentPage++; loadAndDisplayCekimler(); }
         });
         paginationControlsEl.appendChild(nextButton);
     }
+
     function loadAndDisplayCekimler() {
         let cek_kayitlari = getCekimlerFromStorage();
         const filterInputs = document.querySelectorAll('.filter-input');
@@ -518,6 +534,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         setupPagination(filteredKayitlar);
     }
+
     cekForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const id = editingIdInput.value;
@@ -525,20 +542,43 @@ document.addEventListener('DOMContentLoaded', () => {
             showNotification("Lütfen düzenlemek için bir çekim seçin.", "error");
             return;
         }
-        let cek_kayitlari = getCekimlerFromStorage();
-        const kayitIndex = cek_kayitlari.findIndex(k => k.id == id);
-        if (kayitIndex > -1) {
-            cek_kayitlari[kayitIndex].yonetmen = document.getElementById('yonetmen').value;
-            cek_kayitlari[kayitIndex].akademikDinleyici = document.getElementById('akademik-dinleyici').value;
-            saveCekimlerToStorage(cek_kayitlari);
-            loadAndDisplayCekimler();
-            cekForm.reset();
-            editingIdInput.value = '';
-            updateSelectDisplay(document.getElementById('yonetmen'));
-            updateSelectDisplay(document.getElementById('akademik-dinleyici'));
-            showNotification('Atama başarıyla güncellendi!');
+
+        const fileInput = document.getElementById('timecode-file');
+        const file = fileInput.files[0];
+
+        const updateRecord = (fileData, fileName) => {
+            let cek_kayitlari = getCekimlerFromStorage();
+            const kayitIndex = cek_kayitlari.findIndex(k => k.id == id);
+            if (kayitIndex > -1) {
+                cek_kayitlari[kayitIndex].yonetmen = document.getElementById('yonetmen').value;
+                cek_kayitlari[kayitIndex].akademikDinleyici = document.getElementById('akademik-dinleyici').value;
+                if (fileData !== undefined) { // Dosya alanı değişmişse
+                    cek_kayitlari[kayitIndex].timecodeFileData = fileData;
+                    cek_kayitlari[kayitIndex].timecodeFileName = fileName;
+                }
+                saveCekimlerToStorage(cek_kayitlari);
+                loadAndDisplayCekimler();
+                cekForm.reset();
+                document.getElementById('current-file-display').textContent = '';
+                editingIdInput.value = '';
+                updateSelectDisplay(document.getElementById('yonetmen'));
+                updateSelectDisplay(document.getElementById('akademik-dinleyici'));
+                showNotification('Atama başarıyla güncellendi!');
+            }
+        };
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                updateRecord(event.target.result, file.name);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            // Eğer yeni dosya seçilmediyse, dosya bilgilerini 'undefined' göndererek mevcutun silinmemesini sağlıyoruz
+            updateRecord(undefined, undefined);
         }
     });
+
     tableBody.addEventListener('click', function(e) {
         const editButton = e.target.closest('.edit-row');
         if (editButton) {
@@ -553,10 +593,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('akademik-dinleyici').value = kayit.akademikDinleyici || '';
                 updateSelectDisplay(document.getElementById('yonetmen'));
                 updateSelectDisplay(document.getElementById('akademik-dinleyici'));
+                
+                document.getElementById('timecode-file').value = ''; // file input'u temizle
+                const currentFileDisplay = document.getElementById('current-file-display');
+                if (kayit.timecodeFileName) {
+                    currentFileDisplay.textContent = `Mevcut dosya: ${kayit.timecodeFileName}`;
+                } else {
+                    currentFileDisplay.textContent = '';
+                }
+
                 document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
             }
         }
     });
+    
     document.querySelectorAll('.filter-input').forEach(input => {
         input.addEventListener('keyup', () => {
             currentPage = 1;
