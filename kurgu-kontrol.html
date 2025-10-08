@@ -44,15 +44,15 @@
         }
         #cekim-tablosu th, #cekim-tablosu td {
             text-align: center;
-            vertical-align: middle;
+            vertical-align: middle; /* Dikey hizalamayı garantiler */
             border-left: 1px solid #e5e7eb;
-            padding: 0.5rem;
+            padding: 0.75rem 0.5rem; /* Dikey boşluğu biraz artırdık */
             word-break: break-word; 
             font-size: 0.75rem;
             line-height: 1rem;
         }
-        #cekim-tablosu th {
-            white-space: nowrap;
+        #cekim-tablosu th { /* SADECE BAŞLIKLARA ÖZEL KURAL */
+            white-space: nowrap; /* Başlıkların alt satıra kaymasını engeller */
             font-weight: 600;
         }
         #cekim-tablosu th:first-child, #cekim-tablosu td:first-child { 
