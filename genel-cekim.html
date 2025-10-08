@@ -234,6 +234,31 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentPage = 1;
     const rowsPerPage = 10;
 
+    // Estetik bildirim fonksiyonu
+    function showNotification(message, type = 'success') {
+        const container = document.getElementById('notification-container');
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        
+        const iconClass = type === 'success' ? 'fa-check-circle' : 'fa-times-circle';
+        notification.innerHTML = `<i class="fas ${iconClass}"></i><span>${message}</span>`;
+        
+        container.appendChild(notification);
+        
+        // Bildirimi göster
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 10);
+
+        // Bildirimi 3 saniye sonra kaldır
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                container.removeChild(notification);
+            }, 500);
+        }, 3000);
+    }
+
     // Veri listeleri
     const bransListeleri = {
         'TYT': ['TYT TÜRKÇE', 'TYT MATEMATİK', 'TYT FİZİK', 'TYT KİMYA', 'TYT BİYOLOJİ', 'TYT COĞRAFYA', 'TYT DİN KÜLTÜRÜ', 'TYT-AYT GEOMETRİ', 'TYT-AYT TARİH', 'TYT-AYT FELSEFE'],
@@ -273,6 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tableBody = document.getElementById('cekim-tablosu-body');
     const recordCountEl = document.getElementById('record-count');
     const paginationControlsEl = document.getElementById('pagination-controls');
+    const filterInputs = document.querySelectorAll('.filter-input');
 
     // ARAMA YAPILABİLİR DROPDOWN FONKSİYONU
     function createSearchableDropdown(selectElement) {
@@ -408,8 +434,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSelectDisplay(uniteSelect);
     });
 
-
-    // Kısaltılabilir alanlar için fonksiyon
     const triggers = document.querySelectorAll('.collapsible-trigger');
     triggers.forEach(trigger => {
         trigger.addEventListener('click', () => {
@@ -426,16 +450,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Tablo filtreleme
-    const filterInputs = document.querySelectorAll('.filter-input');
     filterInputs.forEach(input => {
         input.addEventListener('keyup', () => {
-            currentPage = 1; // Filtreleme yapıldığında ilk sayfaya dön
+            currentPage = 1;
             renderTable();
         });
     });
     
-    // FORM İŞLEMLERİ (EKLEME/GÜNCELLEME)
     cekForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const editingId = document.getElementById('editing-row-index').value;
@@ -445,14 +466,13 @@ document.addEventListener('DOMContentLoaded', () => {
         let cekimler = JSON.parse(localStorage.getItem('cekimListesi')) || [];
 
         if (editingId) {
-            // GÜNCELLEME MODU
             const cekimIndex = cekimler.findIndex(c => c.id === editingId);
             if (cekimIndex > -1) {
                 const mevcutCekim = cekimler[cekimIndex];
                 cekimler[cekimIndex] = { ...mevcutCekim, ...data, id: editingId };
+                showNotification('Kayıt başarıyla güncellendi!');
             }
         } else {
-            // EKLEME MODU
             const newCekim = { 
                 ...data, 
                 id: crypto.randomUUID(), 
@@ -460,12 +480,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 akademikDinleyici: '' 
             };
             cekimler.push(newCekim);
+            showNotification('Kayıt başarıyla eklendi!');
         }
         
         localStorage.setItem('cekimListesi', JSON.stringify(cekimler));
         
-        currentPage = 1; // Yeni kayıt ekledikten sonra ilk sayfaya git
-        renderTable();
+        currentPage = 1;
+        renderTable(true); // `true` parametresi filtreleri temizlemesi gerektiğini belirtir
         resetForm();
     });
 
@@ -510,10 +531,20 @@ document.addEventListener('DOMContentLoaded', () => {
         paginationControlsEl.innerHTML = '';
         const pageCount = Math.ceil(items.length / rowsPerPage);
 
-        // Önceki butonu
+        if (pageCount <= 1 && items.length > 0) {
+             const btn = document.createElement('button');
+            btn.innerText = 1;
+            btn.className = 'pagination-button active';
+            btn.disabled = true;
+            paginationControlsEl.appendChild(btn);
+            return;
+        }
+
+        if (pageCount === 0) return;
+
         const prevButton = document.createElement('button');
         prevButton.innerHTML = `<i class="fas fa-chevron-left"></i>`;
-        prevButton.classList.add('pagination-button');
+        prevButton.className = 'pagination-button';
         prevButton.disabled = currentPage === 1;
         prevButton.addEventListener('click', () => {
             if (currentPage > 1) {
@@ -523,11 +554,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         paginationControlsEl.appendChild(prevButton);
 
-        // Sayfa numaraları
         for (let i = 1; i <= pageCount; i++) {
             const btn = document.createElement('button');
             btn.innerText = i;
-            btn.classList.add('pagination-button');
+            btn.className = 'pagination-button';
             if (i === currentPage) {
                 btn.classList.add('active');
             }
@@ -538,10 +568,9 @@ document.addEventListener('DOMContentLoaded', () => {
             paginationControlsEl.appendChild(btn);
         }
 
-        // Sonraki butonu
         const nextButton = document.createElement('button');
         nextButton.innerHTML = `<i class="fas fa-chevron-right"></i>`;
-        nextButton.classList.add('pagination-button');
+        nextButton.className = 'pagination-button';
         nextButton.disabled = currentPage === pageCount;
         nextButton.addEventListener('click', () => {
             if (currentPage < pageCount) {
@@ -552,10 +581,13 @@ document.addEventListener('DOMContentLoaded', () => {
         paginationControlsEl.appendChild(nextButton);
     }
 
-    function renderTable() {
+    function renderTable(clearFilters = false) {
+        if (clearFilters) {
+            filterInputs.forEach(input => input.value = '');
+        }
+
         let cekimler = JSON.parse(localStorage.getItem('cekimListesi')) || [];
         
-        // Filtreleme mantığı
         const filters = Array.from(filterInputs).map(i => i.value.toLowerCase());
         const filteredCekimler = cekimler.filter(row => {
             return filters.every((filter, index) => {
@@ -565,12 +597,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     row.brans, row.unite, row.bolum, row.ders, row.testAdi,
                     row.soruSayisi, row.not, row.anlaticiOgretmen, row.yonetmen, row.akademikDinleyici
                 ];
-                const cellValue = columns[index] ? columns[index].toString().toLowerCase() : '';
+                let cellValue = '';
+                if (index === 0 && row.cekimTarihi) {
+                    const date = new Date(row.cekimTarihi + 'T00:00:00');
+                    cellValue = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+                } else {
+                    cellValue = columns[index] ? columns[index].toString().toLowerCase() : '';
+                }
                 return cellValue.includes(filter);
             });
         });
 
-        // Verileri en yeniden eskiye sırala
         filteredCekimler.sort((a, b) => new Date(b.cekimTarihi) - new Date(a.cekimTarihi));
 
         recordCountEl.textContent = `Toplam ${filteredCekimler.length} kayıt bulundu.`;
@@ -594,11 +631,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         bransSelect.disabled = true;
         uniteSelect.disabled = true;
+        bransSelect.innerHTML = '<option value="">Önce sınav türü seçiniz...</option>';
+        uniteSelect.innerHTML = '<option value="">Önce branş seçiniz...</option>';
         updateSelectDisplay(bransSelect);
         updateSelectDisplay(uniteSelect);
     }
 
-    // TABLO İŞLEMLERİ (SİLME/DÜZENLEME)
     tableBody.addEventListener('click', function(e) {
         const deleteButton = e.target.closest('.delete-row');
         const editButton = e.target.closest('.edit-row');
@@ -606,10 +644,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (deleteButton) {
             e.preventDefault();
             const id = deleteButton.dataset.id;
-            let cekimler = JSON.parse(localStorage.getItem('cekimListesi')) || [];
-            cekimler = cekimler.filter(c => c.id !== id);
-            localStorage.setItem('cekimListesi', JSON.stringify(cekimler));
-            renderTable();
+            if (confirm('Bu kaydı silmek istediğinizden emin misiniz?')) {
+                let cekimler = JSON.parse(localStorage.getItem('cekimListesi')) || [];
+                cekimler = cekimler.filter(c => c.id !== id);
+                localStorage.setItem('cekimListesi', JSON.stringify(cekimler));
+                renderTable();
+                showNotification('Kayıt başarıyla silindi.', 'error');
+            }
         }
 
         if (editButton) {
@@ -638,8 +679,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 setSelectValue('brans', cekim.brans);
                 setTimeout(() => {
                     setSelectValue('unite', cekim.unite);
-                }, 100);
-            }, 100);
+                }, 50);
+            }, 50);
 
             setSelectValue('anlatimTuru', cekim.anlatimTuru);
             setSelectValue('bolum', cekim.bolum);
@@ -662,22 +703,17 @@ document.addEventListener('DOMContentLoaded', () => {
     renderTable(); 
     window.addEventListener('storage', renderTable); 
 
-});
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.collapsible-content').forEach(content => {
+    document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
+        const content = document.getElementById(trigger.dataset.target);
+        const icon = trigger.querySelector('i.fas');
+        if (content && icon) {
             content.style.maxHeight = content.scrollHeight + "px";
-            const trigger = content.parentElement.querySelector('.collapsible-trigger');
-            if (trigger) {
-                const icon = trigger.querySelector('.fa-chevron-down');
-                if (icon) {
-                    icon.classList.add('rotate-180');
-                }
-            }
-        });
+            icon.classList.add('rotate-180');
+        }
     });
+});
 </script>
 </body>
 </html>
+
 
