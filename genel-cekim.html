@@ -13,26 +13,16 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        .nav-link.active {
-            background-color: #4f46e5; /* indigo-600 */
-            color: white;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        }
         .collapsible-content {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.5s ease-out;
         }
-        .form-input:focus, .search-input:focus {
-            border-color: #818cf8; /* indigo-400 */
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
-            outline: none;
-        }
         .searchable-select-container {
             position: relative;
         }
         #table-container {
-            max-height: 800px; /* Yaklaşık 20-25 satır için yükseklik */
+            max-height: 800px;
             overflow-y: auto;
         }
         .searchable-select-dropdown {
@@ -40,7 +30,7 @@
             top: 100%;
             left: 0;
             right: 0;
-            z-index: 10;
+            z-index: 50;
             max-height: 200px;
             overflow-y: auto;
         }
@@ -53,7 +43,7 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-        .pagination-button:hover {
+        .pagination-button:hover:not(:disabled) {
             background-color: #f3f4f6;
         }
         .pagination-button.active {
@@ -65,12 +55,40 @@
             cursor: not-allowed;
             opacity: 0.5;
         }
+        /* Bildirim Stilleri */
+        .notification {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.25rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 100;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .notification.success {
+            background-color: #22c55e; /* green-500 */
+        }
+        .notification.error {
+            background-color: #ef4444; /* red-500 */
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800">
 
+    <div id="notification-container"></div>
+
     <div class="min-h-screen flex flex-col">
-        <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-40">
+      <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-40">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <a href="index.html" class="flex items-center space-x-2">
@@ -82,7 +100,6 @@
     </header>
 
         <main class="flex-grow p-4 md:p-6">
-
             <div class="space-y-8">
                 <div id="form-container" class="bg-white rounded-xl shadow-lg border border-gray-200/80">
                     <button class="collapsible-trigger w-full p-5 text-left font-bold text-lg text-indigo-700 flex justify-between items-center hover:bg-gray-50 rounded-t-xl transition-colors duration-200" data-target="cekim-ekle-form">
@@ -197,14 +214,14 @@
                                         </tr>
                                     </thead>
                                     <tbody id="cekim-tablosu-body" class="bg-white divide-y divide-gray-200">
-                                        </tbody>
+                                    </tbody>
                                 </table>
                             </div>
                             <div class="flex items-center justify-between mt-4 p-2 border-t">
                                 <span id="record-count" class="text-sm text-gray-600"></span>
                                 <div id="pagination-controls" class="flex items-center space-x-1"></div>
                             </div>
-                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -663,3 +680,4 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
