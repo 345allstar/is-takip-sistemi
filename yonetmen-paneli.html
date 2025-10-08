@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yönetmen Paneli - ÜDB All Star</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,81 +61,22 @@
         #cekim-tablosu thead tr:last-child th { 
             border-bottom: 2px solid #d1d5db; 
         }
-        .pagination-button {
-            padding: 0.5rem 0.75rem;
-            border: 1px solid #d1d5db;
-            background-color: white;
-            color: #374151;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .pagination-button:hover:not(:disabled) {
-            background-color: #f3f4f6;
-        }
-        .pagination-button.active {
-            background-color: #4f46e5;
-            color: white;
-            border-color: #4f46e5;
-        }
-        .pagination-button:disabled {
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-        .notification {
-            position: fixed;
-            top: 1.25rem;
-            right: 1.25rem;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            z-index: 100;
-            opacity: 0;
-            transform: translateX(100%);
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-        }
-        .notification.show {
-            opacity: 1;
-            transform: translateX(0);
-        }
+        .pagination-button { padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; background-color: white; color: #374151; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s; }
+        .pagination-button:hover:not(:disabled) { background-color: #f3f4f6; }
+        .pagination-button.active { background-color: #4f46e5; color: white; border-color: #4f46e5; }
+        .pagination-button:disabled { cursor: not-allowed; opacity: 0.5; }
+        .notification { position: fixed; top: 1.25rem; right: 1.25rem; padding: 1rem; border-radius: 0.5rem; color: white; display: flex; align-items: center; gap: 0.75rem; z-index: 100; opacity: 0; transform: translateX(100%); transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+        .notification.show { opacity: 1; transform: translateX(0); }
         .notification.success { background-color: #22c55e; }
         .notification.error { background-color: #ef4444; }
-        .form-label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #374151;
-        }
-        .form-input-base {
-            margin-top: 0.25rem;
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            background-color: #f9fafb;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            color: #111827;
-            placeholder-color: #9ca3af;
-            font-size: 0.875rem;
-        }
-        .form-input-base:focus-within, .form-input-base:focus {
-            outline: none;
-            border-color: #6366f1;
-            box-shadow: 0 0 0 1px #6366f1;
-        }
-        .form-file-input {
-            font-size: 0.875rem;
-            color: #4b5563;
-        }
-        .form-file-input::-webkit-file-upload-button {
-            margin-right: 0.75rem; padding: 0.5rem 1rem; border-radius: 9999px; border-width: 0; font-size: 0.875rem; font-weight: 600; background-color: #eef2ff; color: #4338ca; cursor: pointer;
-        }
-        .form-file-input::-webkit-file-upload-button:hover {
-            background-color: #e0e7ff;
-        }
+        .form-label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; }
+        .form-input-base { margin-top: 0.25rem; width: 100%; padding: 0.5rem 0.75rem; background-color: #f9fafb; border: 1px solid #d1d5db; border-radius: 0.5rem; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); color: #111827; placeholder-color: #9ca3af; font-size: 0.875rem; }
+        .form-input-base:focus-within, .form-input-base:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 1px #6366f1; }
+        .form-file-input { font-size: 0.875rem; color: #4b5563; }
+        .form-file-input::-webkit-file-upload-button { margin-right: 0.75rem; padding: 0.5rem 1rem; border-radius: 9999px; border-width: 0; font-size: 0.875rem; font-weight: 600; background-color: #eef2ff; color: #4338ca; cursor: pointer; }
+        .form-file-input::-webkit-file-upload-button:hover { background-color: #e0e7ff; }
+        .file-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; padding: 0.25rem 0; }
+        .delete-file { cursor: pointer; color: #ef4444; margin-left: 8px; }
     </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
@@ -175,9 +117,9 @@
                             </select>
                         </div>
                         <div class="md:col-span-2">
-                            <label for="timecode-file" class="form-label">Time Code Dosyası Ekle</label>
-                            <input id="timecode-file" type="file" class="form-input-base form-file-input">
-                            <span id="current-file-display" class="text-xs text-gray-500 mt-1 block"></span>
+                            <label for="timecode-file" class="form-label">Time Code Dosyası Ekle (Çoklu Seçim)</label>
+                            <input id="timecode-file" type="file" class="form-input-base form-file-input" multiple>
+                            <div id="current-files-list" class="text-xs text-gray-500 mt-2"></div>
                         </div>
                         <div class="md:col-span-2 flex justify-end pt-4 mt-4 border-t">
                             <button type="submit" id="submit-button" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">
@@ -262,9 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             notification.classList.remove('show');
             setTimeout(() => {
-                if (notification.parentNode === container) {
-                    container.removeChild(notification);
-                }
+                if (notification.parentNode === container) container.removeChild(notification);
             }, 500);
         }, 3000);
     }
@@ -405,17 +345,25 @@ document.addEventListener('DOMContentLoaded', () => {
         updateOptions();
     }
     document.querySelectorAll('.searchable-select').forEach(createSearchableDropdown);
+
     const updateSelectDisplay = (selectElement) => {
         if(selectElement && selectElement.updateDropdown) {
            selectElement.updateDropdown();
         }
     }
-    function getCekimlerFromStorage() {
-        return JSON.parse(localStorage.getItem('cekimListesi') || '[]');
+    
+    function getCekimlerFromStorage() { return JSON.parse(localStorage.getItem('cekimListesi') || '[]'); }
+    function saveCekimlerToStorage(cek_kayitlari) { localStorage.setItem('cekimListesi', JSON.stringify(cek_kayitlari)); }
+
+    function readFileAsDataURL(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve({ name: file.name, data: reader.result });
+            reader.onerror = (error) => reject(error);
+            reader.readAsDataURL(file);
+        });
     }
-    function saveCekimlerToStorage(cek_kayitlari) {
-        localStorage.setItem('cekimListesi', JSON.stringify(cek_kayitlari));
-    }
+
     function displayPage(items) {
         tableBody.innerHTML = '';
         const start = (currentPage - 1) * rowsPerPage;
@@ -427,8 +375,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const date = new Date(kayit.cekimTarihi + 'T00:00:00');
             const formattedDate = kayit.cekimTarihi ? `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}` : '';
             
-            const fileIcon = (kayit.timecodeFileData && kayit.timecodeFileName)
-                ? `<a href="${kayit.timecodeFileData}" download="${kayit.timecodeFileName}" class="ml-2 text-indigo-500 hover:text-indigo-700" title="Time Code Dosyasını İndir"><i class="fas fa-download"></i></a>`
+            const fileIcon = (kayit.timecodeFiles && kayit.timecodeFiles.length > 0)
+                ? `<button class="download-files-btn ml-2 text-indigo-500 hover:text-indigo-700" title="Time Code Dosyalarını İndir" data-id="${kayit.id}"><i class="fas fa-download"></i></button>`
                 : '';
 
             const yonetmenDurum = kayit.yonetmen 
@@ -477,9 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
         prevButton.innerHTML = `<i class="fas fa-chevron-left"></i>`;
         prevButton.className = 'pagination-button';
         prevButton.disabled = currentPage === 1;
-        prevButton.addEventListener('click', () => {
-            if (currentPage > 1) { currentPage--; loadAndDisplayCekimler(); }
-        });
+        prevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; loadAndDisplayCekimler(); } });
         paginationControlsEl.appendChild(prevButton);
         for (let i = 1; i <= pageCount; i++) {
             const btn = document.createElement('button');
@@ -493,12 +439,10 @@ document.addEventListener('DOMContentLoaded', () => {
         nextButton.innerHTML = `<i class="fas fa-chevron-right"></i>`;
         nextButton.className = 'pagination-button';
         nextButton.disabled = currentPage === pageCount;
-        nextButton.addEventListener('click', () => {
-            if (currentPage < pageCount) { currentPage++; loadAndDisplayCekimler(); }
-        });
+        nextButton.addEventListener('click', () => { if (currentPage < pageCount) { currentPage++; loadAndDisplayCekimler(); } });
         paginationControlsEl.appendChild(nextButton);
     }
-
+    
     function loadAndDisplayCekimler() {
         let cek_kayitlari = getCekimlerFromStorage();
         const filterInputs = document.querySelectorAll('.filter-input');
@@ -535,7 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setupPagination(filteredKayitlar);
     }
 
-    cekForm.addEventListener('submit', function(e) {
+    cekForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         const id = editingIdInput.value;
         if (!id) {
@@ -544,42 +488,64 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const fileInput = document.getElementById('timecode-file');
-        const file = fileInput.files[0];
+        const newFiles = Array.from(fileInput.files);
+        
+        let cek_kayitlari = getCekimlerFromStorage();
+        const kayitIndex = cek_kayitlari.findIndex(k => k.id == id);
+        
+        if (kayitIndex > -1) {
+            const mevcutKayit = cek_kayitlari[kayitIndex];
+            mevcutKayit.yonetmen = document.getElementById('yonetmen').value;
+            mevcutKayit.akademikDinleyici = document.getElementById('akademik-dinleyici').value;
 
-        const updateRecord = (fileData, fileName) => {
-            let cek_kayitlari = getCekimlerFromStorage();
-            const kayitIndex = cek_kayitlari.findIndex(k => k.id == id);
-            if (kayitIndex > -1) {
-                cek_kayitlari[kayitIndex].yonetmen = document.getElementById('yonetmen').value;
-                cek_kayitlari[kayitIndex].akademikDinleyici = document.getElementById('akademik-dinleyici').value;
-                if (fileData !== undefined) { // Dosya alanı değişmişse
-                    cek_kayitlari[kayitIndex].timecodeFileData = fileData;
-                    cek_kayitlari[kayitIndex].timecodeFileName = fileName;
+            if (newFiles.length > 0) {
+                try {
+                    const uploadedFiles = await Promise.all(newFiles.map(readFileAsDataURL));
+                    if (!mevcutKayit.timecodeFiles) {
+                        mevcutKayit.timecodeFiles = [];
+                    }
+                    mevcutKayit.timecodeFiles.push(...uploadedFiles);
+                } catch (error) {
+                    showNotification("Dosya yüklenirken bir hata oluştu.", "error");
+                    return;
                 }
-                saveCekimlerToStorage(cek_kayitlari);
-                loadAndDisplayCekimler();
-                cekForm.reset();
-                document.getElementById('current-file-display').textContent = '';
-                editingIdInput.value = '';
-                updateSelectDisplay(document.getElementById('yonetmen'));
-                updateSelectDisplay(document.getElementById('akademik-dinleyici'));
-                showNotification('Atama başarıyla güncellendi!');
             }
-        };
-
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                updateRecord(event.target.result, file.name);
-            };
-            reader.readAsDataURL(file);
-        } else {
-            // Eğer yeni dosya seçilmediyse, dosya bilgilerini 'undefined' göndererek mevcutun silinmemesini sağlıyoruz
-            updateRecord(undefined, undefined);
+            saveCekimlerToStorage(cek_kayitlari);
+            loadAndDisplayCekimler();
+            cekForm.reset();
+            document.getElementById('current-files-list').innerHTML = '';
+            editingIdInput.value = '';
+            updateSelectDisplay(document.getElementById('yonetmen'));
+            updateSelectDisplay(document.getElementById('akademik-dinleyici'));
+            showNotification('Atama başarıyla güncellendi!');
         }
     });
 
     tableBody.addEventListener('click', function(e) {
+        if (e.target.classList.contains('delete-file')) {
+            const id = editingIdInput.value;
+            const fileNameToDelete = e.target.dataset.filename;
+            if (!id || !fileNameToDelete) return;
+            let records = getCekimlerFromStorage();
+            const recordIndex = records.findIndex(r => r.id === id);
+            if (recordIndex > -1 && records[recordIndex].timecodeFiles) {
+                records[recordIndex].timecodeFiles = records[recordIndex].timecodeFiles.filter(f => f.name !== fileNameToDelete);
+                saveCekimlerToStorage(records);
+                const kayit = records[recordIndex];
+                const currentFilesList = document.getElementById('current-files-list');
+                currentFilesList.innerHTML = '<strong>Mevcut Dosyalar:</strong>';
+                if (kayit.timecodeFiles && kayit.timecodeFiles.length > 0) {
+                    kayit.timecodeFiles.forEach(file => {
+                        currentFilesList.innerHTML += `<div class="file-item"><span>${file.name}</span><i class="fas fa-trash-alt delete-file" data-filename="${file.name}"></i></div>`;
+                    });
+                } else {
+                    currentFilesList.innerHTML = 'Mevcut dosya bulunmuyor.';
+                }
+                loadAndDisplayCekimler();
+                showNotification('Dosya başarıyla silindi.', 'success');
+            }
+        }
+        
         const editButton = e.target.closest('.edit-row');
         if (editButton) {
             e.preventDefault();
@@ -594,15 +560,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateSelectDisplay(document.getElementById('yonetmen'));
                 updateSelectDisplay(document.getElementById('akademik-dinleyici'));
                 
-                document.getElementById('timecode-file').value = ''; // file input'u temizle
-                const currentFileDisplay = document.getElementById('current-file-display');
-                if (kayit.timecodeFileName) {
-                    currentFileDisplay.textContent = `Mevcut dosya: ${kayit.timecodeFileName}`;
+                document.getElementById('timecode-file').value = '';
+                const currentFilesList = document.getElementById('current-files-list');
+                currentFilesList.innerHTML = '<strong>Mevcut Dosyalar:</strong>';
+                if (kayit.timecodeFiles && kayit.timecodeFiles.length > 0) {
+                    kayit.timecodeFiles.forEach(file => {
+                        currentFilesList.innerHTML += `<div class="file-item"><span>${file.name}</span><i class="fas fa-trash-alt delete-file" data-filename="${file.name}"></i></div>`;
+                    });
                 } else {
-                    currentFileDisplay.textContent = '';
+                    currentFilesList.innerHTML = 'Mevcut dosya bulunmuyor.';
                 }
-
                 document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        const downloadBtn = e.target.closest('.download-files-btn');
+        if(downloadBtn) {
+            e.preventDefault();
+            const id = downloadBtn.dataset.id;
+            const records = getCekimlerFromStorage();
+            const record = records.find(r => r.id === id);
+            if (record && record.timecodeFiles && record.timecodeFiles.length > 0) {
+                const zip = new JSZip();
+                record.timecodeFiles.forEach(file => {
+                    const base64Data = file.data.split(',')[1];
+                    zip.file(file.name, base64Data, { base64: true });
+                });
+                zip.generateAsync({ type: "blob" }).then(function(content) {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(content);
+                    link.download = `${record.videoKodu || 'timecodes'}.zip`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                });
             }
         }
     });
@@ -613,9 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadAndDisplayCekimler();
         });
     });
-    window.addEventListener('storage', () => {
-        loadAndDisplayCekimler();
-    });
+    window.addEventListener('storage', () => { loadAndDisplayCekimler(); });
     loadAndDisplayCekimler();
 });
 </script>
