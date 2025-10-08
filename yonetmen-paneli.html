@@ -35,7 +35,7 @@
         #cekim-tablosu {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed; /* Sütun genişliklerini sabitlemek için */
+            table-layout: fixed;
         }
         #table-container {
             max-height: 800px;
@@ -45,11 +45,14 @@
             text-align: center;
             vertical-align: middle;
             border-left: 1px solid #e5e7eb;
-            padding: 0.75rem; 
+            padding: 0.5rem; /* Yazı boyutu küçüldüğü için padding azaltıldı */
             word-break: break-word; 
+            font-size: 0.75rem; /* text-xs - YAZI BOYUTU KÜÇÜLTÜLDÜ */
+            line-height: 1rem;
         }
         #cekim-tablosu th {
-            white-space: nowrap; /* Başlıkların aşağı kaymasını engelle */
+            white-space: nowrap;
+            font-weight: 600; /* font-semibold */
         }
         #cekim-tablosu th:first-child, #cekim-tablosu td:first-child { 
             border-left: 0; 
@@ -99,29 +102,28 @@
         }
         .notification.success { background-color: #22c55e; }
         .notification.error { background-color: #ef4444; }
-
         .form-label {
             display: block;
-            font-size: 0.875rem; /* text-sm */
-            font-weight: 500; /* font-medium */
-            color: #374151; /* text-gray-700 */
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
         }
         .form-input-base {
             margin-top: 0.25rem;
             width: 100%;
             padding: 0.5rem 0.75rem;
-            background-color: #f9fafb; /* bg-gray-50 */
-            border: 1px solid #d1d5db; /* border-gray-300 */
-            border-radius: 0.5rem; /* rounded-lg */
-            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* shadow-sm */
-            color: #111827; /* text-gray-900 */
-            placeholder-color: #9ca3af; /* placeholder-gray-400 */
-            font-size: 0.875rem; /* text-sm */
+            background-color: #f9fafb;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            color: #111827;
+            placeholder-color: #9ca3af;
+            font-size: 0.875rem;
         }
         .form-input-base:focus-within, .form-input-base:focus {
             outline: none;
-            border-color: #6366f1; /* focus:border-indigo-500 */
-            box-shadow: 0 0 0 1px #6366f1; /* focus:ring-1 focus:ring-indigo-500 */
+            border-color: #6366f1;
+            box-shadow: 0 0 0 1px #6366f1;
         }
     </style>
 </head>
@@ -147,7 +149,7 @@
                     <h2 class="text-xl font-bold text-gray-800 flex items-center"><i class="fas fa-user-edit mr-3 text-indigo-500"></i><span id="form-title">Çekim Detayları ve Atama</span></h2>
                     <i class="fas fa-chevron-down transform transition-transform text-gray-500"></i>
                 </div>
-                <div class="collapsible-content mt-4">
+                <div class="collapsible-content mt-4 pb-56">
                     <form id="cek-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6 items-start">
                         <input type="hidden" id="editing-row-id">
                         <div>
@@ -181,19 +183,19 @@
                         <table id="cekim-tablosu">
                             <thead class="bg-gray-100">
                                 <tr>
-                                    <th style="width: 110px;">ÇEKİM TARİHİ</th>
-                                    <th style="width: 90px;">SINAV TÜRÜ</th>
+                                    <th style="width: 100px;">ÇEKİM TARİHİ</th>
+                                    <th style="width: 80px;">SINAV TÜRÜ</th>
                                     <th>ANLATIM TÜRÜ</th>
                                     <th>VİDEO KODU</th>
                                     <th>BRANŞ</th>
                                     <th>ÜNİTE</th>
                                     <th>BÖLÜM</th>
                                     <th>TEST ADI</th>
-                                    <th style="width: 90px;">SORU SAYISI</th>
+                                    <th style="width: 80px;">SORU SAYISI</th>
                                     <th>ANLATICI ÖĞRETMEN</th>
                                     <th>YÖNETMEN</th>
                                     <th>AKADEMİK DİNLEYİCİ</th>
-                                    <th style="width: 90px;">İŞLEMLER</th>
+                                    <th style="width: 80px;">İŞLEMLER</th>
                                 </tr>
                                 <tr>
                                     <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
@@ -260,7 +262,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const yonetmenler = ["Sait Eralkan", "Anıl Kolay", "Batuhan Gültekin", "Nurdan Özveren", "Merve Çoklar", "Gözde Bulut", "Ali Yıldırım", "Raşit Güngör"];
     const akademikDinleyiciler = ["Ali Yıldırım", "İsmail Tolga Aktaş", "Rahim Ural", "Burak Onay", "Betül Çiçek", "Sinem Şentürk", "Ahmet Ölmez", "Barış Özcan", "Cem Oğuz Büke", "Cihat Çiçek", "Didem Özbay Sarıaydın", "Eda Güney", "Edip İçli", "Elif Bozkurt", "Emine Bolat Kırbıyık", "Esra Dindar", "Esra Şahin", "Esra Yurttaş", "Firdevs Bozkurt", "Fuat Ses", "Hülya Güçkan Taşkın", "İbrahim Atakuru", "İbrahim Halil Kesici", "Koray Dindar", "Mehmet Bademli", "Mehmet Kırbıyık", "Muharrem Akbaş", "Özcan Kulaksız", "Raziye İnal", "Sabri Bingöl", "Semih Sunucuoğlu", "Serkan Yıldız", "Serpil Tunç İçli", "Suat Emre", "Tuğba Bostancı", "Yasin Baş", "Yavuz Selim Yıldız", "Yok"];
     
-    // GÜNCELLENMİŞ KOD: overflow stilini değiştirir
     document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
         trigger.addEventListener('click', () => {
             const content = trigger.nextElementSibling;
@@ -277,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-    // GÜNCELLENMİŞ KOD: Sayfa ilk açıldığında overflow'u visible yapar
+    
     setTimeout(() => {
         document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
             const content = trigger.nextElementSibling;
@@ -288,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon.classList.add('rotate-180');
             }
         });
-    }, 100);
+    }, 200);
 
     function populateSelect(selectId, data) {
         const select = document.getElementById(selectId);
@@ -407,26 +408,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const date = new Date(kayit.cekimTarihi + 'T00:00:00');
             const formattedDate = kayit.cekimTarihi ? `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}` : '';
             const yonetmenDurum = kayit.yonetmen 
-                ? `<td class="text-sm font-semibold text-green-600 align-middle">${kayit.yonetmen}</td>`
-                : `<td class="text-sm font-semibold text-gray-500 align-middle">Atanmadı</td>`;
+                ? `<td class="font-semibold text-green-600 align-middle">${kayit.yonetmen}</td>`
+                : `<td class="font-semibold text-gray-500 align-middle">Atanmadı</td>`;
             const akademikDinleyiciDurum = kayit.akademikDinleyici 
-                ? `<td class="text-sm font-semibold text-green-600 align-middle">${kayit.akademikDinleyici}</td>`
-                : `<td class="text-sm font-semibold text-gray-500 align-middle">Atanmadı</td>`;
+                ? `<td class="font-semibold text-green-600 align-middle">${kayit.akademikDinleyici}</td>`
+                : `<td class="font-semibold text-gray-500 align-middle">Atanmadı</td>`;
             const buttonTitle = kayit.yonetmen ? "Düzenle" : "Ata";
             row.innerHTML = `
-                <td class="text-sm align-middle">${formattedDate || ''}</td>
-                <td class="text-sm align-middle">${kayit.sinavTuru || ''}</td>
-                <td class="text-sm align-middle">${kayit.anlatimTuru || ''}</td>
-                <td class="text-sm align-middle">${kayit.videoKodu || ''}</td>
-                <td class="text-sm align-middle">${kayit.brans || ''}</td>
-                <td class="text-sm align-middle">${kayit.unite || ''}</td>
-                <td class="text-sm align-middle">${kayit.bolum || ''}</td>
-                <td class="text-sm align-middle">${kayit.testAdi || ''}</td>
-                <td class="text-sm align-middle">${kayit.soruSayisi || ''}</td>
-                <td class="text-sm align-middle">${kayit.anlaticiOgretmen || ''}</td>
+                <td class="align-middle">${formattedDate || ''}</td>
+                <td class="align-middle">${kayit.sinavTuru || ''}</td>
+                <td class="align-middle">${kayit.anlatimTuru || ''}</td>
+                <td class="align-middle">${kayit.videoKodu || ''}</td>
+                <td class="align-middle">${kayit.brans || ''}</td>
+                <td class="align-middle">${kayit.unite || ''}</td>
+                <td class="align-middle">${kayit.bolum || ''}</td>
+                <td class="align-middle">${kayit.testAdi || ''}</td>
+                <td class="align-middle">${kayit.soruSayisi || ''}</td>
+                <td class="align-middle">${kayit.anlaticiOgretmen || ''}</td>
                 ${yonetmenDurum}
                 ${akademikDinleyiciDurum}
-                <td class="text-sm align-middle">
+                <td class="align-middle">
                     <button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="${buttonTitle}">
                         <i class="fas fa-pencil-alt"></i>
                     </button>
