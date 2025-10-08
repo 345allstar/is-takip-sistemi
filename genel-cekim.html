@@ -5,112 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Genel Çekim Takip - ÜçDörtBeş All Star</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-        }
-        .collapsible-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-out;
-        }
-        .searchable-select-container {
-            position: relative;
-        }
-        #table-container {
-            max-height: 800px;
-            overflow-y: auto;
-        }
-        .searchable-select-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            z-index: 50;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .pagination-button {
-            padding: 0.5rem 0.75rem;
-            border: 1px solid #d1d5db;
-            background-color: white;
-            color: #374151;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .pagination-button:hover:not(:disabled) {
-            background-color: #f3f4f6;
-        }
-        .pagination-button.active {
-            background-color: #4f46e5;
-            color: white;
-            border-color: #4f46e5;
-        }
-        .pagination-button:disabled {
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-        .notification {
-            position: fixed;
-            top: 1.25rem;
-            right: 1.25rem;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            z-index: 100;
-            opacity: 0;
-            transform: translateX(100%);
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-        }
-        .notification.show {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        .notification.success { background-color: #22c55e; }
-        .notification.error { background-color: #ef4444; }
-        .form-label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #374151;
-        }
-        .form-input-base {
-            margin-top: 0.25rem;
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            background-color: #f9fafb;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            color: #111827;
-            placeholder-color: #9ca3af;
-            font-size: 0.875rem;
-        }
-        .form-input-base:focus-within, .form-input-base:focus {
-            outline: none;
-            border-color: #6366f1;
-            box-shadow: 0 0 0 1px #6366f1;
-        }
-         .status-badge {
-            display: inline-block;
-            padding: 0.25rem 0.6rem;
-            border-radius: 9999px;
-            font-weight: 500;
-            font-size: 0.7rem;
-        }
-        .status-sirada { background-color: #f3f4f6; color: #4b5563; }
-        .status-kurguda { background-color: #dbeafe; color: #1d4ed8; }
-        .status-tamamlandi { background-color: #dcfce7; color: #166534; }
-        .status-revize { background-color: #fee2e2; color: #991b1b; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; } .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; } .searchable-select-container { position: relative; } #table-container { max-height: 800px; overflow-y: auto; } .searchable-select-dropdown { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; max-height: 200px; overflow-y: auto; } .pagination-button { padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; background-color: white; color: #374151; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s; } .pagination-button:hover:not(:disabled) { background-color: #f3f4f6; } .pagination-button.active { background-color: #4f46e5; color: white; border-color: #4f46e5; } .pagination-button:disabled { cursor: not-allowed; opacity: 0.5; } .notification { position: fixed; top: 1.25rem; right: 1.25rem; padding: 1rem; border-radius: 0.5rem; color: white; display: flex; align-items: center; gap: 0.75rem; z-index: 100; opacity: 0; transform: translateX(100%); transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); } .notification.show { opacity: 1; transform: translateX(0); } .notification.success { background-color: #22c55e; } .notification.error { background-color: #ef4444; } .form-label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; } .form-input-base { margin-top: 0.25rem; width: 100%; padding: 0.5rem 0.75rem; background-color: #f9fafb; border: 1px solid #d1d5db; border-radius: 0.5rem; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); color: #111827; placeholder-color: #9ca3af; font-size: 0.875rem; } .form-input-base:focus-within, .form-input-base:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 1px #6366f1; } .status-badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 9999px; font-weight: 500; font-size: 0.7rem; } .status-sirada { background-color: #f3f4f6; color: #4b5563; } .status-kurguda { background-color: #dbeafe; color: #1d4ed8; } .status-tamamlandi { background-color: #dcfce7; color: #166534; } .status-revize { background-color: #fee2e2; color: #991b1b; }
     </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
@@ -506,13 +407,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'Tamamlandı': statusClass = 'status-tamamlandi'; break;
                 case 'Revize': statusClass = 'status-revize'; break;
             }
-
-            // --- EKLENEN KOD ---
-            const fileIcon = (data.timecodeFileData && data.timecodeFileName)
-                ? `<a href="${data.timecodeFileData}" download="${data.timecodeFileName}" class="ml-2 text-indigo-500 hover:text-indigo-700" title="Time Code Dosyasını İndir"><i class="fas fa-download"></i></a>`
+            const fileIcon = (data.timecodeFiles && data.timecodeFiles.length > 0)
+                ? `<button class="download-files-btn ml-2 text-indigo-500 hover:text-indigo-700" title="Time Code Dosyalarını İndir" data-id="${data.id}"><i class="fas fa-download"></i></button>`
                 : '';
-            // --- EKLENEN KOD SONU ---
-
             newRow.innerHTML = `
                 <td class="p-2 align-middle border">${formatDate(data.cekimTarihi)}</td>
                 <td class="p-2 align-middle border">${data.sinavTuru || ''}</td>
@@ -628,8 +525,29 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSelectDisplay(uniteSelect);
     }
     tableBody.addEventListener('click', function(e) {
+        const downloadBtn = e.target.closest('.download-files-btn');
+        if(downloadBtn) {
+            e.preventDefault();
+            const id = downloadBtn.dataset.id;
+            const records = JSON.parse(localStorage.getItem('cekimListesi')) || [];
+            const record = records.find(r => r.id === id);
+            if (record && record.timecodeFiles && record.timecodeFiles.length > 0) {
+                const zip = new JSZip();
+                record.timecodeFiles.forEach(file => {
+                    const base64Data = file.data.split(',')[1];
+                    zip.file(file.name, base64Data, { base64: true });
+                });
+                zip.generateAsync({ type: "blob" }).then(function(content) {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(content);
+                    link.download = `${record.videoKodu || 'timecodes'}.zip`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                });
+            }
+        }
         const deleteButton = e.target.closest('.delete-row');
-        const editButton = e.target.closest('.edit-row');
         if (deleteButton) {
             e.preventDefault();
             const id = deleteButton.dataset.id;
@@ -641,6 +559,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showNotification('Kayıt başarıyla silindi.', 'error');
             }
         }
+        const editButton = e.target.closest('.edit-row');
         if (editButton) {
             e.preventDefault();
             const id = editButton.dataset.id;
@@ -699,5 +618,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
-
-
