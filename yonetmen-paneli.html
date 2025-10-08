@@ -181,15 +181,18 @@
             });
         });
 
+        setTimeout(() => {
         document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
             const content = trigger.nextElementSibling;
             const icon = trigger.querySelector('i:last-child');
             if (content) {
+                // Bu hesaplamanın, tarayıcı yerleşimi tamamladıktan sonra yapıldığından emin oluyoruz
                 content.style.maxHeight = content.scrollHeight + "px";
                 content.style.overflow = 'visible';
             }
             if (icon) icon.classList.add('rotate-180');
         });
+    }, 100); // 100 milisaniyelik küçük bir gecikme ekliyoruz
 
         function populateSelect(selectId, data) {
             const select = document.getElementById(selectId);
@@ -435,3 +438,4 @@
 
 </body>
 </html>
+
