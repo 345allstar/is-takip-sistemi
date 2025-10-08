@@ -422,7 +422,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // GÜNCELLEME MODU
             const cekimIndex = cekimler.findIndex(c => c.id === editingId);
             if (cekimIndex > -1) {
-                // Sadece bu formdaki alanları güncelle, yönetmen ve akademik dinleyiciyi koru
                 const mevcutCekim = cekimler[cekimIndex];
                 cekimler[cekimIndex] = { ...mevcutCekim, ...data, id: editingId };
             }
@@ -438,6 +437,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         localStorage.setItem('cekimListesi', JSON.stringify(cekimler));
+        
+        // Düzeltme burada: Bu iki satır tabloyu günceller ve formu sıfırlar.
         renderTable();
         resetForm();
     });
@@ -595,6 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </html>
 </body>
 </html>
+
 
 
 
