@@ -12,6 +12,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* bg-slate-50 */
         }
         .collapsible-content {
             max-height: 0;
@@ -81,9 +82,33 @@
         .notification.error {
             background-color: #ef4444; /* red-500 */
         }
+        /* Yeni Form Stilleri */
+        .form-label {
+            display: block;
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 500; /* font-medium */
+            color: #374151; /* text-gray-700 */
+        }
+        .form-input-base {
+            margin-top: 0.25rem;
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            background-color: #f9fafb; /* bg-gray-50 */
+            border: 1px solid #d1d5db; /* border-gray-300 */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* shadow-sm */
+            color: #111827; /* text-gray-900 */
+            placeholder-color: #9ca3af; /* placeholder-gray-400 */
+            font-size: 0.875rem; /* text-sm */
+        }
+        .form-input-base:focus-within, .form-input-base:focus {
+            outline: none;
+            border-color: #6366f1; /* focus:border-indigo-500 */
+            box-shadow: 0 0 0 1px #6366f1; /* focus:ring-1 focus:ring-indigo-500 */
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800">
+<body class="bg-slate-50 text-gray-800">
 
     <div id="notification-container"></div>
 
@@ -108,58 +133,58 @@
                     </button>
                     <div id="cekim-ekle-form" class="collapsible-content">
                         <div class="p-6 border-t border-gray-200">
-                             <form id="cek-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5">
+                             <form id="cek-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-6">
                                 <input type="hidden" id="editing-row-index">
-                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Çekim Tarihi</label><input name="cekimTarihi" type="date" class="form-input mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 shadow-sm transition duration-300"></div>
                                 
-                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Sınav Türü</label>
+                                <div><label class="form-label">Çekim Tarihi</label><input name="cekimTarihi" type="date" class="form-input-base"></div>
+                                
+                                <div><label class="form-label">Sınav Türü</label>
                                     <select name="sinavTuru" id="sinav-turu-select" class="searchable-select">
                                         <option value="">Seçiniz...</option><option>TYT</option><option>AYT</option><option>LGS</option>
                                     </select>
                                 </div>
-                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Anlatım Türü</label>
+                                <div><label class="form-label">Anlatım Türü</label>
                                     <select name="anlatimTuru" class="searchable-select">
                                         <option value="">Seçiniz...</option><option>GGÇK</option><option>SORU PRATİĞİ</option><option>TABLET ANLATIM</option><option>AKILLI TAHTA ANLATIM</option><option>ÖZET ANLATIM</option><option>DERECE ANLATIM</option><option>EĞLENCELİ ANLATIM</option><option>İSPATLI ANLATIM</option><option>SÜREÇ İZLEME SINAVI</option><option>ENDENEME</option><option>TÜRKİYE GENELİ DENEME</option><option>TIPKI PROVA</option>
                                     </select>
                                 </div>
 
-                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Video Kodu</label><input name="videoKodu" type="text" class="form-input mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 shadow-sm transition duration-300"></div>
+                                <div><label class="form-label">Video Kodu</label><input name="videoKodu" type="text" placeholder="Video kodunu girin..." class="form-input-base"></div>
                                 
-                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Branş</label>
+                                <div><label class="form-label">Branş</label>
                                     <select name="brans" id="brans-select" class="searchable-select" disabled><option value="">Önce sınav türü seçiniz...</option></select>
                                 </div>
-                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Ünite</label>
+                                <div><label class="form-label">Ünite</label>
                                     <select name="unite" id="unite-select" class="searchable-select" disabled><option value="">Önce branş seçiniz...</option></select>
                                 </div>
 
-                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Bölüm</label>
+                                <div><label class="form-label">Bölüm</label>
                                     <select name="bolum" class="searchable-select">
                                         <option value="">Seçiniz...</option><option>1.BÖLÜM</option><option>2. BÖLÜM</option><option>3. BÖLÜM</option><option>4. BÖLÜM</option><option>5. BÖLÜM</option><option>6. BÖLÜM</option><option>7. BÖLÜM</option><option>8. BÖLÜM</option><option>9. BÖLÜM</option><option>10. BÖLÜM</option><option>11. BÖLÜM</option><option>12. BÖLÜM</option><option>13. BÖLÜM</option><option>14. BÖLÜM</option><option>15. BÖLÜM</option><option>16. BÖLÜM</option><option>17. BÖLÜM</option><option>18. BÖLÜM</option><option>19. BÖLÜM</option><option>20. BÖLÜM</option><option>21. BÖLÜM</option><option>22. BÖLÜM</option><option>23. BÖLÜM</option><option>24. BÖLÜM</option><option>25. BÖLÜM</option><option>26. BÖLÜM</option><option>27. BÖLÜM</option><option>28. BÖLÜM</option><option>29. BÖLÜM</option><option>30. BÖLÜM</option><option>31. BÖLÜM</option><option>32. BÖLÜM</option><option>33. BÖLÜM</option><option>34. BÖLÜM</option><option>35. BÖLÜM</option><option>36. BÖLÜM</option><option>37. BÖLÜM</option><option>38. BÖLÜM</option><option>39. BÖLÜM</option><option>40. BÖLÜM</option><option>41. BÖLÜM</option><option>42. BÖLÜM</option><option>43. BÖLÜM</option><option>44. BÖLÜM</option><option>45. BÖLÜM</option><option>46. BÖLÜM</option><option>47. BÖLÜM</option><option>48. BÖLÜM</option><option>49. BÖLÜM</option><option>50. BÖLÜM</option><option>MODULE A</option><option>MODULE B</option><option>MODULE C</option><option>MODULE D</option><option>MODULE E</option><option>MODULE F</option><option>MODULE G</option><option>MODULE H</option>
                                     </select>
                                 </div>
-                                 <div><label class="block text-sm font-semibold text-gray-600 mb-1">Ders</label>
+                                 <div><label class="form-label">Ders</label>
                                     <select name="ders" class="searchable-select">
                                         <option value="">Seçiniz...</option><option>1. DERS</option><option>2. DERS</option><option>3. DERS</option><option>4. DERS</option><option>5. DERS</option><option>6. DERS</option><option>7. DERS</option><option>8. DERS</option><option>9. DERS</option><option>10. DERS</option><option>11. DERS</option><option>12. DERS</option><option>13. DERS</option><option>14. DERS</option><option>15. DERS</option><option>16. DERS</option><option>17. DERS</option><option>18. DERS</option><option>19. DERS</option><option>20. DERS</option><option>21. DERS</option><option>22. DERS</option><option>23. DERS</option><option>24. DERS</option><option>25. DERS</option><option>26. DERS</option><option>27. DERS</option><option>28. DERS</option><option>29. DERS</option><option>30. DERS</option><option>31. DERS</option><option>32. DERS</option><option>33. DERS</option><option>34. DERS</option><option>35. DERS</option><option>36. DERS</option><option>37. DERS</option><option>38. DERS</option><option>39. DERS</option><option>40. DERS</option><option>41. DERS</option><option>42. DERS</option><option>43. DERS</option><option>44. DERS</option><option>45. DERS</option><option>46. DERS</option><option>47. DERS</option><option>48. DERS</option><option>49. DERS</option><option>50. DERS</option><option>SINAV 1</option><option>SINAV 2</option><option>SINAV 3</option><option>SINAV 4</option><option>SINAV 5</option><option>SINAV 6</option><option>SINAV 7</option><option>SINAV 8</option>
                                     </select>
                                 </div>
-                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Test Adı</label>
-                                    <input name="testAdi" type="text" list="test-adi-list" class="form-input mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 shadow-sm transition duration-300">
+                                <div><label class="form-label">Test Adı</label>
+                                    <input name="testAdi" type="text" list="test-adi-list" placeholder="Test adını yazın..." class="form-input-base">
                                     <datalist id="test-adi-list">
-                                        <option value="LGS TADINDA 1"></option><option value="LGS TADINDA 2"></option><option value="LGS TADINDA 3"></option><option value="LGS TADINDA 4"></option><option value="LGS TADINDA 5"></option><option value="LGS TADINDA 6"></option><option value="LGS TADINDA 7"></option><option value="LGS TADINDA 8"></option><option value="LGS TADINDA 9"></option><option value="LGS TADINDA 10"></option><option value="LGS TADINDA 1-A"></option><option value="LGS TADINDA 1-B"></option><option value="LGS TADINDA 1-C"></option><option value="LGS TADINDA 1-D"></option><option value="LGS TADINDA 2-A"></option><option value="LGS TADINDA 2-B"></option><option value="LGS TADINDA 2-C"></option><option value="LGS TADINDA 2-D"></option><option value="LGS TADINDA 3-A"></option><option value="LGS TADINDA 3-B"></option><option value="LGS TADINDA 3-C"></option><option value="LGS TADINDA 3-D"></option><option value="LGS TADINDA 4-A"></option><option value="LGS TADINDA 4-B"></option><option value="LGS TADINDA 4-C"></option><option value="LGS TADINDA 4-D"></option><option value="LGS TADINDA 5-A"></option><option value="LGS TADINDA 5-B"></option><option value="LGS TADINDA 5-C"></option><option value="LGS TADINDA 5-D"></option><option value="LGS TADINDA 6-A"></option><option value="LGS TADINDA 6-B"></option><option value="LGS TADINDA 6-C"></option><option value="LGS TADINDA 6-D"></option><option value="LGS TADINDA 7-A"></option><option value="LGS TADINDA 7-B"></option><option value="LGS TADINDA 7-C"></option><option value="LGS TADINDA 7-D"></option><option value="LGS TADINDA 8-A"></option><option value="LGS TADINDA 8-B"></option><option value="LGS TADINDA 8-C"></option><option value="LGS TADINDA 8-D"></option><option value="SINAV TADINDA 1"></option><option value="SINAV TADINDA 1-A"></option><option value="SINAV TADINDA 1-B"></option><option value="SINAV TADINDA 2"></option><option value="SINAV TADINDA 2-A"></option><option value="SINAV TADINDA 2-B"></option><option value="SINAV TADINDA 3"></option><option value="SINAV TADINDA 3-A"></option><option value="SINAV TADINDA 3-B"></option><option value="SINAV TADINDA 3-C"></option><option value="SINAV TADINDA 4"></option><option value="SINAV TADINDA 4-A"></option><option value="SINAV TADINDA 4-B"></option><option value="SINAV TADINDA 5"></option><option value="SINAV TADINDA 5-A"></option><option value="SINAV TADINDA 5-B"></option><option value="SINAV TADINDA 5-C"></option><option value="SINAV TADINDA 6"></option><option value="SINAV TADINDA 6-A"></option><option value="SINAV TADINDA 6-B"></option><option value="SINAV TADINDA 7"></option><option value="SINAV TADINDA 7-A"></option><option value="SINAV TADINDA 7-B"></option><option value="SINAV TADINDA 8"></option><option value="SINAV TADINDA 8-A"></option><option value="SINAV TADINDA 8-B"></option><option value="SINAV TADINDA 9"></option><option value="SINAV TADINDA 9-A"></option><option value="SINAV TADINDA 9-B"></option><option value="SINAV TADINDA 10"></option><option value="SINAV TADINDA 10-A"></option><option value="SINAV TADINDA 10-B"></option><option value="YENİ NESİL ISINDIRMA 1"></option><option value="YENİ NESİL ISINDIRMA 1-A"></option><option value="YENİ NESİL ISINDIRMA 1-B"></option><option value="YENİ NESİL ISINDIRMA 1-C"></option><option value="YENİ NESİL ISINDIRMA 1-D"></option><option value="YENİ NESİL ISINDIRMA 1-E"></option><option value="YENİ NESİL ISINDIRMA 2"></option><option value="YENİ NESİL ISINDIRMA 2-A"></option><option value="YENİ NESİL ISINDIRMA 2-B"></option><option value="YENİ NESİL ISINDIRMA 2-C"></option><option value="YENİ NESİL ISINDIRMA 2-D"></option><option value="YENİ NESİL ISINDIRMA 2-E"></option><option value="YENİ NESİL ISINDIRMA 3"></option><option value="YENİ NESİL ISINDIRMA 3-A"></option><option value="YENİ NESİL ISINDIRMA 3-B"></option><option value="YENİ NESİL ISINDIRMA 3-C"></option><option value="YENİ NESİL ISINDIRMA 3-D"></option><option value="YENİ NESİL ISINDIRMA 3-E"></option><option value="YENİ NESİL ISINDIRMA 4"></option><option value="YENİ NESİL ISINDIRMA 4-A"></option><option value="YENİ NESİL ISINDIRMA 4-B"></option><option value="YENİ NESİL ISINDIRMA 4-C"></option><option value="YENİ NESİL ISINDIRMA 4-D"></option><option value="YENİ NESİL ISINDIRMA 4-E"></option><option value="YENİ NESİL ISINDIRMA 5"></option><option value="YENİ NESİL ISINDIRMA 5-A"></option><option value="YENİ NESİL ISINDIRMA 5-B"></option><option value="YENİ NESİL ISINDIRMA 5-C"></option><option value="YENİ NESİL ISINDIRMA 5-D"></option><option value="YENİ NESİL ISINDIRMA 5-E"></option><option value="YENİ NESİL ISINDIRMA 6"></option><option value="YENİ NESİL ISINDIRMA 6-A"></option><option value="YENİ NESİL ISINDIRMA 6-B"></option><option value="YENİ NESİL ISINDIRMA 6-C"></option><option value="YENİ NESİL ISINDIRMA 7"></option><option value="YENİ NESİL ISINDIRMA 7-A"></option><option value="YENİ NESİL ISINDIRMA 7-B"></option><option value="YENİ NESİL ISINDIRMA 8"></option><option value="YENİ NESİL ISINDIRMA 8-A"></option><option value="YENİ NESİL ISINDIRMA 8-B"></option><option value="YENİ NESİL ISINDIRMA 9"></option><option value="YENİ NESİL ISINDIRMA 9-A"></option><option value="YENİ NESİL ISINDIRMA 9-B"></option><option value="YENİ NESİL ISINDIRMA 10"></option><option value="YENİ NESİL ISINDIRMA 10-A"></option><option value="YENİ NESİL ISINDIRMA 10-B"></option><option value="YENİ NESLE GEÇİŞ 1"></option><option value="YENİ NESLE GEÇİŞ 1-A"></option><option value="YENİ NESLE GEÇİŞ 1-B"></option><option value="YENİ NESLE GEÇİŞ 1-C"></option><option value="YENİ NESLE GEÇİŞ 1-D"></option><option value="YENİ NESLE GEÇİŞ 1-E"></option><option value="YENİ NESLE GEÇİŞ 2"></option><option value="YENİ NESLE GEÇİŞ 2-A"></option><option value="YENİ NESLE GEÇİŞ 2-B"></option><option value="YENİ NESLE GEÇİŞ 2-C"></option><option value="YENİ NESLE GEÇİŞ 2-D"></option><option value="YENİ NESLE GEÇİŞ 2-E"></option><option value="YENİ NESLE GEÇİŞ 3"></option><option value="YENİ NESLE GEÇİŞ 3-A"></option><option value="YENİ NESLE GEÇİŞ 3-B"></option><option value="YENİ NESLE GEÇİŞ 3-C"></option><option value="YENİ NESLE GEÇİŞ 3-D"></option><option value="YENİ NESLE GEÇİŞ 3-E"></option><option value="YENİ NESLE GEÇİŞ 4"></option><option value="YENİ NESLE GEÇİŞ 4-A"></option><option value="YENİ NESLE GEÇİŞ 4-B"></option><option value="YENİ NESLE GEÇİŞ 4-C"></option><option value="YENİ NESLE GEÇİŞ 4-D"></option><option value="YENİ NESLE GEÇİŞ 4-E"></option><option value="YENİ NESLE GEÇİŞ 5"></option><option value="YENİ NESLE GEÇİŞ 5-A"></option><option value="YENİ NESLE GEÇİŞ 5-B"></option><option value="YENİ NESLE GEÇİŞ 5-C"></option><option value="YENİ NESLE GEÇİŞ 5-D"></option><option value="YENİ NESLE GEÇİŞ 5-E"></option><option value="YENİ NESLE GEÇİŞ 6"></option><option value="YENİ NESLE GEÇİŞ 6-A"></option><option value="YENİ NESLE GEÇİŞ 6-B"></option><option value="YENİ NESLE GEÇİŞ 6-C"></option><option value="YENİ NESLE GEÇİŞ 7"></option><option value="YENİ NESLE GEÇİŞ 7-A"></option><option value="YENİ NESLE GEÇİŞ 7-B"></option><option value="YENİ NESLE GEÇİŞ 8"></option><option value="YENİ NESLE GEÇİŞ 8-A"></option><option value="YENİ NESLE GEÇİŞ 8-B"></option><option value="YENİ NESLE GEÇİŞ 9"></option><option value="YENİ NESLE GEÇİŞ 9-A"></option><option value="YENİ NESLE GEÇİŞ 9-B"></option><option value="YENİ NESLE GEÇİŞ 10"></option><option value="YENİ NESLE GEÇİŞ 10-A"></option><option value="YENİ NESLE GEÇİŞ 10-B"></option><option value="MODULE A"></option><option value="MODULE B"></option><option value="MODULAR CHECK 1"></option><option value="MODULE C"></option><option value="MODULE D"></option><option value="MODULAR CHECK 2"></option><option value="MODULE E"></option><option value="MODULE F"></option><option value="MODULAR CHECK 3"></option><option value="MODULE G"></option><option value="MODULE H"></option><option value="LGS EXPLORER"></option><option value="LGS EXPLORER 1"></option><option value="LGS EXPLORER 2"></option><option value="EXIT TEST 1"></option><option value="EXIT TEST 2"></option><option value="EXIT TEST 3"></option><option value="LGS MASTER"></option><option value="MODULE TEST 1"></option><option value="MODULE TEST 2"></option><option value="MODULE TEST 3"></option><option value="MODULE TEST 4"></option><option value="MODULE TEST 5"></option><option value="MODULE TEST 6"></option><option value="MODULE TEST 7"></option><option value="MODULE TEST 8"></option><option value="MODULE TEST 9"></option><option value="MODULE TEST 10"></option><option value="FINAL TEST"></option><option value="KONU TESTİ 1"></option><option value="KONU TESTİ 1-A"></option><option value="KONU TESTİ 1-B"></option><option value="KONU TESTİ 2"></option><option value="KONU TESTİ 2-A"></option><option value="KONU TESTİ 2-B"></option><option value="KONU TESTİ 3"></option><option value="KONU TESTİ 3-A"></option><option value="KONU TESTİ 3-B"></option><option value="KONU TESTİ 4"></option><option value="KONU TESTİ 4-A"></option><option value="KONU TESTİ 4-B"></option><option value="KONU TESTİ 5"></option><option value="KONU TESTİ 5-A"></option><option value="KONU TESTİ 5-B"></option><option value="KONU TESTİ 6"></option><option value="KONU TESTİ 6-A"></option><option value="KONU TESTİ 6-B"></option><option value="KONU TESTİ 7"></option><option value="KONU TESTİ 8"></option><option value="KONU TESTİ 9"></option><option value="KONU TESTİ 10"></option><option value="KONU TESTİ 11"></option><option value="KONU TESTİ 12"></option><option value="KONU TESTİ 13"></option><option value="KONU TESTİ 14"></option><option value="KONU TESTİ 15"></option><option value="KONU TESTİ 16"></option><option value="KONU TOPARLAMA"></option><option value="SEÇİCİ 1"></option><option value="SEÇİCİ 2"></option><option value="SEÇİCİ 3"></option><option value="SEÇİCİ 4"></option><option value="SEÇİCİ 5"></option><option value="SEÇİCİ 6"></option><option value="SEÇİCİ 7"></option><option value="SEÇİCİ 8"></option><option value="SEÇİCİ 9"></option><option value="SEÇİCİ 10"></option><option value="ÖDEV 1"></option><option value="ÖDEV 2"></option><option value="ÖDEV 3"></option><option value="ÖDEV 4"></option><option value="ÖDEV 5"></option><option value="ÖDEV 6"></option><option value="ÖDEV 7"></option><option value="ÖDEV 8"></option><option value="ÖDEV 9"></option><option value="ÖDEV 10"></option><option value="ÖDEV 1-A"></option><option value="ÖDEV 1-B"></option><option value="ÖDEV 1-C"></option><option value="ÖDEV 1-D"></option><option value="ÖDEV 2-A"></option><option value="ÖDEV 2-B"></option><option value="ÖDEV 2-C"></option><option value="ÖDEV 2-D"></option><option value="ÖDEV 3-A"></option><option value="ÖDEV 3-B"></option><option value="ÖDEV 3-C"></option><option value="ÖDEV 3-D"></option><option value="ÖDEV 4-A"></option><option value="ÖDEV 4-B"></option><option value="ÖDEV 4-C"></option><option value="ÖDEV 4-D"></option><option value="ÖDEV 5-A"></option><option value="ÖDEV 5-B"></option><option value="ÖDEV 5-C"></option><option value="ÖDEV 5-D"></option><option value="ÖDEV 6-A"></option><option value="ÖDEV 6-B"></option><option value="ÖDEV 6-C"></option><option value="ÖDEV 6-D"></option><option value="ÖDEV 7-A"></option><option value="ÖDEV 7-B"></option><option value="ÖDEV 7-C"></option><option value="ÖDEV 7-D"></option><option value="ÖDEV 8-A"></option><option value="ÖDEV 8-B"></option><option value="ÖDEV 8-C"></option><option value="ÖDEV 8-D"></option><option value="ÖDEV 9-A"></option><option value="ÖDEV 9-B"></option><option value="ÖDEV 9-C"></option><option value="ÖDEV 9-D"></option><option value="ÖDEV 10-A"></option><option value="ÖDEV 10-B"></option><option value="ÖDEV 10-C"></option><option value="ÖDEV 10-D"></option>
                                     </datalist>
                                 </div>
-                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Soru Sayısı</label>
-                                    <input name="soruSayisi" type="number" min="1" max="50" class="form-input mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 shadow-sm transition duration-300">
+                                <div><label class="form-label">Soru Sayısı</label>
+                                    <input name="soruSayisi" type="number" min="1" max="50" placeholder="Örn: 8" class="form-input-base">
                                 </div>
-                                <div><label class="block text-sm font-semibold text-gray-600 mb-1">Anlatıcı Öğretmen</label>
+                                <div><label class="form-label">Anlatıcı Öğretmen</label>
                                     <select name="anlaticiOgretmen" class="searchable-select">
                                         <option value="">Seçiniz...</option><option>Ali Saçan</option><option>Altuğ Güneş</option><option>Anıl Gül</option><option>Bayram Meral</option><option>Betül Büyükkalaycı</option><option>Buğra Arslan</option><option>Burak Onay</option><option>Büşra Altınok</option><option>Cebrail Karaoğlan</option><option>Celal Gündüz</option><option>Deniz Bozkurt</option><option>Didar Baskın</option><option>Emrah Karcı</option><option>Enes Avcı</option><option>Erdal Aydemir</option><option>Erkan Ayrancı</option><option>Erkan Özaslan</option><option>Erkan Tunçer</option><option>Ersen Örenler</option><option>Eyüp Boncuk</option><option>Fatih Demirkaya</option><option>Fatih Sefi</option><option>Görkem Şahin</option><option>Gülhan Şen</option><option>Hale Karataş</option><option>İbrahim Taş</option><option>İbrahim Ulaş Baldemir</option><option>İlayda Gültekin</option><option>İlhan Aslan</option><option>İlyas Güneş</option><option>İsmail Kocabaş</option><option>İsmail Tolga Aktaş</option><option>Kader Altınel</option><option>Kadir Gümüş</option><option>Kadir Sefi</option><option>Kemal Coşkun</option><option>Kenan Kara</option><option>Mahsum Öztürk</option><option>Mehmet Celal Özyıldız</option><option>Mehmet Dural</option><option>Mehmet Durmuş</option><option>Mehmet Özalp</option><option>Melih Akgündüz</option><option>Mesut Uğurdoğan</option><option>Murat Namlı</option><option>Mustafa Öztürk</option><option>Mustafa Yağcı</option><option>Nagihan Damargüç</option><option>Nurtaç Kozak</option><option>Nurten Aydın</option><option>Onur Soğuk</option><option>Önay Çepe</option><option>Özcan Aykın</option><option>Özer Akgümüş</option><option>Öznur Saat Yıldırım</option><option>Rahim Ural</option><option>Recep Üstünel</option><option>Rıdvan Çelebi</option><option>Rümeysa Enise Özdemir</option><option>Rüştü Bayındır</option><option>Salih Yıldırır</option><option>Selim Yüksel</option><option>Semih Akpınar</option><option>Sercan Dural</option><option>Serkan Yeşilkan</option><option>Sinan Aydın</option><option>Şenol Aydın</option><option>Sinem Şentürk</option><option>Şükrü Akkoyun</option><option>Tuncay Ateş</option><option>Umut Öncül</option><option>Uzay Arslantürk</option><option>Veysel Boynueğri</option><option>Yaşar Aslan</option><option>Yavuz Tuna</option><option>Yunus Turan</option>
                                     </select>
                                 </div>
-                                <div class="lg:col-span-2"><label class="block text-sm font-semibold text-gray-600 mb-1">Not</label><textarea name="not" rows="3" class="form-input mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 shadow-sm transition duration-300"></textarea></div>
+                                <div class="lg:col-span-3"><label class="form-label">Not</label><textarea name="not" rows="2" class="form-input-base" placeholder="Eklemek istediğiniz notlar..."></textarea></div>
                                 
                                 <div class="md:col-span-2 lg:col-span-3 text-right pt-4">
-                                    <button id="submit-button" type="submit" class="inline-flex items-center justify-center py-2.5 px-6 border border-transparent shadow-lg text-sm font-medium rounded-lg text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform hover:scale-105 transition-all duration-300">
+                                    <button id="submit-button" type="submit" class="inline-flex items-center justify-center py-2 px-6 border border-transparent shadow-lg text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">
                                         <i id="submit-icon" class="fas fa-check mr-2"></i><span id="submit-text">Kaydet</span>
                                     </button>
                                 </div>
@@ -306,12 +331,12 @@ document.addEventListener('DOMContentLoaded', () => {
         container.appendChild(selectElement);
         const displayButton = document.createElement('button');
         displayButton.type = 'button';
-        displayButton.className = 'form-input mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 shadow-sm text-left flex justify-between items-center';
+        displayButton.className = 'form-input-base text-left flex justify-between items-center';
         const displaySpan = document.createElement('span');
-        displaySpan.className = 'truncate p-2';
+        displaySpan.className = 'truncate';
         displayButton.appendChild(displaySpan);
         const icon = document.createElement('i');
-        icon.className = 'fas fa-chevron-down text-gray-400 mr-2';
+        icon.className = 'fas fa-chevron-down text-gray-400';
         displayButton.appendChild(icon);
         container.appendChild(displayButton);
         const dropdown = document.createElement('div');
@@ -319,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const searchInput = document.createElement('input');
         searchInput.type = 'text';
         searchInput.placeholder = 'Ara...';
-        searchInput.className = 'search-input block w-full p-2 border-b border-gray-200';
+        searchInput.className = 'block w-full p-2 border-b border-gray-200 focus:outline-none';
         dropdown.appendChild(searchInput);
         const optionsList = document.createElement('div');
         optionsList.className = 'p-1';
@@ -328,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const updateOptions = () => {
             optionsList.innerHTML = '';
             Array.from(selectElement.options).forEach(option => {
-                if (option.value === "" && option.textContent.includes('Seçiniz')) return;
+                if (option.value === "" && (option.textContent.includes('Seçiniz') || option.textContent.includes('Önce'))) return;
                 const optionDiv = document.createElement('div');
                 optionDiv.textContent = option.textContent;
                 optionDiv.dataset.value = option.value;
@@ -345,7 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`) || selectElement.options[0];
             if (selectedOption) {
                 displaySpan.textContent = selectedOption.textContent;
-                if(selectedOption.value === "") displaySpan.classList.add('text-gray-400');
+                if(selectedOption.value === "" || selectElement.disabled) displaySpan.classList.add('text-gray-400');
                 else displaySpan.classList.remove('text-gray-400');
             }
         };
@@ -410,17 +435,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         updateSelectDisplay(uniteSelect);
     });
-
-    // Açılır/kapanır alanların yüksekliğini ayarlar
     function updateCollapsibleHeight(contentElement) {
         if (contentElement.style.maxHeight && contentElement.style.maxHeight !== '0px') {
-            // Animasyonun pürüzsüz olması için önce yüksekliği kaldırıp sonra yeniden hesaplıyoruz
             requestAnimationFrame(() => {
                 contentElement.style.maxHeight = contentElement.scrollHeight + 'px';
             });
         }
     }
-
     const triggers = document.querySelectorAll('.collapsible-trigger');
     triggers.forEach(trigger => {
         trigger.addEventListener('click', () => {
@@ -579,8 +600,6 @@ document.addEventListener('DOMContentLoaded', () => {
         recordCountEl.textContent = `Toplam ${filteredCekimler.length} kayıt bulundu.`;
         displayPage(filteredCekimler);
         setupPagination(filteredCekimler);
-
-        // SORUNU ÇÖZEN KOD: Liste render edildikten sonra yükseklik ayarlanır.
         updateCollapsibleHeight(document.getElementById('liste-tablo-alani'));
         updateCollapsibleHeight(document.getElementById('cekim-ekle-form'));
     }
@@ -655,12 +674,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Sayfa ilk yüklendiğinde varsayılan olarak açık gelir
     document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
         const content = document.getElementById(trigger.dataset.target);
         const icon = trigger.querySelector('i.fas');
         if (content && icon) {
-            // İlk render'dan sonra yüksekliği doğru alabilmek için küçük bir gecikme
             setTimeout(() => {
                 content.style.maxHeight = content.scrollHeight + "px";
                 icon.classList.add('rotate-180');
