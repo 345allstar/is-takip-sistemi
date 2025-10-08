@@ -25,6 +25,7 @@
             width: 100%;
             max-height: 200px;
             overflow-y: auto;
+            z-index: 50; /* Added z-index */
         }
         #form-container.is-active {
             position: relative;
@@ -231,6 +232,10 @@
         function populateSelect(selectId, data) {
             const select = document.getElementById(selectId);
             if (!select) return;
+            // Clear existing options before populating
+            const existingOptions = select.querySelectorAll('option:not([value=""])');
+            existingOptions.forEach(opt => opt.remove());
+            
             data.forEach(item => {
                 const option = document.createElement('option');
                 option.value = item;
@@ -269,14 +274,14 @@
             displayButton.appendChild(icon);
             container.appendChild(displayButton);
             const dropdown = document.createElement('div');
-            dropdown.className = 'searchable-select-dropdown hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg';
+            dropdown.className = 'searchable-select-dropdown absolute hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg';
             const searchInput = document.createElement('input');
             searchInput.type = 'text';
             searchInput.placeholder = 'Ara...';
             searchInput.className = 'block w-full p-2 border-b border-gray-200 focus:outline-none';
             dropdown.appendChild(searchInput);
             const optionsList = document.createElement('div');
-            optionsList.className = 'p-1';
+            optionsList.className = 'p-1 max-h-48 overflow-y-auto';
             dropdown.appendChild(optionsList);
             container.appendChild(dropdown);
             
@@ -393,8 +398,11 @@
         function setupPagination(items) {
             paginationControlsEl.innerHTML = '';
             const pageCount = Math.ceil(items.length / rowsPerPage);
-            if (pageCount <= 1) return;
+            
+            // Eğer hiç kayıt yoksa, sayfalama kontrolünü gösterme
+            if (pageCount === 0) return;
 
+            // Önceki butonu
             const prevButton = document.createElement('button');
             prevButton.innerHTML = `<i class="fas fa-chevron-left"></i>`;
             prevButton.classList.add('pagination-button');
@@ -407,6 +415,7 @@
             });
             paginationControlsEl.appendChild(prevButton);
 
+            // Sayfa numaraları
             for (let i = 1; i <= pageCount; i++) {
                 const btn = document.createElement('button');
                 btn.innerText = i;
@@ -421,6 +430,7 @@
                 paginationControlsEl.appendChild(btn);
             }
 
+            // Sonraki butonu
             const nextButton = document.createElement('button');
             nextButton.innerHTML = `<i class="fas fa-chevron-right"></i>`;
             nextButton.classList.add('pagination-button');
@@ -437,7 +447,6 @@
         function loadAndDisplayCekimler() {
             let cek_kayitlari = getCekimlerFromStorage();
             
-            // Filtreleme
             const filterInputs = document.querySelectorAll('.filter-input');
             const filterValues = Array.from(filterInputs).map(input => input.value.toLowerCase());
             
@@ -449,7 +458,14 @@
                         kayit.brans, kayit.unite, kayit.bolum, kayit.testAdi,
                         kayit.soruSayisi, kayit.anlaticiOgretmen, kayit.yonetmen, kayit.akademikDinleyici
                     ];
-                    const cellValue = columns[index] ? columns[index].toString().toLowerCase() : '';
+                    // Format date for filtering if it exists
+                    let cellValue = '';
+                    if (index === 0 && kayit.cekimTarihi) {
+                        const date = new Date(kayit.cekimTarihi + 'T00:00:00');
+                        cellValue = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+                    } else {
+                        cellValue = columns[index] ? columns[index].toString().toLowerCase() : '';
+                    }
                     return cellValue.includes(filterValue);
                 });
             });
@@ -462,13 +478,12 @@
                 noDataMessage.classList.remove('hidden');
                 document.getElementById('cekim-tablosu').classList.add('hidden');
                 tableBody.innerHTML = '';
-                paginationControlsEl.innerHTML = '';
             } else {
                 noDataMessage.classList.add('hidden');
                 document.getElementById('cekim-tablosu').classList.remove('hidden');
                 displayPage(filteredKayitlar);
-                setupPagination(filteredKayitlar);
             }
+            setupPagination(filteredKayitlar); // Moved outside the if/else to always run
         }
 
         cekForm.addEventListener('submit', function(e) {
@@ -517,6 +532,11 @@
                 currentPage = 1;
                 loadAndDisplayCekimler();
             });
+        });
+
+        // Diğer sekmelerdeki değişiklikleri dinle
+        window.addEventListener('storage', () => {
+            loadAndDisplayCekimler();
         });
 
         loadAndDisplayCekimler();
