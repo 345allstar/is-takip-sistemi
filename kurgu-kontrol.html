@@ -124,6 +124,14 @@
                                 <option value="">Seçiniz...</option>
                             </select>
                         </div>
+                        <div>
+                            <label class="form-label">Teknik İzleme Yapılabilirliği</label>
+                            <select id="teknik-izleme" name="teknikIzlemeYapilabilirligi" class="searchable-select">
+                                <option value="">Seçiniz...</option>
+                                <option value="Yapılabilir">Yapılabilir</option>
+                                <option value="Yapılamaz">Yapılamaz</option>
+                            </select>
+                        </div>
                         <div class="md:col-span-2 flex justify-end pt-4 mt-4 border-t">
                             <button type="submit" id="submit-button" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">
                                 <i class="fas fa-save mr-2"></i>Güncelle
@@ -153,9 +161,11 @@
                                     <th style="width: 110px;">KURGU BİTİŞ</th>
                                     <th>KURGU OPERATÖRÜ</th>
                                     <th style="width: 120px;">KURGU DURUMU</th>
+                                    <th style="width: 120px;">TEKNİK İZLENEBİLİRLİK</th>
                                     <th style="width: 80px;">İŞLEMLER</th>
                                 </tr>
                                 <tr>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
                                     <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
                                     <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
                                     <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
@@ -394,6 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="align-middle">${formatDate(kayit.kurguBitisTarihi)}</td>
                 <td class="align-middle">${kayit.kurguOperatoru || ''}</td>
                 <td class="align-middle"><span class="status-badge ${statusClass}">${kayit.kurguDurumu || 'Belirtilmedi'}</span></td>
+                <td class="align-middle">${kayit.teknikIzlemeYapilabilirligi || ''}</td>
                 <td class="align-middle">
                     <button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="Düzenle">
                         <i class="fas fa-pencil-alt"></i>
@@ -447,8 +458,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (filterValue === '') return true;
                 const columns = [
                     kayit.cekimTarihi, kayit.sinavTuru, kayit.anlatimTuru, kayit.videoKodu, kayit.anlaticiOgretmen,
-                    kayit.yonetmen,
-                    kayit.kurguBaslamaTarihi, kayit.kurguBitisTarihi, kayit.kurguOperatoru, kayit.kurguDurumu
+                    kayit.yonetmen, kayit.kurguBaslamaTarihi, kayit.kurguBitisTarihi, 
+                    kayit.kurguOperatoru, kayit.kurguDurumu, kayit.teknikIzlemeYapilabilirligi
                 ];
                 let cellValue = columns[index] ? columns[index].toString().toLowerCase() : '';
                 return cellValue.includes(filterValue);
@@ -482,6 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cek_kayitlari[kayitIndex].kurguBitisTarihi = document.getElementById('kurgu-bitis-tarihi').value;
             cek_kayitlari[kayitIndex].kurguOperatoru = document.getElementById('kurgu-operatoru').value;
             cek_kayitlari[kayitIndex].kurguDurumu = document.getElementById('kurgu-durumu').value;
+            cek_kayitlari[kayitIndex].teknikIzlemeYapilabilirligi = document.getElementById('teknik-izleme').value;
             saveCekimlerToStorage(cek_kayitlari);
             loadAndDisplayCekimler();
             cekForm.reset();
@@ -506,8 +518,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('kurgu-bitis-tarihi').value = kayit.kurguBitisTarihi || '';
                 document.getElementById('kurgu-operatoru').value = kayit.kurguOperatoru || '';
                 document.getElementById('kurgu-durumu').value = kayit.kurguDurumu || '';
+                document.getElementById('teknik-izleme').value = kayit.teknikIzlemeYapilabilirligi || '';
                 updateSelectDisplay(document.getElementById('kurgu-operatoru'));
                 updateSelectDisplay(document.getElementById('kurgu-durumu'));
+                updateSelectDisplay(document.getElementById('teknik-izleme'));
                 document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
             }
         }
