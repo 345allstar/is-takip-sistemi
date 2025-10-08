@@ -35,6 +35,7 @@
         #cekim-tablosu {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed; /* Sütun genişliklerini sabitlemek için */
         }
         #table-container {
             max-height: 800px;
@@ -46,6 +47,9 @@
             border-left: 1px solid #e5e7eb;
             padding: 0.75rem; 
             word-break: break-word; 
+        }
+        #cekim-tablosu th {
+            white-space: nowrap; /* Başlıkların aşağı kaymasını engelle */
         }
         #cekim-tablosu th:first-child, #cekim-tablosu td:first-child { 
             border-left: 0; 
@@ -177,33 +181,33 @@
                         <table id="cekim-tablosu">
                             <thead class="bg-gray-100">
                                 <tr>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">ÇEKİM TARİHİ</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">SINAV TÜRÜ</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">ANLATIM TÜRÜ</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">VİDEO KODU</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">BRANŞ</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">ÜNİTE</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">BÖLÜM</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">TEST ADI</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">SORU SAYISI</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">ANLATICI ÖĞRETMEN</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">YÖNETMEN</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">AKADEMİK DİNLEYİCİ</th>
-                                    <th class="p-3 text-sm font-semibold tracking-wide">İŞLEMLER</th>
+                                    <th style="width: 110px;">ÇEKİM TARİHİ</th>
+                                    <th style="width: 90px;">SINAV TÜRÜ</th>
+                                    <th>ANLATIM TÜRÜ</th>
+                                    <th>VİDEO KODU</th>
+                                    <th>BRANŞ</th>
+                                    <th>ÜNİTE</th>
+                                    <th>BÖLÜM</th>
+                                    <th>TEST ADI</th>
+                                    <th style="width: 90px;">SORU SAYISI</th>
+                                    <th>ANLATICI ÖĞRETMEN</th>
+                                    <th>YÖNETMEN</th>
+                                    <th>AKADEMİK DİNLEYİCİ</th>
+                                    <th style="width: 90px;">İŞLEMLER</th>
                                 </tr>
                                 <tr>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="0"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="1"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="2"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="3"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="4"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="5"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="6"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="7"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="8"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="9"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="10"></th>
-                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded" data-column-index="11"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
                                     <th class="p-2"></th>
                                 </tr>
                             </thead>
@@ -255,14 +259,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const paginationControlsEl = document.getElementById('pagination-controls');
     const yonetmenler = ["Sait Eralkan", "Anıl Kolay", "Batuhan Gültekin", "Nurdan Özveren", "Merve Çoklar", "Gözde Bulut", "Ali Yıldırım", "Raşit Güngör"];
     const akademikDinleyiciler = ["Ali Yıldırım", "İsmail Tolga Aktaş", "Rahim Ural", "Burak Onay", "Betül Çiçek", "Sinem Şentürk", "Ahmet Ölmez", "Barış Özcan", "Cem Oğuz Büke", "Cihat Çiçek", "Didem Özbay Sarıaydın", "Eda Güney", "Edip İçli", "Elif Bozkurt", "Emine Bolat Kırbıyık", "Esra Dindar", "Esra Şahin", "Esra Yurttaş", "Firdevs Bozkurt", "Fuat Ses", "Hülya Güçkan Taşkın", "İbrahim Atakuru", "İbrahim Halil Kesici", "Koray Dindar", "Mehmet Bademli", "Mehmet Kırbıyık", "Muharrem Akbaş", "Özcan Kulaksız", "Raziye İnal", "Sabri Bingöl", "Semih Sunucuoğlu", "Serkan Yıldız", "Serpil Tunç İçli", "Suat Emre", "Tuğba Bostancı", "Yasin Baş", "Yavuz Selim Yıldız", "Yok"];
-    function re_calculate_collapsible_height(element) {
-        setTimeout(() => {
-            const parentCollapsible = element.closest('.collapsible-content');
-            if (parentCollapsible && parentCollapsible.style.maxHeight && parentCollapsible.style.maxHeight !== '0px') {
-                parentCollapsible.style.maxHeight = parentCollapsible.scrollHeight + "px";
-            }
-        }, 10);
-    }
+    
+    // GÜNCELLENMİŞ KOD: overflow stilini değiştirir
     document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
         trigger.addEventListener('click', () => {
             const content = trigger.nextElementSibling;
@@ -271,22 +269,27 @@ document.addEventListener('DOMContentLoaded', () => {
             if (content) {
                 if (content.style.maxHeight && content.style.maxHeight !== '0px') {
                     content.style.maxHeight = null;
+                    content.style.overflow = 'hidden';
                 } else {
                     content.style.maxHeight = content.scrollHeight + "px";
+                    content.style.overflow = 'visible';
                 }
             }
         });
     });
+    // GÜNCELLENMİŞ KOD: Sayfa ilk açıldığında overflow'u visible yapar
     setTimeout(() => {
         document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
             const content = trigger.nextElementSibling;
             const icon = trigger.querySelector('i:last-child');
             if (content && icon) {
                 content.style.maxHeight = content.scrollHeight + "px";
+                content.style.overflow = 'visible';
                 icon.classList.add('rotate-180');
             }
         });
     }, 100);
+
     function populateSelect(selectId, data) {
         const select = document.getElementById(selectId);
         if (!select) return;
@@ -377,7 +380,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 searchInput.dispatchEvent(new Event('input'));
                 searchInput.focus();
             }
-            re_calculate_collapsible_height(displayButton);
         });
         selectElement.updateDropdown = updateOptions;
         updateOptions();
@@ -405,26 +407,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const date = new Date(kayit.cekimTarihi + 'T00:00:00');
             const formattedDate = kayit.cekimTarihi ? `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}` : '';
             const yonetmenDurum = kayit.yonetmen 
-                ? `<td class="p-3 text-sm font-semibold text-green-600 align-middle">${kayit.yonetmen}</td>`
-                : `<td class="p-3 text-sm font-semibold text-gray-500 align-middle">Atanmadı</td>`;
+                ? `<td class="text-sm font-semibold text-green-600 align-middle">${kayit.yonetmen}</td>`
+                : `<td class="text-sm font-semibold text-gray-500 align-middle">Atanmadı</td>`;
             const akademikDinleyiciDurum = kayit.akademikDinleyici 
-                ? `<td class="p-3 text-sm font-semibold text-green-600 align-middle">${kayit.akademikDinleyici}</td>`
-                : `<td class="p-3 text-sm font-semibold text-gray-500 align-middle">Atanmadı</td>`;
+                ? `<td class="text-sm font-semibold text-green-600 align-middle">${kayit.akademikDinleyici}</td>`
+                : `<td class="text-sm font-semibold text-gray-500 align-middle">Atanmadı</td>`;
             const buttonTitle = kayit.yonetmen ? "Düzenle" : "Ata";
             row.innerHTML = `
-                <td class="align-middle">${formattedDate || ''}</td>
-                <td class="align-middle">${kayit.sinavTuru || ''}</td>
-                <td class="align-middle">${kayit.anlatimTuru || ''}</td>
-                <td class="align-middle">${kayit.videoKodu || ''}</td>
-                <td class="align-middle">${kayit.brans || ''}</td>
-                <td class="align-middle">${kayit.unite || ''}</td>
-                <td class="align-middle">${kayit.bolum || ''}</td>
-                <td class="align-middle">${kayit.testAdi || ''}</td>
-                <td class="align-middle">${kayit.soruSayisi || ''}</td>
-                <td class="align-middle">${kayit.anlaticiOgretmen || ''}</td>
+                <td class="text-sm align-middle">${formattedDate || ''}</td>
+                <td class="text-sm align-middle">${kayit.sinavTuru || ''}</td>
+                <td class="text-sm align-middle">${kayit.anlatimTuru || ''}</td>
+                <td class="text-sm align-middle">${kayit.videoKodu || ''}</td>
+                <td class="text-sm align-middle">${kayit.brans || ''}</td>
+                <td class="text-sm align-middle">${kayit.unite || ''}</td>
+                <td class="text-sm align-middle">${kayit.bolum || ''}</td>
+                <td class="text-sm align-middle">${kayit.testAdi || ''}</td>
+                <td class="text-sm align-middle">${kayit.soruSayisi || ''}</td>
+                <td class="text-sm align-middle">${kayit.anlaticiOgretmen || ''}</td>
                 ${yonetmenDurum}
                 ${akademikDinleyiciDurum}
-                <td class="align-middle">
+                <td class="text-sm align-middle">
                     <button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="${buttonTitle}">
                         <i class="fas fa-pencil-alt"></i>
                     </button>
