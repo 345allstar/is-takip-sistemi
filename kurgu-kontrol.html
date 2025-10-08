@@ -440,12 +440,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'Revize': statusClass = 'status-revize'; break;
             }
 
-            row.innerHTML = `
+           row.innerHTML = `
                 <td class="align-middle">${formatDate(kayit.cekimTarihi)}</td>
                 <td class="align-middle">${kayit.sinavTuru || ''}</td>
                 <td class="align-middle">${kayit.anlatimTuru || ''}</td>
                 <td class="align-middle">${kayit.videoKodu || ''}</td>
                 <td class="align-middle">${kayit.anlaticiOgretmen || ''}</td>
+                <td class="align-middle">${kayit.yonetmen || ''}${fileIcon}</td>
                 <td class="align-middle">${formatDate(kayit.kurguBaslamaTarihi)}</td>
                 <td class="align-middle">${formatDate(kayit.kurguBitisTarihi)}</td>
                 <td class="align-middle">${kayit.kurguOperatoru || ''}</td>
