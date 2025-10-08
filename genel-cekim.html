@@ -506,6 +506,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'Tamamlandı': statusClass = 'status-tamamlandi'; break;
                 case 'Revize': statusClass = 'status-revize'; break;
             }
+
+            // --- EKLENEN KOD ---
+            const fileIcon = (data.timecodeFileData && data.timecodeFileName)
+                ? `<a href="${data.timecodeFileData}" download="${data.timecodeFileName}" class="ml-2 text-indigo-500 hover:text-indigo-700" title="Time Code Dosyasını İndir"><i class="fas fa-download"></i></a>`
+                : '';
+            // --- EKLENEN KOD SONU ---
+
             newRow.innerHTML = `
                 <td class="p-2 align-middle border">${formatDate(data.cekimTarihi)}</td>
                 <td class="p-2 align-middle border">${data.sinavTuru || ''}</td>
@@ -519,7 +526,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="p-2 align-middle border">${data.soruSayisi || ''}</td>
                 <td class="p-2 align-middle border"><div class="max-w-[100px] mx-auto whitespace-nowrap overflow-hidden text-ellipsis" title="${data.not || ''}">${(data.not || '').substring(0,15)}${(data.not || '').length > 15 ? '...' : ''}</div></td>
                 <td class="p-2 align-middle border">${data.anlaticiOgretmen || ''}</td>
-                <td class="p-2 align-middle border">${data.yonetmen || ''}</td>
+                <td class="p-2 align-middle border">${data.yonetmen || ''}${fileIcon}</td>
                 <td class="p-2 align-middle border">${data.akademikDinleyici || ''}</td>
                 <td class="p-2 align-middle border">${formatDate(data.kurguBaslamaTarihi)}</td>
                 <td class="p-2 align-middle border">${formatDate(data.kurguBitisTarihi)}</td>
@@ -692,4 +699,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
