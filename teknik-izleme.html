@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${kayit.anlatimTuru || ''}</td>
                 <td>${kayit.videoKodu || ''}</td>
                 <td>${kayit.anlaticiOgretmen || ''}</td>
-                <td>${kayit.yonetmen || ''}${timecodeFileIcon}</td>
+                <td>${kayit.yonetmen || ''}${timecodeFileIcon}</td> 
                 <td>${kayit.kurguOperatoru || ''}</td>
                 <td>${kayit.kurguDurumu || ''}</td>
                 <td>${kayit.teknikEkipUyesi || ''}${revizyonNotuIcon}</td>
@@ -472,6 +472,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 ['teknik-ekip-uyesi', 'teknik-izleme-durumu'].forEach(id => updateSelectDisplay(document.getElementById(id)));
                 
                 document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        if (timecodeBtn) {
+            e.preventDefault();
+            const id = timecodeBtn.dataset.id;
+            const record = getCekimlerFromStorage().find(r => r.id === id);
+            if (record && record.timecodeFiles && record.timecodeFiles.length > 0) {
+                const zip = new JSZip();
+                record.timecodeFiles.forEach(file => {
+                    const base64Data = file.data.split(',')[1];
+                    zip.file(file.name, base64Data, { base64: true });
+                });
+                zip.generateAsync({ type: "blob" }).then(function(content) {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(content);
+                    link.download = `${record.videoKodu || 'timecodes'}.zip`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                });
             }
         }
         
