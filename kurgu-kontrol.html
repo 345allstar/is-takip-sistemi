@@ -322,7 +322,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'Revize': statusClass = 'status-revize'; break;
             }
 
-            // Yeni HTML'i burada oluşturuyoruz, akademik sütunlar eklendi
+            // ***** DÜZELTME BURADA YAPILDI *****
+            // Eksik olan <td>'ler eklendi.
             row.innerHTML = `
                 <td>${formatDate(kayit.cekimTarihi)}</td>
                 <td>${kayit.anlatimTuru || ''}</td>
@@ -348,7 +349,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Bu fonksiyonu ve içindeki filter/column mantığını da güncellemeliyiz.
     function loadAndDisplayCekimler() {
         const allCekimler = getCekimlerFromStorage();
         const cekimlerWithYonetmen = allCekimler.filter(kayit => kayit.yonetmen);
@@ -357,6 +357,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const filteredKayitlar = cekimlerWithYonetmen.filter(kayit => {
             return filterValues.every((filterValue, index) => {
                 if (filterValue === '') return true;
+                // ***** DÜZELTME BURADA YAPILDI *****
+                // Filtreleme için columns dizisine yeni alanlar eklendi
                 const columns = [
                     formatDate(kayit.cekimTarihi), kayit.anlatimTuru, kayit.videoKodu, kayit.anlaticiOgretmen, kayit.yonetmen,
                     formatDate(kayit.kurguBaslamaTarihi), formatDate(kayit.kurguBitisTarihi), kayit.kurguOperatoru, kayit.kurguDurumu,
@@ -380,17 +382,66 @@ document.addEventListener('DOMContentLoaded', () => {
         setupPagination(filteredKayitlar);
     }
     
-    // tableBody click event listener'ına akademik not indirme butonu için bir case ekliyoruz.
     tableBody.addEventListener('click', function(e) {
         const editButton = e.target.closest('.edit-row');
         const notesBtn = e.target.closest('.download-notes-btn');
         const academicNotesBtn = e.target.closest('.download-academic-notes-btn');
         const timecodeBtn = e.target.closest('.download-files-btn');
 
-        if (editButton) { /* ... mevcut kod ... */ }
-        if (notesBtn) { /* ... mevcut kod ... */ }
-        if (timecodeBtn) { /* ... mevcut kod ... */ }
+        if (editButton) {
+            e.preventDefault();
+            const row = editButton.closest('tr');
+            const id = row.dataset.id;
+            const kayit = getCekimlerFromStorage().find(k => k.id == id);
+            if (kayit) {
+                editingIdInput.value = kayit.id;
+                document.getElementById('kurgu-baslama-tarihi').value = kayit.kurguBaslamaTarihi || '';
+                document.getElementById('kurgu-bitis-tarihi').value = kayit.kurguBitisTarihi || '';
+                document.getElementById('kurgu-operatoru').value = kayit.kurguOperatoru || '';
+                document.getElementById('kurgu-durumu').value = kayit.kurguDurumu || '';
+                document.getElementById('teknik-izleme').value = kayit.teknikIzlemeYapilabilirligi || '';
+                document.getElementById('akademik-izleme').value = kayit.akademikIzlemeYapilabilirligi || '';
+                ['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme'].forEach(id => updateSelectDisplay(document.getElementById(id)));
+                document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        if (notesBtn) {
+            e.preventDefault();
+            const id = notesBtn.dataset.id;
+            const kayit = getCekimlerFromStorage().find(k => k.id === id);
+            if (kayit && kayit.revizyonNotu && kayit.revizyonNotu.content) {
+                const blob = new Blob([kayit.revizyonNotu.content], { type: 'text/plain;charset=utf-8' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = kayit.revizyonNotu.fileName || 'revizyon.txt';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
         
+        if (timecodeBtn) {
+             e.preventDefault();
+            const id = timecodeBtn.dataset.id;
+            const record = getCekimlerFromStorage().find(r => r.id === id);
+            if (record && record.timecodeFiles && record.timecodeFiles.length > 0) {
+                const zip = new JSZip();
+                record.timecodeFiles.forEach(file => {
+                    const base64Data = file.data.split(',')[1];
+                    zip.file(file.name, base64Data, { base64: true });
+                });
+                zip.generateAsync({ type: "blob" }).then(function(content) {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(content);
+                    link.download = `${record.videoKodu || 'timecodes'}.zip`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                });
+            }
+        }
+
         if (academicNotesBtn) {
             e.preventDefault();
             const id = academicNotesBtn.dataset.id;
@@ -406,15 +457,68 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+    
+    function setupPagination(items) {
+        paginationControlsEl.innerHTML = '';
+        const pageCount = Math.ceil(items.length / rowsPerPage);
+        if (pageCount <= 1) return;
+        
+        const prevButton = document.createElement('button');
+        prevButton.innerHTML = `<i class="fas fa-chevron-left"></i>`;
+        prevButton.className = 'pagination-button';
+        prevButton.disabled = currentPage === 1;
+        prevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; loadAndDisplayCekimler(); } });
+        paginationControlsEl.appendChild(prevButton);
 
-    // Geri kalan tüm kodlar (setupPagination, form submit vb.) aynı kalabilir.
-    // Bu yüzden sadece değişen kısımları buraya ekledim.
-    // En iyisi siz script'in tamamını aşağıdakilerle değiştirin.
+        for (let i = 1; i <= pageCount; i++) {
+            const btn = document.createElement('button');
+            btn.innerText = i;
+            btn.className = 'pagination-button';
+            if (i === currentPage) { btn.classList.add('active'); }
+            btn.addEventListener('click', () => { currentPage = i; loadAndDisplayCekimler(); });
+            paginationControlsEl.appendChild(btn);
+        }
+        
+        const nextButton = document.createElement('button');
+        nextButton.innerHTML = `<i class="fas fa-chevron-right"></i>`;
+        nextButton.className = 'pagination-button';
+        nextButton.disabled = currentPage === pageCount;
+        nextButton.addEventListener('click', () => { if (currentPage < pageCount) { currentPage++; loadAndDisplayCekimler(); } });
+        paginationControlsEl.appendChild(nextButton);
+    }
 
-    function setupPagination(items) { /* ... mevcut kod ... */ }
-    cekForm.addEventListener('submit', function(e) { /* ... mevcut kod ... */ });
-    document.querySelectorAll('.filter-input').forEach(input => { /* ... mevcut kod ... */ });
-    document.addEventListener('click', () => { /* ... mevcut kod ... */ });
+    cekForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const id = editingIdInput.value;
+        if (!id) {
+            showNotification("Lütfen düzenlemek için bir çekim seçin.", "error");
+            return;
+        }
+        let cek_kayitlari = getCekimlerFromStorage();
+        const kayitIndex = cek_kayitlari.findIndex(k => k.id == id);
+        if (kayitIndex > -1) {
+            cek_kayitlari[kayitIndex].kurguBaslamaTarihi = document.getElementById('kurgu-baslama-tarihi').value;
+            cek_kayitlari[kayitIndex].kurguBitisTarihi = document.getElementById('kurgu-bitis-tarihi').value;
+            cek_kayitlari[kayitIndex].kurguOperatoru = document.getElementById('kurgu-operatoru').value;
+            cek_kayitlari[kayitIndex].kurguDurumu = document.getElementById('kurgu-durumu').value;
+            cek_kayitlari[kayitIndex].teknikIzlemeYapilabilirligi = document.getElementById('teknik-izleme').value;
+            cek_kayitlari[kayitIndex].akademikIzlemeYapilabilirligi = document.getElementById('akademik-izleme').value;
+            saveCekimlerToStorage(cek_kayitlari);
+            loadAndDisplayCekimler();
+            cekForm.reset();
+            editingIdInput.value = '';
+            ['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme'].forEach(id => updateSelectDisplay(document.getElementById(id)));
+            showNotification('Kurgu bilgileri başarıyla güncellendi!');
+        }
+    });
+    
+    document.querySelectorAll('.filter-input').forEach(input => {
+        input.addEventListener('keyup', () => { currentPage = 1; loadAndDisplayCekimler(); });
+    });
+    
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.searchable-select-dropdown').forEach(d => d.classList.add('hidden'));
+    });
     
     populateSelect('kurgu-operatoru', kurguOperatorleri);
     populateSelect('kurgu-durumu', kurguDurumlari);
