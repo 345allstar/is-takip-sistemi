@@ -123,9 +123,13 @@
                                             <th class="p-2 border">Kurgu Durumu</th>
                                             <th class="p-2 border">Teknik Ekip Üyesi</th>
                                             <th class="p-2 border">Teknik İzleme Tarihi</th>
+                                            <th class="p-2 border">Akademik İzl. Öğretmeni</th>
+                                            <th class="p-2 border">Akademik İzl. Tarihi</th>
                                             <th class="p-2 border">İşlemler</th>
                                         </tr>
                                         <tr>
+                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
                                             <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
                                             <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
                                             <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
@@ -187,8 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterInputs = document.querySelectorAll('.filter-input');
 
     function showNotification(message, type = 'success') {
-        const container = document.getElementById('notification-container');
-        if (!container) return;
+        const container = document.getElementById('notification-container'); if (!container) return;
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
         notification.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-times-circle'}"></i><span>${message}</span>`;
@@ -284,9 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     document.querySelectorAll('.searchable-select').forEach(createSearchableDropdown);
-    document.addEventListener('click', () => {
-        document.querySelectorAll('.searchable-select-dropdown').forEach(d => d.classList.add('hidden'));
-    });
+    document.addEventListener('click', () => { document.querySelectorAll('.searchable-select-dropdown').forEach(d => d.classList.add('hidden')); });
     
     const updateSelectDisplay = (selectElement) => {
         if(selectElement && selectElement.updateDropdown) {
@@ -399,9 +400,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const teknikIzlemeYapildi = data.teknikIzlemeDurumu === 'Yapıldı';
             const revizyonNotuIcon = teknikIzlemeYapildi && data.revizyonNotu && data.revizyonNotu.content ? `<button class="download-notes-btn ml-2 text-green-500 hover:text-green-700" title="Revizyon Notunu İndir" data-id="${data.id}"><i class="fas fa-file-alt"></i></button>` : '';
-            
             const teknikEkipUyesiHtml = teknikIzlemeYapildi ? `${data.teknikEkipUyesi || ''}${revizyonNotuIcon}` : '';
             const teknikIzlemeTarihiHtml = teknikIzlemeYapildi ? formatDate(data.teknikIzlemeTarihi) : '';
+
+            const akademikIzlemeYapildi = data.akademikIzlemeDurumu === 'Yapıldı';
+            const akademikOgretmenHtml = akademikIzlemeYapildi ? (data.akademikIzlemeOgretmeni || '') : '';
+            const akademikTarihHtml = akademikIzlemeYapildi ? formatDate(data.akademikIzlemeTarihi) : '';
 
             newRow.innerHTML = `
                 <td class="p-2 align-middle border">${formatDate(data.cekimTarihi)}</td>
@@ -424,6 +428,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="p-2 align-middle border">${data.kurguDurumu ? `<span class="status-badge ${statusClass}">${data.kurguDurumu}</span>` : ''}</td>
                 <td class="p-2 align-middle border">${teknikEkipUyesiHtml}</td>
                 <td class="p-2 align-middle border">${teknikIzlemeTarihiHtml}</td>
+                <td class="p-2 align-middle border">${akademikOgretmenHtml}</td>
+                <td class="p-2 align-middle border">${akademikTarihHtml}</td>
                 <td class="p-2 align-middle border">
                     <div class="flex items-center justify-center space-x-2">
                         <button title="Düzenle" class="text-indigo-600 hover:text-indigo-900 p-2 rounded-full hover:bg-indigo-100 edit-row" data-id="${data.id}"><i class="fas fa-edit"></i></button>
@@ -480,7 +486,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     row.soruSayisi, row.not, row.anlaticiOgretmen, row.yonetmen, row.akademikDinleyici, formatDate(row.kurguBaslamaTarihi),
                     formatDate(row.kurguBitisTarihi), row.kurguOperatoru, row.kurguDurumu,
                     (row.teknikIzlemeDurumu === 'Yapıldı' ? row.teknikEkipUyesi : ''), 
-                    (row.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(row.teknikIzlemeTarihi) : '')
+                    (row.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(row.teknikIzlemeTarihi) : ''),
+                    (row.akademikIzlemeDurumu === 'Yapıldı' ? row.akademikIzlemeOgretmeni : ''),
+                    (row.akademikIzlemeDurumu === 'Yapıldı' ? formatDate(row.akademikIzlemeTarihi) : '')
                 ];
                 return (columns[index] || '').toString().toLowerCase().includes(filter);
             });
@@ -597,7 +605,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = downloadNotesBtn.dataset.id;
             const kayit = getCekimlerFromStorage().find(k => k.id === id);
             if (kayit && kayit.revizyonNotu && kayit.revizyonNotu.content) {
-                const blob = new Blob([kayit.revizyonNotu.content], { type: 'text/plain' });
+                const blob = new Blob([kayit.revizyonNotu.content], { type: 'text/plain;charset=utf-8' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
                 link.download = kayit.revizyonNotu.fileName || 'revizyon.txt';
@@ -626,5 +634,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
-
-
