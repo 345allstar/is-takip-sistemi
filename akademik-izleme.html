@@ -39,74 +39,79 @@
                     <form id="cek-form" class="space-y-6">
                         <input type="hidden" id="editing-row-id">
                         
-                        <div>
-                            <label class="form-label mb-2">Video İzleme Ekranı</label>
-                            <div id="video-placeholder" class="w-full aspect-video bg-gray-900 rounded-lg flex items-center justify-center text-gray-500">
-                                <i class="fas fa-video fa-3x"></i>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                            
+                            <div class="lg:col-span-1">
+                                <label class="form-label mb-2">Video İzleme Ekranı</label>
+                                <div id="video-placeholder" class="w-full aspect-video bg-gray-900 rounded-lg flex items-center justify-center text-gray-500">
+                                    <i class="fas fa-video fa-3x"></i>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t">
-                             <div>
-                                <label class="form-label">Akademik İzleme Öğretmeni</label>
-                                <select id="akademik-izleme-ogretmeni" name="akademikIzlemeOgretmeni" class="searchable-select">
-                                    <option value="">Seçiniz...</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="form-label">Akademik İzleme Tarihi</label>
-                                <input type="date" id="akademik-izleme-tarihi" name="akademikIzlemeTarihi" class="form-input-base">
-                            </div>
-                            <div>
-                                <label class="form-label">Akademik İzleme Durumu</label>
-                                <select id="akademik-izleme-durumu" name="akademikIzlemeDurumu" class="searchable-select">
-                                    <option value="">Seçiniz...</option>
-                                    <option value="Yapıldı">Yapıldı</option>
-                                    <option value="Yapılmadı">Yapılmadı</option>
-                                </select>
-                            </div>
-                             <div>
-                                <label class="form-label">Video Süresi</label>
-                                <input type="text" id="video-suresi" name="videoSuresi" class="form-input-base" placeholder="Örn: 00:05:21">
-                            </div>
-                            <div>
-                                <label class="form-label">Kazanım Kodu</label>
-                                <select id="kazanim-kodu" name="kazanimKodu" class="searchable-select">
-                                    <option value="">Seçiniz...</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="form-label">Zorluk Derecesi</label>
-                                <select id="zorluk-derecesi" name="zorlukDerecesi" class="searchable-select">
-                                    <option value="">Seçiniz...</option>
-                                    <option value="Kolay">Kolay</option>
-                                    <option value="Orta">Orta</option>
-                                    <option value="Zor">Zor</option>
-                                </select>
-                            </div>
-                            <div class="md:col-span-3">
-                                <label class="form-label">Cevap Anahtarları</label>
-                                <input type="text" id="cevap-anahtarlari" name="cevapAnahtarlari" class="form-input-base" placeholder="Örn: 1-A, 2-C, 3-D...">
-                            </div>
-                             <div class="md:col-span-3">
-                                <label class="form-label">Anahtar Kelimeler</label>
-                                <input type="text" id="anahtar-kelimeler" name="anahtarKelimeler" class="form-input-base" placeholder="Kelimeleri virgülle ayırarak yazın...">
-                            </div>
-                            <div class="md:col-span-3">
-                                <label class="form-label">Öneri-İstek</label>
-                                <textarea id="oneri-istek" name="oneriIstek" rows="3" class="form-input-base" placeholder="Varsa öneri veya isteklerinizi yazın..."></textarea>
+                            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                 <div>
+                                    <label class="form-label">Akademik İzleme Öğretmeni</label>
+                                    <select id="akademik-izleme-ogretmeni" name="akademikIzlemeOgretmeni" class="searchable-select">
+                                        <option value="">Seçiniz...</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label">Akademik İzleme Tarihi</label>
+                                    <input type="date" id="akademik-izleme-tarihi" name="akademikIzlemeTarihi" class="form-input-base">
+                                </div>
+                                <div>
+                                    <label class="form-label">Akademik İzleme Durumu</label>
+                                    <select id="akademik-izleme-durumu" name="akademikIzlemeDurumu" class="searchable-select">
+                                        <option value="">Seçiniz...</option>
+                                        <option value="Yapıldı">Yapıldı</option>
+                                        <option value="Yapılmadı">Yapılmadı</option>
+                                    </select>
+                                </div>
+                                 <div>
+                                    <label class="form-label">Video Süresi</label>
+                                    <input type="text" id="video-suresi" name="videoSuresi" class="form-input-base" placeholder="Örn: 00:05:21">
+                                </div>
+                                <div>
+                                    <label class="form-label">Kazanım Kodu</label>
+                                    <select id="kazanim-kodu" name="kazanimKodu" class="searchable-select">
+                                        <option value="">Seçiniz...</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label">Zorluk Derecesi</label>
+                                    <select id="zorluk-derecesi" name="zorlukDerecesi" class="searchable-select">
+                                        <option value="">Seçiniz...</option>
+                                        <option value="Kolay">Kolay</option>
+                                        <option value="Orta">Orta</option>
+                                        <option value="Zor">Zor</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="form-label">Cevap Anahtarları</label>
+                                    <input type="text" id="cevap-anahtarlari" name="cevapAnahtarlari" class="form-input-base" placeholder="Örn: 1-A, 2-C, 3-D...">
+                                </div>
+                                 <div class="md:col-span-2">
+                                    <label class="form-label">Anahtar Kelimeler</label>
+                                    <input type="text" id="anahtar-kelimeler" name="anahtarKelimeler" class="form-input-base" placeholder="Kelimeleri virgülle ayırarak yazın...">
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="pt-6 border-t flex justify-end">
-                            <button type="submit" id="submit-button" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700">
-                                <i class="fas fa-save mr-2"></i>Tüm Bilgileri Güncelle
-                            </button>
+                        <div class="space-y-4 pt-4 border-t">
+                             <div>
+                                <label class="form-label">Öneri-İstek</label>
+                                <textarea id="oneri-istek" name="oneriIstek" rows="3" class="form-input-base" placeholder="Varsa öneri veya isteklerinizi yazın..."></textarea>
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="submit" id="submit-button" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700">
+                                    <i class="fas fa-save mr-2"></i>Tüm Bilgileri Güncelle
+                                </button>
+                            </div>
                         </div>
                         
                         <div class="mt-4 pt-4 border-t">
                             <label for="akademik-izleme-notu" class="form-label">Akademik İzleme Notu (Ayrı Kaydedilir)</label>
-                            <textarea id="akademik-izleme-notu" rows="6" class="form-input-base" placeholder="Detaylı akademik izleme notlarınızı buraya yazın..."></textarea>
+                            <textarea id="akademik-izleme-notu" name="akademikIzlemeNotu" rows="6" class="form-input-base" placeholder="Detaylı akademik izleme notlarınızı buraya yazın..."></textarea>
                             <div class="flex justify-end mt-3">
                                 <button type="button" id="kaydet-notu-btn" class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg shadow-md hover:bg-green-700">
                                     <i class="fas fa-file-alt mr-2"></i>Notu Kaydet ve İndir (.txt)
