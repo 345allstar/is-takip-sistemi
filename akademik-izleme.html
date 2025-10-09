@@ -44,70 +44,71 @@
                     <form id="cek-form" class="space-y-6">
                         <input type="hidden" id="editing-row-id">
                         
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
                             
-                            <div class="lg:col-span-1">
+                            <div class="flex flex-col">
                                 <label class="form-label mb-2">Video İzleme Ekranı</label>
-                                <div id="video-placeholder" class="w-full aspect-video bg-gray-900 rounded-lg flex items-center justify-center text-gray-500">
+                                <div id="video-placeholder" class="w-full flex-grow min-h-[300px] bg-gray-900 rounded-lg flex items-center justify-center text-gray-500">
                                     <i class="fas fa-video fa-3x"></i>
                                 </div>
                             </div>
 
-                            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-                                 <div>
-                                    <label class="form-label" for="akademik-izleme-ogretmeni">Akademik İzleme Öğretmeni</label>
-                                    <select id="akademik-izleme-ogretmeni" name="akademikIzlemeOgretmeni">
-                                        <option value="">Seçiniz...</option>
-                                    </select>
+                            <div class="flex flex-col space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="form-label" for="akademik-izleme-ogretmeni">Akademik İzleme Öğretmeni</label>
+                                        <select id="akademik-izleme-ogretmeni" name="akademikIzlemeOgretmeni">
+                                            <option value="">Seçiniz...</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Akademik İzleme Tarihi</label>
+                                        <input type="date" id="akademik-izleme-tarihi" name="akademikIzlemeTarihi" class="form-input-base">
+                                    </div>
+                                    <div>
+                                        <label class="form-label" for="akademik-izleme-durumu">Akademik İzleme Durumu</label>
+                                        <select id="akademik-izleme-durumu" name="akademikIzlemeDurumu">
+                                            <option value="">Seçiniz...</option>
+                                            <option value="Yapıldı">Yapıldı</option>
+                                            <option value="Yapılmadı">Yapılmadı</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Video Süresi</label>
+                                        <input type="text" id="video-suresi" name="videoSuresi" class="form-input-base" placeholder="Örn: 00:05:21">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="form-label" for="kazanim-kodu">Kazanım Kodu</label>
+                                        <select id="kazanim-kodu" name="kazanimKodu" multiple>
+                                            <option value="">Seçiniz...</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="form-label" for="zorluk-derecesi">Zorluk Derecesi</label>
+                                        <select id="zorluk-derecesi" name="zorlukDerecesi">
+                                            <option value="">Seçiniz...</option>
+                                            <option value="Kolay">Kolay</option>
+                                            <option value="Orta">Orta</option>
+                                            <option value="Zor">Zor</option>
+                                        </select>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="form-label">Cevap Anahtarları</label>
+                                        <input type="text" id="cevap-anahtarlari" name="cevapAnahtarlari" class="form-input-base" placeholder="Örn: 1-A, 2-C, 3-D...">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="form-label">Anahtar Kelimeler</label>
+                                        <input type="text" id="anahtar-kelimeler" name="anahtarKelimeler" class="form-input-base" placeholder="Kelimeleri virgülle ayırarak yazın...">
+                                    </div>
                                 </div>
                                 <div>
-                                    <label class="form-label">Akademik İzleme Tarihi</label>
-                                    <input type="date" id="akademik-izleme-tarihi" name="akademikIzlemeTarihi" class="form-input-base">
-                                </div>
-                                <div>
-                                    <label class="form-label" for="akademik-izleme-durumu">Akademik İzleme Durumu</label>
-                                    <select id="akademik-izleme-durumu" name="akademikIzlemeDurumu">
-                                        <option value="">Seçiniz...</option>
-                                        <option value="Yapıldı">Yapıldı</option>
-                                        <option value="Yapılmadı">Yapılmadı</option>
-                                    </select>
-                                </div>
-                                 <div>
-                                    <label class="form-label">Video Süresi</label>
-                                    <input type="text" id="video-suresi" name="videoSuresi" class="form-input-base" placeholder="Örn: 00:05:21">
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="form-label" for="kazanim-kodu">Kazanım Kodu</label>
-                                    <select id="kazanim-kodu" name="kazanimKodu" multiple>
-                                        <option value="">Seçiniz...</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="form-label" for="zorluk-derecesi">Zorluk Derecesi</label>
-                                    <select id="zorluk-derecesi" name="zorlukDerecesi">
-                                        <option value="">Seçiniz...</option>
-                                        <option value="Kolay">Kolay</option>
-                                        <option value="Orta">Orta</option>
-                                        <option value="Zor">Zor</option>
-                                    </select>
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="form-label">Cevap Anahtarları</label>
-                                    <input type="text" id="cevap-anahtarlari" name="cevapAnahtarlari" class="form-input-base" placeholder="Örn: 1-A, 2-C, 3-D...">
-                                </div>
-                                 <div class="md:col-span-2">
-                                    <label class="form-label">Anahtar Kelimeler</label>
-                                    <input type="text" id="anahtar-kelimeler" name="anahtarKelimeler" class="form-input-base" placeholder="Kelimeleri virgülle ayırarak yazın...">
+                                    <label class="form-label">Öneri-İstek</label>
+                                    <textarea id="oneri-istek" name="oneriIstek" rows="3" class="form-input-base" placeholder="Varsa öneri veya isteklerinizi yazın..."></textarea>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="space-y-4 pt-4 border-t">
-                             <div>
-                                <label class="form-label">Öneri-İstek</label>
-                                <textarea id="oneri-istek" name="oneriIstek" rows="3" class="form-input-base" placeholder="Varsa öneri veya isteklerinizi yazın..."></textarea>
-                            </div>
-                            <div class="flex justify-end">
+
+                        <div class="flex justify-end pt-4 border-t">
                                 <button type="submit" id="submit-button" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700">
                                     <i class="fas fa-save mr-2"></i>Tüm Bilgileri Güncelle
                                 </button>
