@@ -179,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const rowsPerPage = 10;
     
     const akademikIzlemeOgretmenleri = ["Ali Yıldırım", "İsmail Tolga Aktaş", "Rahim Ural", "Burak Onay", "Betül Çiçek", "Sinem Şentürk", "Ahmet Ölmez", "Barış Özcan", "Cem Oğuz Büke", "Cihat Çiçek", "Didem Özbay Sarıaydın", "Eda Güney", "Edip İçli", "Elif Bozkurt", "Emine Bolat Kırbıyık", "Esra Dindar", "Esra Şahin", "Esra Yurttaş", "Firdevs Bozkurt", "Fuat Ses", "Hülya Güçkan Taşkın", "İbrahim Atakuru", "İbrahim Halil Kesici", "Koray Dindar", "Mehmet Bademli", "Mehmet Kırbıyık", "Muharrem Akbaş", "Özcan Kulaksız", "Raziye İnal", "Sabri Bingöl", "Semih Sunucuoğlu", "Serkan Yıldız", "Serpil Tunç İçli", "Suat Emre", "Tuğba Bostancı", "Yasin Baş", "Yavuz Selim Yıldız"];
+    const kazanımKodlari = ["T.1.1", "M.8.2.3", "F.9.1.2"]; // Örnek kazanım kodları, burayı kendi listenizle doldurun
 
     const cekForm = document.getElementById('cek-form');
     const tableBody = document.getElementById('cekim-tablosu-body');
@@ -186,6 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const noDataMessage = document.getElementById('no-data');
     const recordCountEl = document.getElementById('record-count');
     const paginationControlsEl = document.getElementById('pagination-controls');
+    const kaydetNotuBtn = document.getElementById('kaydet-notu-btn');
 
     function showNotification(message, type = 'success') {
         const container = document.getElementById('notification-container');
@@ -330,7 +332,10 @@ document.addEventListener('DOMContentLoaded', () => {
             row.dataset.id = kayit.id;
             
             let durumClass = kayit.akademikIzlemeDurumu === 'Yapıldı' ? 'status-yapildi' : 'status-yapilmadi';
-            
+            const noteIcon = (kayit.akademikIzlemeNotu && kayit.akademikIzlemeNotu.content) 
+                ? `<button class="download-note-btn ml-2 text-green-500 hover:text-green-700" title="Akademik Notu İndir" data-id="${kayit.id}"><i class="fas fa-file-alt"></i></button>` 
+                : '';
+
             row.innerHTML = `
                 <td>${formatDate(kayit.cekimTarihi)}</td>
                 <td>${kayit.anlatimTuru || ''}</td>
@@ -341,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${kayit.ders || ''}</td>
                 <td>${kayit.testAdi || ''}</td>
                 <td>${kayit.soruSayisi || ''}</td>
-                <td>${kayit.akademikIzlemeOgretmeni || ''}</td>
+                <td>${kayit.akademikIzlemeOgretmeni || ''}${noteIcon}</td>
                 <td>${formatDate(kayit.akademikIzlemeTarihi)}</td>
                 <td><span class="status-badge ${durumClass}">${kayit.akademikIzlemeDurumu || 'Belirtilmedi'}</span></td>
                 <td>
@@ -380,7 +385,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function loadAndDisplayCekimler() {
         const allCekimler = getCekimlerFromStorage();
         const izlenebilirCekimler = allCekimler.filter(k => k.akademikIzlemeYapilabilirligi === 'Yapılabilir');
-
         const filterValues = Array.from(document.querySelectorAll('.filter-input')).map(input => input.value.toLowerCase());
         
         const filteredKayitlar = izlenebilirCekimler.filter(kayit => {
@@ -414,17 +418,57 @@ document.addEventListener('DOMContentLoaded', () => {
         let cek_kayitlari = getCekimlerFromStorage();
         const kayitIndex = cek_kayitlari.findIndex(k => k.id == id);
         if (kayitIndex > -1) {
-            cek_kayitlari[kayitIndex].akademikIzlemeOgretmeni = document.getElementById('akademik-izleme-ogretmeni').value;
-            cek_kayitlari[kayitIndex].akademikIzlemeTarihi = document.getElementById('akademik-izleme-tarihi').value;
-            cek_kayitlari[kayitIndex].akademikIzlemeDurumu = document.getElementById('akademik-izleme-durumu').value;
+            const formData = new FormData(cekForm);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Mevcut kaydı yeni form verileriyle güncelle
+            cek_kayitlari[kayitIndex] = { ...cek_kayitlari[kayitIndex], ...data };
+            
             saveCekimlerToStorage(cek_kayitlari);
             loadAndDisplayCekimler();
-            showNotification('Akademik izleme bilgileri güncellendi!');
+            showNotification('Tüm akademik bilgiler güncellendi!');
         }
     });
 
+    kaydetNotuBtn.addEventListener('click', () => {
+        const id = editingIdInput.value;
+        if (!id) {
+            showNotification("Notu kaydetmek için önce listeden bir kayıt seçmelisiniz.", "error");
+            return;
+        }
+        const notIcerigi = document.getElementById('akademik-izleme-notu').value;
+        if (!notIcerigi.trim()) {
+            showNotification("Not alanı boş bırakılamaz.", "error");
+            return;
+        }
+        let cek_kayitlari = getCekimlerFromStorage();
+        const kayitIndex = cek_kayitlari.findIndex(k => k.id == id);
+        if (kayitIndex > -1) {
+            const kayit = cek_kayitlari[kayitIndex];
+            const dosyaAdi = `akademik_not_${kayit.videoKodu || kayit.id}.txt`;
+            kayit.akademikIzlemeNotu = {
+                fileName: dosyaAdi,
+                content: notIcerigi
+            };
+            saveCekimlerToStorage(cek_kayitlari);
+
+            const blob = new Blob([notIcerigi], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = dosyaAdi;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showNotification('Akademik not kaydedildi ve indirildi!');
+            loadAndDisplayCekimler();
+        }
+    });
+    
     tableBody.addEventListener('click', function(e) {
         const editButton = e.target.closest('.edit-row');
+        const downloadNoteButton = e.target.closest('.download-note-btn');
+
         if (editButton) {
             e.preventDefault();
             const row = editButton.closest('tr');
@@ -432,11 +476,36 @@ document.addEventListener('DOMContentLoaded', () => {
             const kayit = getCekimlerFromStorage().find(k => k.id == id);
             if (kayit) {
                 editingIdInput.value = kayit.id;
-                document.getElementById('akademik-izleme-ogretmeni').value = kayit.akademikIzlemeOgretmeni || '';
-                document.getElementById('akademik-izleme-tarihi').value = kayit.akademikIzlemeTarihi || '';
-                document.getElementById('akademik-izleme-durumu').value = kayit.akademikIzlemeDurumu || '';
-                ['akademik-izleme-ogretmeni', 'akademik-izleme-durumu'].forEach(id => updateSelectDisplay(document.getElementById(id)));
+                // Formdaki tüm alanları doldur
+                Object.keys(kayit).forEach(key => {
+                    const element = cekForm.elements[key];
+                    if (element) {
+                        element.value = kayit[key] || '';
+                        if (element.tagName === 'SELECT') {
+                           updateSelectDisplay(element);
+                        }
+                    }
+                });
+                
+                // Akademik notu ayrı textarea'ya yükle
+                document.getElementById('akademik-izleme-notu').value = (kayit.akademikIzlemeNotu && kayit.akademikIzlemeNotu.content) ? kayit.akademikIzlemeNotu.content : '';
+
                 document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        if (downloadNoteButton) {
+            e.preventDefault();
+            const id = downloadNoteButton.dataset.id;
+            const kayit = getCekimlerFromStorage().find(k => k.id === id);
+            if (kayit && kayit.akademikIzlemeNotu && kayit.akademikIzlemeNotu.content) {
+                const blob = new Blob([kayit.akademikIzlemeNotu.content], { type: 'text/plain;charset=utf-8' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = kayit.akademikIzlemeNotu.fileName || 'akademik_not.txt';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             }
         }
     });
@@ -450,7 +519,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     populateSelect('akademik-izleme-ogretmeni', akademikIzlemeOgretmenleri);
-    ['akademik-izleme-ogretmeni', 'akademik-izleme-durumu'].forEach(id => {
+    populateSelect('kazanim-kodu', kazanımKodlari); // Kazanım kodlarını dropdown'a ekler
+    
+    // Tüm select'leri aranabilir yap
+    ['akademik-izleme-ogretmeni', 'akademik-izleme-durumu', 'kazanim-kodu', 'zorluk-derecesi'].forEach(id => {
         const selectElement = document.getElementById(id);
         if (selectElement) createSearchableDropdown(selectElement);
     });
