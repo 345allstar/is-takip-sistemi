@@ -170,7 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const teknikEkipUyeleri = ["Mert Katıhan", "Sibel Şahin", "Gözde Bulut", "Taner Akçil", "Recep Yurttaş"];
 
-    // DOM Elementleri
     const cekForm = document.getElementById('cek-form');
     const tableBody = document.getElementById('cekim-tablosu-body');
     const editingIdInput = document.getElementById('editing-row-id');
@@ -179,7 +178,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const paginationControlsEl = document.getElementById('pagination-controls');
     const kaydetVeIndirBtn = document.getElementById('kaydet-ve-indir-btn');
 
-    // --- Yardımcı Fonksiyonlar ---
     function showNotification(message, type = 'success') {
         const container = document.getElementById('notification-container');
         if (!container) return;
@@ -202,7 +200,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
     };
     
-    // --- Arayüz ve Form Fonksiyonları ---
     document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
         trigger.addEventListener('click', () => {
             const content = trigger.nextElementSibling;
@@ -214,12 +211,96 @@ document.addEventListener('DOMContentLoaded', () => {
                 content.style.maxHeight = content.scrollHeight + "px";
             }
         });
-        setTimeout(() => trigger.click(), 200);
+        setTimeout(() => {
+             const content = trigger.nextElementSibling;
+             if(content) {
+                content.style.maxHeight = content.scrollHeight + "px";
+                trigger.querySelector('i:last-child').classList.add('rotate-180');
+             }
+        }, 200);
     });
 
-    function createSearchableDropdown(selectElement) { /* Bu fonksiyon diğer dosyalardakiyle aynı, burada tekrar yazmaya gerek yok */ }
+    function createSearchableDropdown(selectElement) {
+        const container = document.createElement('div');
+        container.className = 'searchable-select-container relative';
+        selectElement.parentNode.insertBefore(container, selectElement);
+        selectElement.style.display = 'none';
+        container.appendChild(selectElement);
+        const displayButton = document.createElement('button');
+        displayButton.type = 'button';
+        displayButton.className = 'form-input-base text-left flex justify-between items-center';
+        const displaySpan = document.createElement('span');
+        displaySpan.className = 'truncate';
+        displayButton.appendChild(displaySpan);
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-chevron-down text-gray-400';
+        displayButton.appendChild(icon);
+        container.appendChild(displayButton);
+        const dropdown = document.createElement('div');
+        dropdown.className = 'searchable-select-dropdown absolute hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg';
+        const searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.placeholder = 'Ara...';
+        searchInput.className = 'block w-full p-2 border-b border-gray-200 focus:outline-none';
+        dropdown.appendChild(searchInput);
+        const optionsList = document.createElement('div');
+        optionsList.className = 'p-1 max-h-48 overflow-y-auto';
+        dropdown.appendChild(optionsList);
+        container.appendChild(dropdown);
+        const updateOptions = () => {
+            optionsList.innerHTML = '';
+            Array.from(selectElement.options).forEach(option => {
+                if (option.value === "" && option.textContent.includes('Seçiniz')) return;
+                const optionDiv = document.createElement('div');
+                optionDiv.textContent = option.textContent;
+                optionDiv.dataset.value = option.value;
+                optionDiv.className = 'p-2 cursor-pointer hover:bg-indigo-100 rounded text-sm';
+                optionDiv.addEventListener('click', () => {
+                    selectElement.value = option.value;
+                    displaySpan.textContent = option.textContent;
+                    displaySpan.classList.remove('text-gray-400');
+                    dropdown.classList.add('hidden');
+                    selectElement.dispatchEvent(new Event('change'));
+                });
+                optionsList.appendChild(optionDiv);
+            });
+            const selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`) || selectElement.options[0];
+            if (selectedOption) {
+                displaySpan.textContent = selectedOption.textContent;
+                if(selectedOption.value === "") displaySpan.classList.add('text-gray-400');
+                else displaySpan.classList.remove('text-gray-400');
+            }
+        };
+        searchInput.addEventListener('input', () => {
+            const filter = searchInput.value.toLowerCase();
+            optionsList.querySelectorAll('div').forEach(optionDiv => {
+                const text = optionDiv.textContent.toLowerCase();
+                optionDiv.style.display = text.includes(filter) ? '' : 'none';
+            });
+        });
+        displayButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (selectElement.disabled) return;
+            document.querySelectorAll('.searchable-select-dropdown').forEach(d => { if(d !== dropdown) d.classList.add('hidden'); });
+            dropdown.classList.toggle('hidden');
+            if(!dropdown.classList.contains('hidden')) {
+                searchInput.value = '';
+                searchInput.dispatchEvent(new Event('input'));
+                searchInput.focus();
+            }
+        });
+        selectElement.updateDropdown = updateOptions;
+        updateOptions();
+    }
+    const updateSelectDisplay = (selectElement) => {
+        if(selectElement && selectElement.updateDropdown) {
+           selectElement.updateDropdown();
+        }
+    }
+    
     function populateSelect(selectId, data) {
         const select = document.getElementById(selectId);
+        if(!select) return;
         data.forEach(item => {
             const option = document.createElement('option');
             option.value = item;
@@ -227,10 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
             select.appendChild(option);
         });
     }
-    const updateSelectDisplay = (selectElement) => { /* Bu fonksiyon diğer dosyalardakiyle aynı */ };
 
-
-    // --- Ana Listeleme ve Sayfalama Fonksiyonları ---
     function displayPage(items) {
         tableBody.innerHTML = '';
         const start = (currentPage - 1) * rowsPerPage;
@@ -241,8 +319,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = tableBody.insertRow();
             row.dataset.id = kayit.id;
             
-            const timecodeFileIcon = (kayit.timecodeFiles && kayit.timecodeFiles.length > 0) ? `<button class="download-files-btn ml-2 text-indigo-500 hover:text-indigo-700" title="Time Code Dosyalarını İndir"><i class="fas fa-download"></i></button>` : '';
-            const revizyonNotuIcon = (kayit.revizyonNotu && kayit.revizyonNotu.content) ? `<button class="download-notes-btn ml-2 text-green-500 hover:text-green-700" title="Revizyon Notunu İndir"><i class="fas fa-file-alt"></i></button>` : '';
+            const timecodeFileIcon = (kayit.timecodeFiles && kayit.timecodeFiles.length > 0) ? `<button class="download-files-btn ml-2 text-indigo-500 hover:text-indigo-700" title="Time Code Dosyalarını İndir" data-id="${kayit.id}"><i class="fas fa-download"></i></button>` : '';
+            const revizyonNotuIcon = (kayit.revizyonNotu && kayit.revizyonNotu.content) ? `<button class="download-notes-btn ml-2 text-green-500 hover:text-green-700" title="Revizyon Notunu İndir" data-id="${kayit.id}"><i class="fas fa-file-alt"></i></button>` : '';
 
             let durumClass = kayit.teknikIzlemeDurumu === 'Yapıldı' ? 'status-yapildi' : 'status-yapilmadi';
             
@@ -264,7 +342,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function setupPagination(items) { /* Bu fonksiyon diğer dosyalardakiyle aynı */ }
+    function setupPagination(items) {
+        paginationControlsEl.innerHTML = '';
+        const pageCount = Math.ceil(items.length / rowsPerPage);
+        if (pageCount <= 1) return;
+        
+        const prevButton = document.createElement('button');
+        prevButton.innerHTML = `<i class="fas fa-chevron-left"></i>`;
+        prevButton.className = 'pagination-button';
+        prevButton.disabled = currentPage === 1;
+        prevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; loadAndDisplayCekimler(); } });
+        paginationControlsEl.appendChild(prevButton);
+
+        for (let i = 1; i <= pageCount; i++) {
+            const btn = document.createElement('button');
+            btn.innerText = i;
+            btn.className = 'pagination-button';
+            if (i === currentPage) btn.classList.add('active');
+            btn.addEventListener('click', () => { currentPage = i; loadAndDisplayCekimler(); });
+            paginationControlsEl.appendChild(btn);
+        }
+        
+        const nextButton = document.createElement('button');
+        nextButton.innerHTML = `<i class="fas fa-chevron-right"></i>`;
+        nextButton.className = 'pagination-button';
+        nextButton.disabled = currentPage === pageCount;
+        nextButton.addEventListener('click', () => { if (currentPage < pageCount) { currentPage++; loadAndDisplayCekimler(); } });
+        paginationControlsEl.appendChild(nextButton);
+    }
 
     function loadAndDisplayCekimler() {
         const allCekimler = getCekimlerFromStorage();
@@ -292,9 +397,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setupPagination(filteredKayitlar);
     }
 
-    // --- Olay Dinleyicileri (Event Listeners) ---
-
-    // Ana Formu Güncelleme
     cekForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const id = editingIdInput.value;
@@ -314,7 +416,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Revizyon Notunu Kaydet ve İndir
     kaydetVeIndirBtn.addEventListener('click', () => {
         const id = editingIdInput.value;
         if (!id) {
@@ -338,8 +439,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             saveCekimlerToStorage(cek_kayitlari);
             
-            // Dosyayı indir
-            const blob = new Blob([notIcerigi], { type: 'text/plain' });
+            const blob = new Blob([notIcerigi], { type: 'text/plain;charset=utf-8' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = dosyaAdi;
@@ -348,17 +448,17 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.removeChild(link);
 
             showNotification('Revizyon notu kaydedildi ve indirildi!');
-            loadAndDisplayCekimler(); // İkonun görünmesi için listeyi yenile
+            loadAndDisplayCekimler();
         }
     });
 
-    // Tablo Üzerindeki Tıklama Olayları (Düzenle, Dosya İndir vs.)
     tableBody.addEventListener('click', function(e) {
         const editButton = e.target.closest('.edit-row');
-        const timecodeBtn = e.target.closest('.download-files-btn');
         const notesBtn = e.target.closest('.download-notes-btn');
+        const timecodeBtn = e.target.closest('.download-files-btn');
 
         if (editButton) {
+            e.preventDefault();
             const row = editButton.closest('tr');
             const id = row.dataset.id;
             const kayit = getCekimlerFromStorage().find(k => k.id == id);
@@ -376,11 +476,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if (notesBtn) {
-            // ... (Revizyon notu indirme mantığı buraya da eklenebilir, ama yukarıdaki buton zaten yapıyor)
-        }
-
-        if (timecodeBtn) {
-            // ... (Timecode indirme mantığı buraya eklenebilir)
+            e.preventDefault();
+            const id = notesBtn.dataset.id;
+            const kayit = getCekimlerFromStorage().find(k => k.id === id);
+            if (kayit && kayit.revizyonNotu && kayit.revizyonNotu.content) {
+                const blob = new Blob([kayit.revizyonNotu.content], { type: 'text/plain;charset=utf-8' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = kayit.revizyonNotu.fileName || 'revizyon.txt';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
         }
     });
     
@@ -388,9 +495,14 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('keyup', () => { currentPage = 1; loadAndDisplayCekimler(); });
     });
     
-    // --- Başlangıç ---
     populateSelect('teknik-ekip-uyesi', teknikEkipUyeleri);
-    ['teknik-ekip-uyesi', 'teknik-izleme-durumu'].forEach(id => createSearchableDropdown(document.getElementById(id)));
+    ['teknik-ekip-uyesi', 'teknik-izleme-durumu'].forEach(id => {
+        const selectElement = document.getElementById(id);
+        if (selectElement) {
+            createSearchableDropdown(selectElement);
+        }
+    });
+
     loadAndDisplayCekimler();
     window.addEventListener('storage', loadAndDisplayCekimler);
 });
