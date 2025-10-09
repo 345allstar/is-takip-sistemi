@@ -94,6 +94,14 @@
                                 <option value="Yapılamaz">Yapılamaz</option>
                             </select>
                         </div>
+                         <div>
+                            <label class="form-label">Akademik İzleme Yapılabilirliği</label>
+                            <select id="akademik-izleme" name="akademikIzlemeYapilabilirligi" class="searchable-select">
+                                <option value="">Seçiniz...</option>
+                                <option value="Yapılabilir">Yapılabilir</option>
+                                <option value="Yapılamaz">Yapılamaz</option>
+                            </select>
+                        </div>
                         <div class="md:col-span-2 flex justify-end pt-4 mt-4 border-t">
                             <button type="submit" id="submit-button" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">
                                 <i class="fas fa-save mr-2"></i>Güncelle
@@ -123,11 +131,13 @@
                                     <th>KURGU OPERATÖRÜ</th>
                                     <th>KURGU DURUMU</th>
                                     <th>TEKNİK İZLENEBİLİRLİK</th>
+                                    <th>AKADEMİK İZLENEBİLİRLİK</th>
                                     <th>TEKNİK EKİP ÜYESİ</th>
                                     <th>TEKNİK İZLEME TARİHİ</th>
                                     <th>İŞLEMLER</th>
                                 </tr>
                                 <tr>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
                                     <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
                                     <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
                                     <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
@@ -206,7 +216,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 content.style.maxHeight = content.scrollHeight + "px";
             }
         });
-        setTimeout(() => trigger.click(), 200);
+        setTimeout(() => {
+            const content = trigger.nextElementSibling;
+            if(content) {
+                content.style.maxHeight = content.scrollHeight + "px";
+                const icon = trigger.querySelector('i:last-child');
+                if (icon) icon.classList.add('rotate-180');
+            }
+        }, 200);
     });
 
     function createSearchableDropdown(selectElement) {
@@ -336,6 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${kayit.kurguOperatoru || ''}</td>
                 <td><span class="status-badge ${statusClass}">${kayit.kurguDurumu || 'Belirtilmedi'}</span></td>
                 <td>${kayit.teknikIzlemeYapilabilirligi || ''}</td>
+                <td>${kayit.akademikIzlemeYapilabilirligi || ''}</td>
                 <td>${teknikEkipUyesiHtml}</td>
                 <td>${teknikIzlemeTarihiHtml}</td>
                 <td>
@@ -388,6 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     formatDate(kayit.cekimTarihi), kayit.anlatimTuru, kayit.videoKodu, kayit.anlaticiOgretmen, kayit.yonetmen,
                     formatDate(kayit.kurguBaslamaTarihi), formatDate(kayit.kurguBitisTarihi), kayit.kurguOperatoru, kayit.kurguDurumu,
                     kayit.teknikIzlemeYapilabilirligi,
+                    kayit.akademikIzlemeYapilabilirligi,
                     (kayit.teknikIzlemeDurumu === 'Yapıldı' ? kayit.teknikEkipUyesi : ''), 
                     (kayit.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(kayit.teknikIzlemeTarihi) : '')
                 ];
@@ -419,11 +438,12 @@ document.addEventListener('DOMContentLoaded', () => {
             cek_kayitlari[kayitIndex].kurguOperatoru = document.getElementById('kurgu-operatoru').value;
             cek_kayitlari[kayitIndex].kurguDurumu = document.getElementById('kurgu-durumu').value;
             cek_kayitlari[kayitIndex].teknikIzlemeYapilabilirligi = document.getElementById('teknik-izleme').value;
+            cek_kayitlari[kayitIndex].akademikIzlemeYapilabilirligi = document.getElementById('akademik-izleme').value;
             saveCekimlerToStorage(cek_kayitlari);
             loadAndDisplayCekimler();
             cekForm.reset();
             editingIdInput.value = '';
-            ['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme'].forEach(id => updateSelectDisplay(document.getElementById(id)));
+            ['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme'].forEach(id => updateSelectDisplay(document.getElementById(id)));
             showNotification('Kurgu bilgileri başarıyla güncellendi!');
         }
     });
@@ -445,7 +465,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('kurgu-operatoru').value = kayit.kurguOperatoru || '';
                 document.getElementById('kurgu-durumu').value = kayit.kurguDurumu || '';
                 document.getElementById('teknik-izleme').value = kayit.teknikIzlemeYapilabilirligi || '';
-                ['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme'].forEach(id => updateSelectDisplay(document.getElementById(id)));
+                document.getElementById('akademik-izleme').value = kayit.akademikIzlemeYapilabilirligi || '';
+                ['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme'].forEach(id => updateSelectDisplay(document.getElementById(id)));
                 document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
             }
         }
@@ -455,7 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = notesBtn.dataset.id;
             const kayit = getCekimlerFromStorage().find(k => k.id === id);
             if (kayit && kayit.revizyonNotu && kayit.revizyonNotu.content) {
-                const blob = new Blob([kayit.revizyonNotu.content], { type: 'text/plain' });
+                const blob = new Blob([kayit.revizyonNotu.content], { type: 'text/plain;charset=utf-8' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
                 link.download = kayit.revizyonNotu.fileName || 'revizyon.txt';
@@ -464,16 +485,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.body.removeChild(link);
             }
         }
+        
+        if (timecodeBtn) {
+             e.preventDefault();
+            const id = timecodeBtn.dataset.id;
+            const record = getCekimlerFromStorage().find(r => r.id === id);
+            if (record && record.timecodeFiles && record.timecodeFiles.length > 0) {
+                const zip = new JSZip();
+                record.timecodeFiles.forEach(file => {
+                    const base64Data = file.data.split(',')[1];
+                    zip.file(file.name, base64Data, { base64: true });
+                });
+                zip.generateAsync({ type: "blob" }).then(function(content) {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(content);
+                    link.download = `${record.videoKodu || 'timecodes'}.zip`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                });
+            }
+        }
     });
     
     document.querySelectorAll('.filter-input').forEach(input => {
         input.addEventListener('keyup', () => { currentPage = 1; loadAndDisplayCekimler(); });
     });
     
-    // -- Başlangıç --
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.searchable-select-dropdown').forEach(d => d.classList.add('hidden'));
+    });
+    
     populateSelect('kurgu-operatoru', kurguOperatorleri);
     populateSelect('kurgu-durumu', kurguDurumlari);
-    ['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme'].forEach(id => createSearchableDropdown(document.getElementById(id)));
+    ['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme'].forEach(id => createSearchableDropdown(document.getElementById(id)));
+    
     loadAndDisplayCekimler();
     window.addEventListener('storage', loadAndDisplayCekimler);
 });
