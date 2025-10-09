@@ -62,17 +62,17 @@
                     <i class="fas fa-chevron-down transform transition-transform text-gray-500"></i>
                 </div>
                 <div class="collapsible-content mt-6">
-                    <form id="cek-form" class="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6 items-start">
+                    <form id="cek-form" class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-stretch">
                         <input type="hidden" id="editing-row-id">
                         
-                        <div class="lg:col-span-1">
+                        <div class="lg:col-span-3 flex flex-col">
                             <label class="form-label mb-2">Video İzleme Ekranı</label>
-                            <div id="video-placeholder" class="w-full aspect-video bg-gray-900 rounded-lg flex items-center justify-center text-gray-500">
+                            <div id="video-placeholder" class="w-full flex-grow min-h-[400px] bg-gray-900 rounded-lg flex items-center justify-center text-gray-500">
                                 <i class="fas fa-video fa-3x"></i>
                             </div>
                         </div>
 
-                        <div class="lg:col-span-1 space-y-5">
+                        <div class="lg:col-span-2 flex flex-col space-y-5">
                             <div>
                                 <label class="form-label">Teknik Ekip Üyesi</label>
                                 <select id="teknik-ekip-uyesi" name="teknikEkipUyesi" class="searchable-select">
@@ -91,19 +91,18 @@
                                     <option value="Yapılmadı">Yapılmadı</option>
                                 </select>
                             </div>
-                            <div class="pt-4 border-t flex justify-end">
+                            
+                            <div class="flex flex-col flex-grow">
+                                <label for="revizyon-notlari" class="form-label">Revizyon Notları</label>
+                                <textarea id="revizyon-notlari" name="revizyonNotlari" class="form-input-base flex-grow" placeholder="Revizyon taleplerinizi buraya yazın..."></textarea>
+                            </div>
+
+                            <div class="pt-4 border-t flex flex-col sm:flex-row justify-end gap-3">
+                                 <button type="button" id="kaydet-ve-indir-btn" class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg shadow-md hover:bg-green-700">
+                                    <i class="fas fa-file-alt mr-2"></i>Notları Kaydet ve İndir (.txt)
+                                </button>
                                 <button type="submit" id="submit-button" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700">
                                     <i class="fas fa-save mr-2"></i>Bilgileri Güncelle
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="lg:col-span-2 mt-4 pt-4 border-t">
-                            <label for="revizyon-notlari" class="form-label">Revizyon Notları</label>
-                            <textarea id="revizyon-notlari" name="revizyonNotlari" rows="6" class="form-input-base" placeholder="Revizyon taleplerinizi buraya yazın..."></textarea>
-                            <div class="flex justify-end mt-3">
-                                <button type="button" id="kaydet-ve-indir-btn" class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg shadow-md hover:bg-green-700">
-                                    <i class="fas fa-file-alt mr-2"></i>Notları Kaydet ve İndir (.txt)
                                 </button>
                             </div>
                         </div>
