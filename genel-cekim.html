@@ -404,8 +404,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const teknikIzlemeTarihiHtml = teknikIzlemeYapildi ? formatDate(data.teknikIzlemeTarihi) : '';
 
             const akademikIzlemeYapildi = data.akademikIzlemeDurumu === 'Yapıldı';
-            const akademikOgretmenHtml = akademikIzlemeYapildi ? (data.akademikIzlemeOgretmeni || '') : '';
-            const akademikTarihHtml = akademikIzlemeYapildi ? formatDate(data.akademikIzlemeTarihi) : '';
+            const akademikNotuIcon = akademikIzlemeYapildi && data.akademikIzlemeNotu && data.akademikIzlemeNotu.content 
+                ? `<button class="download-akademik-notes-btn ml-2 text-green-500 hover:text-green-700" title="Akademik Notu İndir" data-id="${data.id}"><i class="fas fa-file-alt"></i></button>` 
+                : '';
+            const akademikOgretmenHtml = akademikIzlemeYapildi ? `${data.akademikIzlemeOgretmeni || ''}${akademikNotuIcon}` : '';
 
             newRow.innerHTML = `
                 <td class="p-2 align-middle border">${formatDate(data.cekimTarihi)}</td>
@@ -538,6 +540,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        if (downloadAkademikNotesBtn) {
+            e.preventDefault();
+            const id = downloadAkademikNotesBtn.dataset.id;
+            const kayit = getCekimlerFromStorage().find(k => k.id === id);
+            if (kayit && kayit.akademikIzlemeNotu && kayit.akademikIzlemeNotu.content) {
+                const blob = new Blob([kayit.akademikIzlemeNotu.content], { type: 'text/plain;charset=utf-8' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = kayit.akademikIzlemeNotu.fileName || `akademik_not_${kayit.videoKodu}.txt`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+        
         if (editButton) {
             e.preventDefault();
             const id = editButton.dataset.id;
@@ -634,5 +651,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
 
