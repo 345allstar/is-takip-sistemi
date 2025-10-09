@@ -131,10 +131,10 @@
                                     <th>KURGU OPERATÖRÜ</th>
                                     <th>KURGU DURUMU</th>
                                     <th>TEKNİK İZLENEBİLİRLİK</th>
-                                    <th>AKADEMİK İZLENEBİLİRLİK</th>
                                     <th>TEKNİK EKİP ÜYESİ</th>
                                     <th>TEKNİK İZLEME TARİHİ</th>
-                                    <th>İŞLEMLER</th>
+                                    <th>AKADEMİK İZLENEBİLİRLİK</th>
+                                  <th>İŞLEMLER</th>
                                 </tr>
                                 <tr>
                                     <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
@@ -353,9 +353,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${kayit.kurguOperatoru || ''}</td>
                 <td><span class="status-badge ${statusClass}">${kayit.kurguDurumu || 'Belirtilmedi'}</span></td>
                 <td>${kayit.teknikIzlemeYapilabilirligi || ''}</td>
-                <td>${kayit.akademikIzlemeYapilabilirligi || ''}</td>
                 <td>${teknikEkipUyesiHtml}</td>
                 <td>${teknikIzlemeTarihiHtml}</td>
+                <td>${kayit.akademikIzlemeYapilabilirligi || ''}</td>
                 <td>
                     <button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="Düzenle">
                         <i class="fas fa-pencil-alt"></i>
@@ -406,9 +406,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     formatDate(kayit.cekimTarihi), kayit.anlatimTuru, kayit.videoKodu, kayit.anlaticiOgretmen, kayit.yonetmen,
                     formatDate(kayit.kurguBaslamaTarihi), formatDate(kayit.kurguBitisTarihi), kayit.kurguOperatoru, kayit.kurguDurumu,
                     kayit.teknikIzlemeYapilabilirligi,
-                    kayit.akademikIzlemeYapilabilirligi,
                     (kayit.teknikIzlemeDurumu === 'Yapıldı' ? kayit.teknikEkipUyesi : ''), 
-                    (kayit.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(kayit.teknikIzlemeTarihi) : '')
+                    (kayit.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(kayit.teknikIzlemeTarihi) : ''),
+                    kayit.akademikIzlemeYapilabilirligi
                 ];
                 return (columns[index] || '').toString().toLowerCase().includes(filterValue);
             });
