@@ -81,6 +81,14 @@
                                         <option value="">Seçiniz...</option>
                                     </select>
                                 </div>
+                                 <div><label class="form-label">Yüklenme Durumu</label>
+                                    <select name="yuklenmeDurumu" class="searchable-select">
+                                        <option value="">Seçiniz...</option>
+                                        <option value="Yüklenmeye Hazır">Yüklenmeye Hazır</option>
+                                        <option value="Yüklenmedi">Yüklenmedi</option>
+                                        <option value="Bekliyor">Bekliyor</option>
+                                    </select>
+                                </div>
                                 <div class="lg:col-span-3"><label class="form-label">Not</label><textarea name="not" rows="2" class="form-input-base" placeholder="Eklemek istediğiniz notlar..."></textarea></div>
                                 <div class="md:col-span-2 lg:col-span-3 text-right pt-4">
                                     <button id="submit-button" type="submit" class="inline-flex items-center justify-center py-2 px-6 border border-transparent shadow-lg text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700">
@@ -682,4 +690,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
