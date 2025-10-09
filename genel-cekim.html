@@ -167,53 +167,16 @@
 document.addEventListener('DOMContentLoaded', () => {
     let currentPage = 1;
     const rowsPerPage = 10;
-    
-    function showNotification(message, type = 'success') {
-        const container = document.getElementById('notification-container');
-        if (!container) return;
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        const iconClass = type === 'success' ? 'fa-check-circle' : 'fa-times-circle';
-        notification.innerHTML = `<i class="fas ${iconClass}"></i><span>${message}</span>`;
-        container.appendChild(notification);
-        setTimeout(() => notification.classList.add('show'), 10);
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                if (notification.parentNode === container) container.removeChild(notification);
-            }, 500);
-        }, 3000);
-    }
+
     const bransListeleri = {
         'TYT': ['TYT TÜRKÇE', 'TYT MATEMATİK', 'TYT FİZİK', 'TYT KİMYA', 'TYT BİYOLOJİ', 'TYT COĞRAFYA', 'TYT DİN KÜLTÜRÜ', 'TYT-AYT GEOMETRİ', 'TYT-AYT TARİH', 'TYT-AYT FELSEFE'],
         'AYT': ['AYT EDEBİYAT', 'AYT MATEMATİK', 'AYT FİZİK', 'AYT KİMYA', 'AYT BİYOLOJİ', 'AYT COĞRAFYA', 'AYT SOSYOLOJİ-PSİKOLOJİ-MANTIK', 'TYT-AYT GEOMETRİ', 'TYT-AYT TARİH', 'TYT-AYT FELSEFE'],
         'LGS': ['LGS TÜRKÇE', 'LGS MATEMATİK', 'LGS FEN BİLİMLERİ', 'LGS İNKILAP TARİHİ', 'LGS İNGİLİZCE', 'LGS DİN KÜLTÜRÜ']
     };
     const uniteListeleri = {
-        'TYT TÜRKÇE': ['SÖZCÜKTE VE SÖZ ÖBEĞİNDE ANLAM', 'CÜMLEDE ANLAM', 'PARAGRAFTA ANLAM', 'SES-YAZIM-NOKTALAMA', 'SÖZCÜK YAPISI', 'İSİM SOYLU SÖZCÜKLER', 'FİİLLER', 'SÖZCÜK GRUPLARI VE CÜMLE BİLGİSİ', 'ANLATIM BOZUKLUKLARI'],
-        'TYT MATEMATİK': ['TEMEL KAVRAMLAR', 'BÖLME BÖLÜNEBİLME', 'RASYONEL SAYILAR', 'I VE II BİLİNMEYENLİ DENKLEMLER', 'I VE II BİLİNMEYENLİ EŞİTSİZLİKLER', 'MUTLAK DEĞER', 'ÜSLÜ SAYILAR', 'KÖKLÜ SAYILAR', 'ORAN-ORANTI', 'ÇARPANLARA AYIRMA', 'SAYI PROBLEMLERİ', 'KESİR PROBLEMLERİ', 'YAŞ PROBLEMLERİ', 'YÜZDE PROBLEMLERİ', 'KARIŞIM PROBLEMLERİ', 'HIZ PROBLEMLERİ', 'EMEK PROBLEMLERİ', 'GRAFİK PROBLEMLERİ', 'TANIM VE FORMÜL KULLANABİLME', 'ÖRÜNTÜLÜ SAYI GRUPLARI', 'MANTIK', 'KÜMELER', 'SAYMA OLASILIK', 'GÖRSEL ZEKA'],
-        'TYT FİZİK': ['FİZİK BİLİMİNE GİRİŞ', 'MADDE VE ÖZELLİKLERİ', 'HAREKET', 'KUVVET', 'İŞ, GÜÇ VE ENERJİ', 'ISI VE SICAKLIK', 'ELEKTROSTATİK', 'ELEKTRİK', 'MANYETİZMA', 'BASINÇ', 'KALDIRMA KUVVETİ', 'DALGA HAREKETİ VE YAY DALGASI', 'SU DALGALARI', 'SES VE DEPREM DALGALARI', 'AYDINLANMA VE GÖLGE', 'IŞIĞIN YANSIMASI VE DÜZLEM AYNALAR', 'IŞIĞIN YANSIMASI VE KÜRESEL AYNALAR', 'IŞIĞIN KIRILMASI', 'MERCEKLER, PRİZMALAR VE RENK'],
-        'TYT KİMYA': ['KİMYA BİLİMİ', 'ATOM VE PERİYODİK SİSTEM', 'KİMYASAL TÜRLER ARASI ETKİLEŞİMLER', 'MADDENİN HALLERİ', 'DOĞA VE KİMYA', 'KİMYANIN TEMEL KANUNLARI VE KİMYASAL HESAPLAMALAR', 'KARIŞIMLAR', 'ASİTLER, BAZLAR VE TUZLAR', 'KİMYA HER YERDE'],
-        'TYT BİYOLOJİ': ['YAŞAM BİLİMİ BİYOLOJİ', 'CANLI YAPISINDAKİ BİLEŞİKLER', 'HÜCRE', 'CANLILARIN SINIFLANDIRILMASI', 'CANLI ALEMLERİ', 'HÜCRE BÖLÜNMELERİ VE ÜREME', 'KALITIM', 'EKOSİSTEM EKOLOJİSİ VE GÜNCEL ÇEVRE SORUNLARI'],
-        'TYT COĞRAFYA': ["DOĞA, İNSAN VE COĞRAFYA", "DÜNYA'NIN ŞEKLİ HAREKETLERİ", 'COĞRAFİ KONUM', 'HARİTA BİLGİSİ', 'İKLİM BİLGİSİ', 'İÇ VE DIŞ KUVVETLER', 'SU-TOPRAK-BİTKİ', "DÜNYA'DA VE TÜRKİYE'DE NÜFUS", 'EKONOMİK FAALİYETLER', 'BÖLGE KAVRAMI', 'BÖLGELER VE ÜLKELER', 'ÇEVRE VE TOPLUM'],
-        'TYT DİN KÜLTÜRÜ': ['BİLGİ VE İNANÇ', 'DİN VE İSLAM', 'İSLAM VE İBADET', 'GENÇLİK VE DEĞERLER', 'GÖNÜL COĞRAFYA', 'ALLAH VE İNSAN İLİŞKİSİ', 'HZ.MUHAMMED (S.A.V)', 'DİN VE HAYAT', 'AHLAKİ TUTUM VE DAVRANİşLAR', 'İSLAM DÜŞÜNCESİNDE İTİKADİ, SİYASİ VE FIKHİ YORUMLAR', 'DÜNYA VE AHİRET', "KUR'AN'A GÖRE HZ.MUHAMMED (S.A.V)", "KUR'AN'DA BAZI KAVRAMLAR", 'İNANÇLA İLGİLİ MESELELER', 'YAHUDİLİK VE HRİSTİYANLIK', 'İSLAM VE BİLİM', "ANADOLU'DA İSLAM", 'İSLAM DÜŞÜNCESİNDE TASAVVUFİ YORUMLAR', 'GÜNCEL DİNİ MESELELER', 'HİNT VE ÇİN DİNLERİ'],
-        'TYT-AYT GEOMETRİ': ['AÇILAR', 'ÖZEL ÜÇGENLER', 'ALAN', 'AÇIORTAY', 'KENARORTAY', 'BENZERLİK', 'AÇI-KENAR BAĞINTILARI', 'ÇOKGENLER', 'GENEL DÖRTGENLER VE DELTOİD', 'PARALELKENAR', 'EŞKENAR DÖRTGEN', 'DİKDÖRTGEN', 'KARE', 'YAMUK', 'ÇEMBERDE AÇI', 'ÇEMBERDE UZUNLUK', 'DAİREDE ALAN', 'NOKTA ANALİTİĞİ', 'DOĞRU ANALİTİĞİ', 'DÖNÜŞÜMLER', 'ÇEMBER ANALİTİĞİ', 'KATI CİSİMLER'],
-        'TYT-AYT TARİH': ['TARİH VE ZAMAN', 'İNSANLIĞIN İLK DÖNEMLERİ', "ORTA ÇAĞ'DA DÜNYA", 'İLK VE ORTA ÇAĞLARDA TÜRK DÜNYASI', 'İSLAM MEDENİYETİNİN DOĞUŞU', 'TÜRKLERİN İSLAMİYETİ KABULÜ', 'YERLEŞME VE DEVLETLEŞME SÜRECİNDE SELÇUKLU', 'BEYLİKTEN DEVLETE OSMANLI SİYASETİ', 'DEVLETLEŞME SÜRECİNDE SAVAŞÇILAR VE ASKERLER', 'BEYLİKTEN DEVLETE OSMANLI MEDENİYETİ', 'DÜNYA GÜCÜ OSMANLI', 'SULTAN VE OSMANLI MERKEZ TEŞKİLATI', "KLASİK ÇAĞ'DA OSMANLI TOPLUM DÜZENİ", 'DEĞİŞEN DÜNYA DENGELERİ KARŞISINDA OSMANLI', 'DEĞİŞİM ÇAĞINDA AVRUPA VE OSMANLI', 'DEVRİMLER ÇAĞINDA DEĞİŞEN DEVLET-TOPLUM İLİŞKİLERİ', 'ULUSLARARASI İLİŞKİLERDE DENGE STRATEJİSİ', 'XIX. VE XX.YÜZYILDA DEĞİŞEN SOSYO-EKONOMİK HAYAT', 'XX.YÜZYIL BAŞLARINDA OSMANLI DEVLETİ VE DÜNYA', 'MİLLİ MÜCADELE', 'ATATÜRKÇÜLÜK VE TÜRK İNKILABI', 'İKİ SAVAŞ ARASINDAKİ DÖNEMDE TÜRKİYE VE DÜNYA', 'II.DÜNYA SAVAŞI SÜRECİNDE TÜRKİYE VE DÜNYA', 'II.DÜNYA SAVAŞI SONRASINDA TÜRKİYE VE DÜNYA', 'TOPLUMSAL DEVRİM ÇAĞINDA DÜNYA VE TÜRKİYE', '21.YÜZYIL EŞİĞİNDE TÜRKİYE VE DÜNYA'],
-        'TYT-AYT FELSEFE': ['FELSEFEYİ TANIMA', 'FELSEFE İLE DÜŞÜNME', 'FELSEFENİN TEMEL KONULARI VE PROBLEMLERİ', 'FELSEFİ OKUMA VE YAZMA', 'MÖ 6.YÜZYIL-MS 2.YÜZYIL FELSEFESİ', 'MS. 2.YÜZYIL-15.YÜZYIL FELSEFESİ', '15.YÜZYIL-17.YÜZYIL FELSEFESİ', '18.YÜZYIL-19.YÜZYIL FELSEFESİ', '20.YÜZYIL FELSEFESİ'],
-        'AYT EDEBİYAT': ['TÜRK DİLİ VE EDEBİYATINA GİRİŞ', 'COŞKU VE HEYECANI DİLE GETİREN METİNLER', 'İSLAMİYET ÖNCESİ VE İSLAMİ DÖNEM TÜRK ŞİİRİ', 'TANZİMATTA MİLLİ EDEBİYATA TÜRK ŞİİRİ', 'CUMHURİYET DÖNEMİ TÜRK ŞİİRİ', 'TANZİMATTAN CUMHURİYETE HİKAYE', 'TANZİMATTAN CUMHURİYETE ROMAN', 'TANZİMATTAN CUMHURİYETE TİYATRO', 'BATI EDEBİYATI VE EDEBİ AKIMLAR'],
-        'AYT MATEMATİK': ['FONKSİYONLAR', 'POLİNOMLAR', 'II.DERECEDEN DENKLEMLER', 'PARABOL', 'EŞİTSİZLİKLER', 'LOGARİTMA', 'DİZİLER', 'TRİGONOMETRİ', 'LİMİT', 'TÜREV', 'İNTEGRAL'],
-        'AYT FİZİK': ['VEKTÖRLER', 'BAĞIL HAREKET', "NEWTON'IN HAREKET YASALARI", 'BİR BOYUTTA SABİT İVMELİ HAREKET', 'BİR VE İKİ BOYUTTA HAREKET', 'ENERJİ', 'İTME VE ÇİZGİSEL MOMENTUM', 'DENGE VE DENGE ŞARTLARI', 'BASİT MAKİNELER', 'ELEKTRİK', 'MANYETİZMA', 'ALTERNATİF AKIM', 'ÇEMBERSEL HAREKET', 'BASİT HARMONİK HAREKET', 'DALGA MEKANİĞİ', 'ATOM FİZİĞİNE GİRİŞ', 'MODERN FİZİK', 'MODERN FİZİĞİN TEKNOLOJİDEKİ UYGULAMALARI'],
-        'AYT KİMYA': ['KARBON KİMYASINA GİRİŞ', 'ENERJİ KAYNAKLARI', 'MODERN ATOM TEORİSİ', 'GAZLAR', 'SIVI ÇÖZELTİLER', 'KİMYASAL TEPKİMELERDE HIZ', 'KİMYASAL TEPKİMELERDE ENERJİ', 'KİMYASAL TEPKİMELERDE DENGE', 'KİMYA VE ELEKTRİK'],
-        'AYT BİYOLOJİ': ['İNSAN FİZYOLOJİSİ', 'KOMÜNİTE VE POPÜLASYON EKOLOJİSİ', 'GENDEN PROTEİNE', 'CANLILARDA ENERJİ DÖNÜŞÜMLERİ', 'BİTKİ BİYOLOJİSİ'],
-        'AYT COĞRAFYA': ['BİYOÇEŞİTLİLİK', 'EKSTREM DOĞA OLAYLARI', 'NÜFUS POLİTİKALARI', 'DOĞAL KAYNAKLAR', "TÜRKİYE'DE EKONOMİ, TARIM, HAYVANCILIK VE ORMANCILIK", "TÜRKİYE'DE MADENLER VE ENERJİ KAYNAKLARI", "TÜRKİYE'DE ULAŞIM, TİCARET VE TURİZM", "TÜRKİYE'NİN İŞLEVSEL BÖLGELERİ VE BÖLGESEL KALKINMA PROJELERİ", 'İLK KÜLTÜR MERKEZLERİ', 'DOĞAL KAYNAKLARIN ETKİLERİ, ÜLKELER ARASI ETKİLEŞİM', 'ULUSLARARASI ÖRGÜTLER', 'ÇEVRE VE TOPLUM'],
-        'AYT SOSYOLOJİ-PSİKOLOJİ-MANTIK': ['SOSYOLOJİYE GİRİŞ', 'BİREY VE TOPLUM', 'TOPLUMSAL YAPI', 'TOPLUMSAL DEĞİŞME VE GELİŞME', 'TOPLUM VE KÜLTÜR', 'TOPLUMSAL KURUMLAR', 'PSİKOLOJİ BİLİMİNİ TANIYALIM', 'PSKİLOJİNİN TEMEL SÜREÇLERİ', 'ÖĞRENME-BELLEK-DÜŞÜNME', 'RUH SAĞLIĞININ TEMELLERİ', 'MANTIĞA GİRİŞ', 'KLASİK MANTIK', 'MANTIK VE DİL', 'SEMBOLİK MANTIK'],
-        'LGS TÜRKÇE': ['SÖZCÜKTE ANLAM', 'CÜMLEDE ANLAM', 'METİNDE ANLAM', 'SÖZEL MANTIK', 'FİİLİMSİLER', 'CÜMLENİN ÖGELERİ', 'FİİİLDE ÇATI', 'CÜMLE TÜRLERİ', 'ANLATIM BOZUKLUKLARI', 'YAZIM KURALLARI', 'NOKTALAMA İŞARETLERİ'],
-        'LGS MATEMATİK': ['ÇARPANLAR VE KATLAR', 'ÜSLÜ İFADELER', 'KAREKÖKLÜ İFADELER', 'VERİ ANALİZİ', 'OLASILIK', 'CEBİRSEL İFADELER', 'DENKLEMLER', 'EŞİTSİZLİKLER', 'ÜÇGENLER', 'BENZERLİK', 'DÖNÜŞÜM GEOMETRİSİ', 'GEOMETRİK CİSİMLER'],
-        'LGS İNKILAP TARİHİ': ['BİR KAHRAMAN DOĞUYOR', 'MİLLİ UYANIŞ', 'MİLLİ BİR DESTAN', 'ATATÜRKÇÜLÜK VE ÇAĞDAŞLAŞAN TÜRKİYE', 'DEMOKRATİKLEŞME ÇABALARI', 'ATATÜRK DÖNEMİ DIŞ POLİTİKA', "ATATÜRK'ÜN ÖLÜMÜ VE SONRASI"],
-        'LGS FEN BİLİMLERİ': ['MEVSİMLER VE İKLİM', 'DNA VE GENETİK KOD', 'BASINÇ', 'MADDE VE ENDÜSTRİ', 'BASİT MAKİNELER', 'ENERJİ DÖNÜŞÜMLERİ', 'ELEKTRİK YÜKLERİ'],
-        'LGS DİN KÜLTÜRÜ': ['KAZA VE KADER İNANCI', 'ZEKAT VE SADAKA', 'DİN VE HAYAT', "HZ.MUHAMMED'İN ÖRNEKLİĞİ", 'KUR\'AN-I KERİM VE ÖZELLİKLERİ'],
-        'LGS İNGİLİZCE': ['FRIENDSHIP', 'TEEN LIFE', 'IN THE KITCHEN', 'ON THE PHONE', 'THE INTERNET', 'ADVENTURES', 'TOURISM', 'CHORES', 'SCIENCE', 'NATURAL FORCES'],
+        'TYT TÜRKÇE': ['SÖZCÜKTE VE SÖZ ÖBEĞİNDE ANLAM', 'CÜMLEDE ANLAM', 'PARAGRAFTA ANLAM', 'SES-YAZIM-NOKTALAMA', 'SÖZCÜK YAPISI', 'İSİM SOYLU SÖZCÜKLER', 'FİİLLER', 'SÖZCÜK GRUPLARI VE CÜMLE BİLGİSİ', 'ANLATIM BOZUKLUKLARI'], 'TYT MATEMATİK': ['TEMEL KAVRAMLAR', 'BÖLME BÖLÜNEBİLME', 'RASYONEL SAYILAR', 'I VE II BİLİNMEYENLİ DENKLEMLER', 'I VE II BİLİNMEYENLİ EŞİTSİZLİKLER', 'MUTLAK DEĞER', 'ÜSLÜ SAYILAR', 'KÖKLÜ SAYILAR', 'ORAN-ORANTI', 'ÇARPANLARA AYIRMA', 'SAYI PROBLEMLERİ', 'KESİR PROBLEMLERİ', 'YAŞ PROBLEMLERİ', 'YÜZDE PROBLEMLERİ', 'KARIŞIM PROBLEMLERİ', 'HIZ PROBLEMLERİ', 'EMEK PROBLEMLERİ', 'GRAFİK PROBLEMLERİ', 'TANIM VE FORMÜL KULLANABİLME', 'ÖRÜNTÜLÜ SAYI GRUPLARI', 'MANTIK', 'KÜMELER', 'SAYMA OLASILIK', 'GÖRSEL ZEKA'], 'TYT FİZİK': ['FİZİK BİLİMİNE GİRİŞ', 'MADDE VE ÖZELLİKLERİ', 'HAREKET', 'KUVVET', 'İŞ, GÜÇ VE ENERJİ', 'ISI VE SICAKLIK', 'ELEKTROSTATİK', 'ELEKTRİK', 'MANYETİZMA', 'BASINÇ', 'KALDIRMA KUVVETİ', 'DALGA HAREKETİ VE YAY DALGASI', 'SU DALGALARI', 'SES VE DEPREM DALGALARI', 'AYDINLANMA VE GÖLGE', 'IŞIĞIN YANSIMASI VE DÜZLEM AYNALAR', 'IŞIĞIN YANSIMASI VE KÜRESEL AYNALAR', 'IŞIĞIN KIRILMASI', 'MERCEKLER, PRİZMALAR VE RENK'], 'TYT KİMYA': ['KİMYA BİLİMİ', 'ATOM VE PERİYODİK SİSTEM', 'KİMYASAL TÜRLER ARASI ETKİLEŞİMLER', 'MADDENİN HALLERİ', 'DOĞA VE KİMYA', 'KİMYANIN TEMEL KANUNLARI VE KİMYASAL HESAPLAMALAR', 'KARIŞIMLAR', 'ASİTLER, BAZLAR VE TUZLAR', 'KİMYA HER YERDE'], 'TYT BİYOLOJİ': ['YAŞAM BİLİMİ BİYOLOJİ', 'CANLI YAPISINDAKİ BİLEŞİKLER', 'HÜCRE', 'CANLILARIN SINIFLANDIRILMASI', 'CANLI ALEMLERİ', 'HÜCRE BÖLÜNMELERİ VE ÜREME', 'KALITIM', 'EKOSİSTEM EKOLOJİSİ VE GÜNCEL ÇEVRE SORUNLARI'], 'TYT COĞRAFYA': ["DOĞA, İNSAN VE COĞRAFYA", "DÜNYA'NIN ŞEKLİ HAREKETLERİ", 'COĞRAFİ KONUM', 'HARİTA BİLGİSİ', 'İKLİM BİLGİSİ', 'İÇ VE DIŞ KUVVETLER', 'SU-TOPRAK-BİTKİ', "DÜNYA'DA VE TÜRKİYE'DE NÜFUS", 'EKONOMİK FAALİYETLER', 'BÖLGE KAVRAMI', 'BÖLGELER VE ÜLKELER', 'ÇEVRE VE TOPLUM'], 'TYT DİN KÜLTÜRÜ': ['BİLGİ VE İNANÇ', 'DİN VE İSLAM', 'İSLAM VE İBADET', 'GENÇLİK VE DEĞERLER', 'GÖNÜL COĞRAFYA', 'ALLAH VE İNSAN İLİŞKİSİ', 'HZ.MUHAMMED (S.A.V)', 'DİN VE HAYAT', 'AHLAKİ TUTUM VE DAVRANİşLAR', 'İSLAM DÜŞÜNCESİNDE İTİKADİ, SİYASİ VE FIKHİ YORUMLAR', 'DÜNYA VE AHİRET', "KUR'AN'A GÖRE HZ.MUHAMMED (S.A.V)", "KUR'AN'DA BAZI KAVRAMLAR", 'İNANÇLA İLGİLİ MESELELER', 'YAHUDİLİK VE HRİSTİYANLIK', 'İSLAM VE BİLİM', "ANADOLU'DA İSLAM", 'İSLAM DÜŞÜNCESİNDE TASAVVUFİ YORUMLAR', 'GÜNCEL DİNİ MESELELER', 'HİNT VE ÇİN DİNLERİ'], 'TYT-AYT GEOMETRİ': ['AÇILAR', 'ÖZEL ÜÇGENLER', 'ALAN', 'AÇIORTAY', 'KENARORTAY', 'BENZERLİK', 'AÇI-KENAR BAĞINTILARI', 'ÇOKGENLER', 'GENEL DÖRTGENLER VE DELTOİD', 'PARALELKENAR', 'EŞKENAR DÖRTGEN', 'DİKDÖRTGEN', 'KARE', 'YAMUK', 'ÇEMBERDE AÇI', 'ÇEMBERDE UZUNLUK', 'DAİREDE ALAN', 'NOKTA ANALİTİĞİ', 'DOĞRU ANALİTİĞİ', 'DÖNÜŞÜMLER', 'ÇEMBER ANALİTİĞİ', 'KATI CİSİMLER'], 'TYT-AYT TARİH': ['TARİH VE ZAMAN', 'İNSANLIĞIN İLK DÖNEMLERİ', "ORTA ÇAĞ'DA DÜNYA", 'İLK VE ORTA ÇAĞLARDA TÜRK DÜNYASI', 'İSLAM MEDENİYETİNİN DOĞUŞU', 'TÜRKLERİN İSLAMİYETİ KABULÜ', 'YERLEŞME VE DEVLETLEŞME SÜRECİNDE SELÇUKLU', 'BEYLİKTEN DEVLETE OSMANLI SİYASETİ', 'DEVLETLEŞME SÜRECİNDE SAVAŞÇILAR VE ASKERLER', 'BEYLİKTEN DEVLETE OSMANLI MEDENİYETİ', 'DÜNYA GÜCÜ OSMANLI', 'SULTAN VE OSMANLI MERKEZ TEŞKİLATI', "KLASİK ÇAĞ'DA OSMANLI TOPLUM DÜZENİ", 'DEĞİŞEN DÜNYA DENGELERİ KARŞISINDA OSMANLI', 'DEĞİŞİM ÇAĞINDA AVRUPA VE OSMANLI', 'DEVRİMLER ÇAĞINDA DEĞİŞEN DEVLET-TOPLUM İLİŞKİLERİ', 'ULUSLARARASI İLİŞKİLERDE DENGE STRATEJİSİ', 'XIX. VE XX.YÜZYILDA DEĞİŞEN SOSYO-EKONOMİK HAYAT', 'XX.YÜZYIL BAŞLARINDA OSMANLI DEVLETİ VE DÜNYA', 'MİLLİ MÜCADELE', 'ATATÜRKÇÜLÜK VE TÜRK İNKILABI', 'İKİ SAVAŞ ARASINDAKİ DÖNEMDE TÜRKİYE VE DÜNYA', 'II.DÜNYA SAVAŞI SÜRECİNDE TÜRKİYE VE DÜNYA', 'II.DÜNYA SAVAŞI SONRASINDA TÜRKİYE VE DÜNYA', 'TOPLUMSAL DEVRİM ÇAĞINDA DÜNYA VE TÜRKİYE', '21.YÜZYIL EŞİĞİNDE TÜRKİYE VE DÜNYA'], 'TYT-AYT FELSEFE': ['FELSEFEYİ TANIMA', 'FELSEFE İLE DÜŞÜNME', 'FELSEFENİN TEMEL KONULARI VE PROBLEMLERİ', 'FELSEFİ OKUMA VE YAZMA', 'MÖ 6.YÜZYIL-MS 2.YÜZYIL FELSEFESİ', 'MS. 2.YÜZYIL-15.YÜZYIL FELSEFESİ', '15.YÜZYIL-17.YÜZYIL FELSEFESİ', '18.YÜZYIL-19.YÜZYIL FELSEFESİ', '20.YÜZYIL FELSEFESİ'], 'AYT EDEBİYAT': ['TÜRK DİLİ VE EDEBİYATINA GİRİŞ', 'COŞKU VE HEYECANI DİLE GETİREN METİNLER', 'İSLAMİYET ÖNCESİ VE İSLAMİ DÖNEM TÜRK ŞİİRİ', 'TANZİMATTA MİLLİ EDEBİYATA TÜRK ŞİİRİ', 'CUMHURİYET DÖNEMİ TÜRK ŞİİRİ', 'TANZİMATTAN CUMHURİYETE HİKAYE', 'TANZİMATTAN CUMHURİYETE ROMAN', 'TANZİMATTAN CUMHURİYETE TİYATRO', 'BATI EDEBİYATI VE EDEBİ AKIMLAR'], 'AYT MATEMATİK': ['FONKSİYONLAR', 'POLİNOMLAR', 'II.DERECEDEN DENKLEMLER', 'PARABOL', 'EŞİTSİZLİKLER', 'LOGARİTMA', 'DİZİLER', 'TRİGONOMETRİ', 'LİMİT', 'TÜREV', 'İNTEGRAL'], 'AYT FİZİK': ['VEKTÖRLER', 'BAĞIL HAREKET', "NEWTON'IN HAREKET YASALARI", 'BİR BOYUTTA SABİT İVMELİ HAREKET', 'BİR VE İKİ BOYUTTA HAREKET', 'ENERJİ', 'İTME VE ÇİZGİSEL MOMENTUM', 'DENGE VE DENGE ŞARTLARI', 'BASİT MAKİNELER', 'ELEKTRİK', 'MANYETİZMA', 'ALTERNATİF AKIM', 'ÇEMBERSEL HAREKET', 'BASİT HARMONİK HAREKET', 'DALGA MEKANİĞİ', 'ATOM FİZİĞİNE GİRİŞ', 'MODERN FİZİK', 'MODERN FİZİĞİN TEKNOLOJİDEKİ UYGULAMALARI'], 'AYT KİMYA': ['KARBON KİMYASINA GİRİŞ', 'ENERJİ KAYNAKLARI', 'MODERN ATOM TEORİSİ', 'GAZLAR', 'SIVI ÇÖZELTİLER', 'KİMYASAL TEPKİMELERDE HIZ', 'KİMYASAL TEPKİMELERDE ENERJİ', 'KİMYASAL TEPKİMELERDE DENGE', 'KİMYA VE ELEKTRİK'], 'AYT BİYOLOJİ': ['İNSAN FİZYOLOJİSİ', 'KOMÜNİTE VE POPÜLASYON EKOLOJİSİ', 'GENDEN PROTEİNE', 'CANLILARDA ENERJİ DÖNÜŞÜMLERİ', 'BİTKİ BİYOLOJİSİ'], 'AYT COĞRAFYA': ['BİYOÇEŞİTLİLİK', 'EKSTREM DOĞA OLAYLARI', 'NÜFUS POLİTİKALARI', 'DOĞAL KAYNAKLAR', "TÜRKİYE'DE EKONOMİ, TARIM, HAYVANCILIK VE ORMANCILIK", "TÜRKİYE'DE MADENLER VE ENERJİ KAYNAKLARI", "TÜRKİYE'DE ULAŞIM, TİCARET VE TURİZM", "TÜRKİYE'NİN İŞLEVSEL BÖLGELERİ VE BÖLGESEL KALKINMA PROJELERİ", 'İLK KÜLTÜR MERKEZLERİ', 'DOĞAL KAYNAKLARIN ETKİLERİ, ÜLKELER ARASI ETKİLEŞİM', 'ULUSLARARASI ÖRGÜTLER', 'ÇEVRE VE TOPLUM'], 'AYT SOSYOLOJİ-PSİKOLOJİ-MANTIK': ['SOSYOLOJİYE GİRİŞ', 'BİREY VE TOPLUM', 'TOPLUMSAL YAPI', 'TOPLUMSAL DEĞİŞME VE GELİŞME', 'TOPLUM VE KÜLTÜR', 'TOPLUMSAL KURUMLAR', 'PSİKOLOJİ BİLİMİNİ TANIYALIM', 'PSKİLOJİNİN TEMEL SÜREÇLERİ', 'ÖĞRENME-BELLEK-DÜŞÜNME', 'RUH SAĞLIĞININ TEMELLERİ', 'MANTIĞA GİRİŞ', 'KLASİK MANTIK', 'MANTIK VE DİL', 'SEMBOLİK MANTIK'], 'LGS TÜRKÇE': ['SÖZCÜKTE ANLAM', 'CÜMLEDE ANLAM', 'METİNDE ANLAM', 'SÖZEL MANTIK', 'FİİLİMSİLER', 'CÜMLENİN ÖGELERİ', 'FİİİLDE ÇATI', 'CÜMLE TÜRLERİ', 'ANLATIM BOZUKLUKLARI', 'YAZIM KURALLARI', 'NOKTALAMA İŞARETLERİ'], 'LGS MATEMATİK': ['ÇARPANLAR VE KATLAR', 'ÜSLÜ İFADELER', 'KAREKÖKLÜ İFADELER', 'VERİ ANALİZİ', 'OLASILIK', 'CEBİRSEL İFADELER', 'DENKLEMLER', 'EŞİTSİZLİKLER', 'ÜÇGENLER', 'BENZERLİK', 'DÖNÜŞÜM GEOMETRİSİ', 'GEOMETRİK CİSİMLER'], 'LGS İNKILAP TARİHİ': ['BİR KAHRAMAN DOĞUYOR', 'MİLLİ UYANIŞ', 'MİLLİ BİR DESTAN', 'ATATÜRKÇÜLÜK VE ÇAĞDAŞLAŞAN TÜRKİYE', 'DEMOKRATİKLEŞME ÇABALARI', 'ATATÜRK DÖNEMİ DIŞ POLİTİKA', "ATATÜRK'ÜN ÖLÜMÜ VE SONRASI"], 'LGS FEN BİLİMLERİ': ['MEVSİMLER VE İKLİM', 'DNA VE GENETİK KOD', 'BASINÇ', 'MADDE VE ENDÜSTRİ', 'BASİT MAKİNELER', 'ENERJİ DÖNÜŞÜMLERİ', 'ELEKTRİK YÜKLERİ'], 'LGS DİN KÜLTÜRÜ': ['KAZA VE KADER İNANCI', 'ZEKAT VE SADAKA', 'DİN VE HAYAT', "HZ.MUHAMMED'İN ÖRNEKLİĞİ", 'KUR\'AN-I KERİM VE ÖZELLİKLERİ'], 'LGS İNGİLİZCE': ['FRIENDSHIP', 'TEEN LIFE', 'IN THE KITCHEN', 'ON THE PHONE', 'THE INTERNET', 'ADVENTURES', 'TOURISM', 'CHORES', 'SCIENCE', 'NATURAL FORCES'],
     };
+
     const sinavTuruSelect = document.getElementById('sinav-turu-select');
     const bransSelect = document.getElementById('brans-select');
     const uniteSelect = document.getElementById('unite-select');
@@ -222,6 +185,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const recordCountEl = document.getElementById('record-count');
     const paginationControlsEl = document.getElementById('pagination-controls');
     const filterInputs = document.querySelectorAll('.filter-input');
+
+    function showNotification(message, type = 'success') {
+        const container = document.getElementById('notification-container');
+        if (!container) return;
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-times-circle'}"></i><span>${message}</span>`;
+        container.appendChild(notification);
+        setTimeout(() => notification.classList.add('show'), 10);
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => { if (notification.parentNode === container) container.removeChild(notification); }, 500);
+        }, 3000);
+    }
+
+    function getCekimlerFromStorage() { return JSON.parse(localStorage.getItem('cekimListesi') || '[]'); }
+    function saveCekimlerToStorage(cekimler) { localStorage.setItem('cekimListesi', JSON.stringify(cekimler)); }
+    const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString + 'T00:00:00');
+        return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+    };
+
     function createSearchableDropdown(selectElement) {
         const container = document.createElement('div');
         container.className = 'searchable-select-container relative';
@@ -296,15 +282,18 @@ document.addEventListener('DOMContentLoaded', () => {
         selectElement.updateDropdown = updateOptions;
         updateOptions();
     }
+    
     document.querySelectorAll('.searchable-select').forEach(createSearchableDropdown);
     document.addEventListener('click', () => {
         document.querySelectorAll('.searchable-select-dropdown').forEach(d => d.classList.add('hidden'));
     });
+    
     const updateSelectDisplay = (selectElement) => {
-        if(selectElement.updateDropdown) {
+        if(selectElement && selectElement.updateDropdown) {
            selectElement.updateDropdown();
         }
     }
+
     sinavTuruSelect.addEventListener('change', () => {
         const secilenSinavTuru = sinavTuruSelect.value;
         const branslar = bransListeleri[secilenSinavTuru] || [];
@@ -321,6 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSelectDisplay(bransSelect);
         updateSelectDisplay(uniteSelect);
     });
+
     bransSelect.addEventListener('change', () => {
         const secilenBrans = bransSelect.value;
         const uniteler = uniteListeleri[secilenBrans] || [];
@@ -334,6 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         updateSelectDisplay(uniteSelect);
     });
+
     function updateCollapsibleHeight(contentElement) {
         if (contentElement.style.maxHeight && contentElement.style.maxHeight !== '0px') {
             requestAnimationFrame(() => {
@@ -341,8 +332,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
-    const triggers = document.querySelectorAll('.collapsible-trigger');
-    triggers.forEach(trigger => {
+
+    document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
         trigger.addEventListener('click', () => {
             const content = document.getElementById(trigger.dataset.target);
             const icon = trigger.querySelector('i.fas');
@@ -355,18 +346,20 @@ document.addEventListener('DOMContentLoaded', () => {
             } 
         });
     });
+
     filterInputs.forEach(input => {
         input.addEventListener('keyup', () => {
             currentPage = 1;
             renderTable();
         });
     });
+
     cekForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const editingId = document.getElementById('editing-row-index').value;
         const formData = new FormData(cekForm);
         const data = Object.fromEntries(formData.entries());
-        let cekimler = JSON.parse(localStorage.getItem('cekimListesi')) || [];
+        let cekimler = getCekimlerFromStorage();
         if (editingId) {
             const cekimIndex = cekimler.findIndex(c => c.id === editingId);
             if (cekimIndex > -1) {
@@ -375,28 +368,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 showNotification('Kayıt başarıyla güncellendi!');
             }
         } else {
-            const newCekim = { 
-                id: crypto.randomUUID(), 
-                ...data 
-            };
+            const newCekim = { id: crypto.randomUUID(), ...data };
             cekimler.push(newCekim);
             showNotification('Kayıt başarıyla eklendi!');
         }
-        localStorage.setItem('cekimListesi', JSON.stringify(cekimler));
+        saveCekimlerToStorage(cekimler);
         currentPage = 1;
         renderTable(true);
         resetForm();
     });
+
     function displayPage(items) {
         tableBody.innerHTML = '';
         const start = (currentPage - 1) * rowsPerPage;
         const end = start + rowsPerPage;
         const paginatedItems = items.slice(start, end);
-        const formatDate = (dateString) => {
-            if (!dateString) return '';
-            const date = new Date(dateString + 'T00:00:00');
-            return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-        };
+
         paginatedItems.forEach(data => {
             const newRow = tableBody.insertRow();
             newRow.className = 'hover:bg-indigo-50 transition-colors duration-200 text-xs';
@@ -407,9 +394,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'Tamamlandı': statusClass = 'status-tamamlandi'; break;
                 case 'Revize': statusClass = 'status-revize'; break;
             }
-            const fileIcon = (data.timecodeFiles && data.timecodeFiles.length > 0)
-                ? `<button class="download-files-btn ml-2 text-indigo-500 hover:text-indigo-700" title="Time Code Dosyalarını İndir" data-id="${data.id}"><i class="fas fa-download"></i></button>`
-                : '';
+            
+            const timecodeFileIcon = (data.timecodeFiles && data.timecodeFiles.length > 0) ? `<button class="download-files-btn ml-2 text-indigo-500 hover:text-indigo-700" title="Time Code Dosyalarını İndir" data-id="${data.id}"><i class="fas fa-download"></i></button>` : '';
+            
+            const teknikIzlemeYapildi = data.teknikIzlemeDurumu === 'Yapıldı';
+            const revizyonNotuIcon = teknikIzlemeYapildi && data.revizyonNotu && data.revizyonNotu.content ? `<button class="download-notes-btn ml-2 text-green-500 hover:text-green-700" title="Revizyon Notunu İndir" data-id="${data.id}"><i class="fas fa-file-alt"></i></button>` : '';
+            
+            const teknikEkipUyesiHtml = teknikIzlemeYapildi ? `${data.teknikEkipUyesi || ''}${revizyonNotuIcon}` : '';
+            const teknikIzlemeTarihiHtml = teknikIzlemeYapildi ? formatDate(data.teknikIzlemeTarihi) : '';
+
             newRow.innerHTML = `
                 <td class="p-2 align-middle border">${formatDate(data.cekimTarihi)}</td>
                 <td class="p-2 align-middle border">${data.sinavTuru || ''}</td>
@@ -423,12 +416,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="p-2 align-middle border">${data.soruSayisi || ''}</td>
                 <td class="p-2 align-middle border"><div class="max-w-[100px] mx-auto whitespace-nowrap overflow-hidden text-ellipsis" title="${data.not || ''}">${(data.not || '').substring(0,15)}${(data.not || '').length > 15 ? '...' : ''}</div></td>
                 <td class="p-2 align-middle border">${data.anlaticiOgretmen || ''}</td>
-                <td class="p-2 align-middle border">${data.yonetmen || ''}${fileIcon}</td>
+                <td class="p-2 align-middle border">${data.yonetmen || ''}${timecodeFileIcon}</td>
                 <td class="p-2 align-middle border">${data.akademikDinleyici || ''}</td>
                 <td class="p-2 align-middle border">${formatDate(data.kurguBaslamaTarihi)}</td>
                 <td class="p-2 align-middle border">${formatDate(data.kurguBitisTarihi)}</td>
                 <td class="p-2 align-middle border">${data.kurguOperatoru || ''}</td>
                 <td class="p-2 align-middle border">${data.kurguDurumu ? `<span class="status-badge ${statusClass}">${data.kurguDurumu}</span>` : ''}</td>
+                <td class="p-2 align-middle border">${teknikEkipUyesiHtml}</td>
+                <td class="p-2 align-middle border">${teknikIzlemeTarihiHtml}</td>
                 <td class="p-2 align-middle border">
                     <div class="flex items-center justify-center space-x-2">
                         <button title="Düzenle" class="text-indigo-600 hover:text-indigo-900 p-2 rounded-full hover:bg-indigo-100 edit-row" data-id="${data.id}"><i class="fas fa-edit"></i></button>
@@ -438,68 +433,59 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         });
     }
+
     function setupPagination(items) {
         paginationControlsEl.innerHTML = '';
         const pageCount = Math.ceil(items.length / rowsPerPage);
-        if (pageCount === 0) return;
-        if (pageCount === 1) {
-             const btn = document.createElement('button');
-            btn.innerText = 1;
-            btn.className = 'pagination-button active';
-            btn.disabled = true;
-            paginationControlsEl.appendChild(btn);
+        if (pageCount <= 1) {
+            recordCountEl.textContent = `Toplam ${items.length} kayıt bulundu.`;
             return;
         }
+        
         const prevButton = document.createElement('button');
         prevButton.innerHTML = `<i class="fas fa-chevron-left"></i>`;
         prevButton.className = 'pagination-button';
         prevButton.disabled = currentPage === 1;
-        prevButton.addEventListener('click', () => {
-            if (currentPage > 1) { currentPage--; renderTable(); }
-        });
+        prevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderTable(); } });
         paginationControlsEl.appendChild(prevButton);
+
         for (let i = 1; i <= pageCount; i++) {
             const btn = document.createElement('button');
             btn.innerText = i;
             btn.className = 'pagination-button';
-            if (i === currentPage) { btn.classList.add('active'); }
+            if (i === currentPage) btn.classList.add('active');
             btn.addEventListener('click', () => { currentPage = i; renderTable(); });
             paginationControlsEl.appendChild(btn);
         }
+        
         const nextButton = document.createElement('button');
         nextButton.innerHTML = `<i class="fas fa-chevron-right"></i>`;
         nextButton.className = 'pagination-button';
         nextButton.disabled = currentPage === pageCount;
-        nextButton.addEventListener('click', () => {
-            if (currentPage < pageCount) { currentPage++; renderTable(); }
-        });
+        nextButton.addEventListener('click', () => { if (currentPage < pageCount) { currentPage++; renderTable(); } });
         paginationControlsEl.appendChild(nextButton);
     }
+
     function renderTable(clearFilters = false) {
-        if (clearFilters) {
-            filterInputs.forEach(input => input.value = '');
-        }
-        let cekimler = JSON.parse(localStorage.getItem('cekimListesi')) || [];
+        if (clearFilters) filterInputs.forEach(input => input.value = '');
+        
+        let cekimler = getCekimlerFromStorage();
         const filters = Array.from(filterInputs).map(i => i.value.toLowerCase());
+        
         const filteredCekimler = cekimler.filter(row => {
             return filters.every((filter, index) => {
                 if (!filter) return true;
                 const columns = [
-                    row.cekimTarihi, row.sinavTuru, row.anlatimTuru, row.videoKodu,
-                    row.brans, row.unite, row.bolum, row.ders, row.testAdi,
-                    row.soruSayisi, row.not, row.anlaticiOgretmen, row.yonetmen, row.akademikDinleyici,
-                    row.kurguBaslamaTarihi, row.kurguBitisTarihi, row.kurguOperatoru, row.kurguDurumu
+                    formatDate(row.cekimTarihi), row.sinavTuru, row.anlatimTuru, row.videoKodu, row.brans, row.unite, row.bolum, row.ders, row.testAdi,
+                    row.soruSayisi, row.not, row.anlaticiOgretmen, row.yonetmen, row.akademikDinleyici, formatDate(row.kurguBaslamaTarihi),
+                    formatDate(row.kurguBitisTarihi), row.kurguOperatoru, row.kurguDurumu,
+                    (row.teknikIzlemeDurumu === 'Yapıldı' ? row.teknikEkipUyesi : ''), 
+                    (row.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(row.teknikIzlemeTarihi) : '')
                 ];
-                let cellValue = '';
-                 if ((index === 0 || index === 14 || index === 15) && columns[index]) {
-                    const date = new Date(columns[index] + 'T00:00:00');
-                    cellValue = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-                } else {
-                    cellValue = columns[index] ? columns[index].toString().toLowerCase() : '';
-                }
-                return cellValue.includes(filter);
+                return (columns[index] || '').toString().toLowerCase().includes(filter);
             });
         });
+
         filteredCekimler.sort((a, b) => new Date(b.cekimTarihi) - new Date(a.cekimTarihi));
         recordCountEl.textContent = `Toplam ${filteredCekimler.length} kayıt bulundu.`;
         displayPage(filteredCekimler);
@@ -507,6 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCollapsibleHeight(document.getElementById('liste-tablo-alani'));
         updateCollapsibleHeight(document.getElementById('cekim-ekle-form'));
     }
+
     function resetForm() {
         cekForm.reset();
         document.getElementById('editing-row-index').value = '';
@@ -524,13 +511,70 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSelectDisplay(bransSelect);
         updateSelectDisplay(uniteSelect);
     }
+
     tableBody.addEventListener('click', function(e) {
-        const downloadBtn = e.target.closest('.download-files-btn');
-        if(downloadBtn) {
+        const deleteButton = e.target.closest('.delete-row');
+        const editButton = e.target.closest('.edit-row');
+        const downloadFilesBtn = e.target.closest('.download-files-btn');
+        const downloadNotesBtn = e.target.closest('.download-notes-btn');
+
+        if (deleteButton) {
             e.preventDefault();
-            const id = downloadBtn.dataset.id;
-            const records = JSON.parse(localStorage.getItem('cekimListesi')) || [];
-            const record = records.find(r => r.id === id);
+            const id = deleteButton.dataset.id;
+            if (confirm('Bu kaydı silmek istediğinizden emin misiniz?')) {
+                let cekimler = getCekimlerFromStorage();
+                cekimler = cekimler.filter(c => c.id !== id);
+                saveCekimlerToStorage(cekimler);
+                renderTable();
+                showNotification('Kayıt başarıyla silindi.', 'error');
+            }
+        }
+
+        if (editButton) {
+            e.preventDefault();
+            const id = editButton.dataset.id;
+            const cekim = getCekimlerFromStorage().find(c => c.id === id);
+            if (!cekim) return;
+            
+            Object.keys(cekim).forEach(key => {
+                const element = cekForm.elements[key];
+                if (element) {
+                    if (element.tagName === 'SELECT') {
+                        element.value = cekim[key];
+                        element.dispatchEvent(new Event('change'));
+                        updateSelectDisplay(element);
+                    } else {
+                        element.value = cekim[key];
+                    }
+                }
+            });
+
+            setTimeout(() => {
+                bransSelect.value = cekim.brans;
+                bransSelect.dispatchEvent(new Event('change'));
+                updateSelectDisplay(bransSelect);
+                setTimeout(() => {
+                    uniteSelect.value = cekim.unite;
+                    uniteSelect.dispatchEvent(new Event('change'));
+                    updateSelectDisplay(uniteSelect);
+                }, 50);
+            }, 50);
+
+            document.getElementById('editing-row-index').value = id;
+            document.getElementById('form-title').innerHTML = '<i class="fas fa-edit mr-3 text-indigo-500"></i>Kaydı Düzenle';
+            document.getElementById('submit-text').textContent = 'Güncelle';
+            document.getElementById('submit-icon').className = 'fas fa-sync-alt mr-2';
+            const formContent = document.getElementById('cekim-ekle-form');
+            if (!formContent.style.maxHeight || formContent.style.maxHeight === '0px') {
+                formContent.parentElement.querySelector('.collapsible-trigger').click();
+            }
+            document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        if (downloadFilesBtn) {
+            e.preventDefault();
+            const id = downloadFilesBtn.dataset.id;
+            const record = getCekimlerFromStorage().find(r => r.id === id);
             if (record && record.timecodeFiles && record.timecodeFiles.length > 0) {
                 const zip = new JSZip();
                 record.timecodeFiles.forEach(file => {
@@ -547,56 +591,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         }
-        const deleteButton = e.target.closest('.delete-row');
-        if (deleteButton) {
+        
+        if (downloadNotesBtn) {
             e.preventDefault();
-            const id = deleteButton.dataset.id;
-            if (confirm('Bu kaydı silmek istediğinizden emin misiniz?')) {
-                let cekimler = JSON.parse(localStorage.getItem('cekimListesi')) || [];
-                cekimler = cekimler.filter(c => c.id !== id);
-                localStorage.setItem('cekimListesi', JSON.stringify(cekimler));
-                renderTable();
-                showNotification('Kayıt başarıyla silindi.', 'error');
+            const id = downloadNotesBtn.dataset.id;
+            const kayit = getCekimlerFromStorage().find(k => k.id === id);
+            if (kayit && kayit.revizyonNotu && kayit.revizyonNotu.content) {
+                const blob = new Blob([kayit.revizyonNotu.content], { type: 'text/plain' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = kayit.revizyonNotu.fileName || 'revizyon.txt';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             }
-        }
-        const editButton = e.target.closest('.edit-row');
-        if (editButton) {
-            e.preventDefault();
-            const id = editButton.dataset.id;
-            const cekimler = JSON.parse(localStorage.getItem('cekimListesi')) || [];
-            const cekim = cekimler.find(c => c.id === id);
-            if (!cekim) return;
-            cekForm.elements.cekimTarihi.value = cekim.cekimTarihi;
-            cekForm.elements.videoKodu.value = cekim.videoKodu;
-            cekForm.elements.testAdi.value = cekim.testAdi;
-            cekForm.elements.soruSayisi.value = cekim.soruSayisi;
-            cekForm.elements.not.value = cekim.not;
-            function setSelectValue(selectName, value) {
-                const select = cekForm.elements[selectName];
-                select.value = value;
-                select.dispatchEvent(new Event('change'));
-                updateSelectDisplay(select);
-            }
-            setSelectValue('sinavTuru', cekim.sinavTuru);
-            setTimeout(() => {
-                setSelectValue('brans', cekim.brans);
-                setTimeout(() => {
-                    setSelectValue('unite', cekim.unite);
-                }, 50);
-            }, 50);
-            setSelectValue('anlatimTuru', cekim.anlatimTuru);
-            setSelectValue('bolum', cekim.bolum);
-            setSelectValue('ders', cekim.ders);
-            setSelectValue('anlaticiOgretmen', cekim.anlaticiOgretmen);
-            document.getElementById('editing-row-index').value = id;
-            document.getElementById('form-title').innerHTML = '<i class="fas fa-edit mr-3 text-indigo-500"></i>Kaydı Düzenle';
-            document.getElementById('submit-text').textContent = 'Güncelle';
-            document.getElementById('submit-icon').className = 'fas fa-sync-alt mr-2';
-            const formContent = document.getElementById('cekim-ekle-form');
-            if (!formContent.style.maxHeight || formContent.style.maxHeight === '0px') {
-                formContent.parentElement.querySelector('.collapsible-trigger').click();
-            }
-            document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
         }
     });
 
@@ -618,4 +626,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
