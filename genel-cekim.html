@@ -403,11 +403,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const teknikEkipUyesiHtml = teknikIzlemeYapildi ? `${data.teknikEkipUyesi || ''}${revizyonNotuIcon}` : '';
             const teknikIzlemeTarihiHtml = teknikIzlemeYapildi ? formatDate(data.teknikIzlemeTarihi) : '';
 
+            // DÜZELTİLMİŞ KISIM BURADA
             const akademikIzlemeYapildi = data.akademikIzlemeDurumu === 'Yapıldı';
             const akademikNotuIcon = akademikIzlemeYapildi && data.akademikIzlemeNotu && data.akademikIzlemeNotu.content 
                 ? `<button class="download-akademik-notes-btn ml-2 text-green-500 hover:text-green-700" title="Akademik Notu İndir" data-id="${data.id}"><i class="fas fa-file-alt"></i></button>` 
                 : '';
             const akademikOgretmenHtml = akademikIzlemeYapildi ? `${data.akademikIzlemeOgretmeni || ''}${akademikNotuIcon}` : '';
+            const akademikTarihHtml = akademikIzlemeYapildi ? formatDate(data.akademikIzlemeTarihi) : '';
+            // DÜZELTME BİTTİ
 
             newRow.innerHTML = `
                 <td class="p-2 align-middle border">${formatDate(data.cekimTarihi)}</td>
@@ -651,6 +654,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
 
 
