@@ -664,6 +664,8 @@ document.addEventListener('DOMContentLoaded', () => {
             anlaticiOgretmenSelect.appendChild(option);
         });
 
+        updateSelectDisplay(anlaticiOgretmenSelect); // YENİ EKLENEN SATIR
+
         const testAdiDatalist = document.getElementById('test-adi-list');
         testAdlari.forEach(test => {
             const option = document.createElement('option');
@@ -680,3 +682,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
