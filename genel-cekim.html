@@ -530,6 +530,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const editButton = e.target.closest('.edit-row');
         const downloadFilesBtn = e.target.closest('.download-files-btn');
         const downloadNotesBtn = e.target.closest('.download-notes-btn');
+        const downloadAkademikNotesBtn = e.target.closest('.download-akademik-notes-btn');
 
         if (deleteButton) {
             e.preventDefault();
@@ -543,21 +544,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        if (downloadAkademikNotesBtn) {
-            e.preventDefault();
-            const id = downloadAkademikNotesBtn.dataset.id;
-            const kayit = getCekimlerFromStorage().find(k => k.id === id);
-            if (kayit && kayit.akademikIzlemeNotu && kayit.akademikIzlemeNotu.content) {
-                const blob = new Blob([kayit.akademikIzlemeNotu.content], { type: 'text/plain;charset=utf-8' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = kayit.akademikIzlemeNotu.fileName || `akademik_not_${kayit.videoKodu}.txt`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        }
-        
         if (editButton) {
             e.preventDefault();
             const id = editButton.dataset.id;
@@ -620,6 +606,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
+        // Bu blok revizyon notunu indirir (İşaretlediğiniz ikon)
         if (downloadNotesBtn) {
             e.preventDefault();
             const id = downloadNotesBtn.dataset.id;
@@ -629,6 +616,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
                 link.download = kayit.revizyonNotu.fileName || 'revizyon.txt';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        // Bu blok akademik izleme notunu indirir
+        if (downloadAkademikNotesBtn) {
+            e.preventDefault();
+            const id = downloadAkademikNotesBtn.dataset.id;
+            const kayit = getCekimlerFromStorage().find(k => k.id === id);
+            if (kayit && kayit.akademikIzlemeNotu && kayit.akademikIzlemeNotu.content) {
+                const blob = new Blob([kayit.akademikIzlemeNotu.content], { type: 'text/plain;charset=utf-8' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = kayit.akademikIzlemeNotu.fileName || `akademik_not_${kayit.videoKodu}.txt`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -654,6 +657,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
 
 
