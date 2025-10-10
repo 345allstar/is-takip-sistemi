@@ -249,36 +249,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayPage(items) {
-    tableBody.innerHTML = '';
-    const start = (currentPage - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    const paginatedItems = items.slice(start, end);
+        tableBody.innerHTML = '';
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const paginatedItems = items.slice(start, end);
 
-    paginatedItems.forEach(kayit => {
-        const row = tableBody.insertRow();
-        row.dataset.id = kayit.id;
+        paginatedItems.forEach(kayit => {
+            const row = tableBody.insertRow();
+            row.dataset.id = kayit.id;
 
-        const viewAkademikIcon = kayit.akademikIzlemeOgretmeni ? `<button class="view-akademik-btn ml-2 text-gray-500 hover:text-blue-600" title="Akademik İzleme Sayfasına Git" data-id="${kayit.id}"><i class="fas fa-eye"></i></button>` : '';
+            const viewAkademikIcon = kayit.akademikIzlemeOgretmeni ? `<button class="view-akademik-btn ml-2 text-gray-500 hover:text-blue-600" title="Akademik İzleme Sayfasına Git" data-id="${kayit.id}"><i class="fas fa-eye"></i></button>` : '';
 
-        row.innerHTML = `
-            <td class="p-2 border">${formatDate(kayit.cekimTarihi)}</td>
-            <td class="p-2 border">${kayit.anlatimTuru || ''}</td>
-            <td class="p-2 border">${kayit.videoKodu || ''}</td>
-            <td class="p-2 border">${kayit.brans || ''}</td>
-            <td class="p-2 border">${kayit.unite || ''}</td>
-            <td class="p-2 border">${kayit.bolum || ''}</td>
-            <td class="p-2 border">${kayit.ders || ''}</td>
-            <td class="p-2 border">${kayit.testAdi || ''}</td>
-            <td class="p-2 border">${kayit.soruSayisi || ''}</td>
-            <td class="p-2 border">${(kayit.akademikIzlemeOgretmeni || '') + viewAkademikIcon}</td>
-            <td class="p-2 border">${formatDate(kayit.yazilimaYuklemeTarihi)}</td>
-            <td class="p-2 border">${kayit.yazilimYuklemeUyesi || ''}</td>
-            <td class="p-2 border">
-                <button class="edit-row text-blue-500 hover:text-blue-700 p-2" title="İşlem Yap"><i class="fas fa-pencil-alt"></i></button>
-            </td>
-        `;
-    });
-}
+            row.innerHTML = `
+                <td class="p-2 border">${formatDate(kayit.cekimTarihi)}</td>
+                <td class="p-2 border">${kayit.anlatimTuru || ''}</td>
+                <td class="p-2 border">${kayit.videoKodu || ''}</td>
+                <td class="p-2 border">${kayit.brans || ''}</td>
+                <td class="p-2 border">${kayit.unite || ''}</td>
+                <td class="p-2 border">${kayit.bolum || ''}</td>
+                <td class="p-2 border">${kayit.ders || ''}</td>
+                <td class="p-2 border">${kayit.testAdi || ''}</td>
+                <td class="p-2 border">${kayit.soruSayisi || ''}</td>
+                <td class="p-2 border">${(kayit.akademikIzlemeOgretmeni || '') + viewAkademikIcon}</td>
+                <td class="p-2 border">${formatDate(kayit.yazilimaYuklemeTarihi)}</td>
+                <td class="p-2 border">${kayit.yazilimYuklemeUyesi || ''}</td>
+                <td class="p-2 border">
+                    <button class="edit-row text-blue-500 hover:text-blue-700 p-2" title="İşlem Yap"><i class="fas fa-pencil-alt"></i></button>
+                </td>
+            `;
+        });
+    }
 
     function setupPagination(items) {
         paginationControlsEl.innerHTML = '';
@@ -334,7 +334,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (kayitIndex > -1) {
             cek_kayitlari[kayitIndex].yazilimYuklemeUyesi = document.getElementById('yazilim-yukleme-uyesi').value;
             cek_kayitlari[kayitIndex].yazilimaYuklemeTarihi = document.getElementById('yazilima-yukleme-tarihi').value;
-            // İşlem tamamlandığında durumu değiştirerek listeden düşmesini sağlıyoruz. 
             
             saveCekimlerToStorage(cek_kayitlari);
             loadAndDisplayCekimler();
@@ -345,12 +344,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ***** DÜZELTİLMİŞ KOD BURADA *****
     tableBody.addEventListener('click', function(e) {
-        // Buton hedeflerini ayrı ayrı tanımlıyoruz
         const editButton = e.target.closest('.edit-row');
         const viewAkademikBtn = e.target.closest('.view-akademik-btn');
 
-        // Düzenleme butonu için kontrol
         if (editButton) {
             e.preventDefault();
             const row = editButton.closest('tr');
@@ -367,11 +365,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Göz ikonu için KENDİ BAŞINA çalışan ayrı bir kontrol
         if (viewAkademikBtn) {
             e.preventDefault();
             const id = viewAkademikBtn.dataset.id;
-            localStorage.setItem('selectedCekimId', id); // Yazım hatası düzeltildi
+            localStorage.setItem('selectedCekimId', id);
             window.location.href = 'akademik-izleme.html';
         }
     });
