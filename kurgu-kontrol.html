@@ -109,9 +109,11 @@
                                     <th>AKADEMİK İZLENEBİLİRLİK</th>
                                     <th>AKADEMİK İZL. ÖĞRETMENİ</th>
                                     <th>AKADEMİK İZL. TARİHİ</th>
+                                    <th>YÜKLENME DURUMU</th>
                                     <th>İŞLEMLER</th>
                                 </tr>
                                 <tr>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
                                     <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
                                     <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
                                     <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
@@ -343,6 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${kayit.akademikIzlemeYapilabilirligi || ''}</td>
                 <td>${akademikOgretmenHtml}</td>
                 <td>${akademikTarihHtml}</td>
+                <td>${kayit.yuklenmeDurumu || ''}</td>
                 <td>
                     <button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="Düzenle">
                         <i class="fas fa-pencil-alt"></i>
@@ -369,6 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     kayit.akademikIzlemeYapilabilirligi,
                     (kayit.akademikIzlemeDurumu === 'Yapıldı' ? kayit.akademikIzlemeOgretmeni : ''),
                     (kayit.akademikIzlemeDurumu === 'Yapıldı' ? formatDate(kayit.akademikIzlemeTarihi) : '')
+                    kayit.yuklenmeDurumu
                 ];
                 return (columns[index] || '').toString().toLowerCase().includes(filterValue);
             });
