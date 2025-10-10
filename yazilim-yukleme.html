@@ -83,6 +83,21 @@
                                     <th class="p-2 border">Yazılım Yükleme Üyesi</th>
                                     <th class="p-2 border">İşlem</th>
                                 </tr>
+                                <tr>
+                                    <th class="p-2 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
+                                    <th class="p-2 border"></th>
+                                </tr>
                             </thead>
                             <tbody id="cekim-tablosu-body" class="divide-y divide-gray-200 text-xs"></tbody>
                         </table>
@@ -313,13 +328,37 @@ document.addEventListener('DOMContentLoaded', () => {
         const allCekimler = getCekimlerFromStorage();
         const yuklenecekCekimler = allCekimler.filter(k => k.yuklenmeDurumu === 'Yüklenmeye Hazır');
 
-        yuklenecekCekimler.sort((a, b) => new Date(b.cekimTarihi) - new Date(a.cekimTarihi));
-        recordCountEl.textContent = `Toplam ${yuklenecekCekimler.length} kayıt bulundu.`;
-        noDataMessage.classList.toggle('hidden', yuklenecekCekimler.length > 0);
-        document.getElementById('cekim-tablosu').classList.toggle('hidden', yuklenecekCekimler.length === 0);
+        // FİLTRELEME MANTIĞI EKLENDİ
+        const filterValues = Array.from(document.querySelectorAll('.filter-input')).map(input => input.value.toLowerCase());
         
-        displayPage(yuklenecekCekimler);
-        setupPagination(yuklenecekCekimler);
+        const filteredKayitlar = yuklenecekCekimler.filter(kayit => {
+            return filterValues.every((filterValue, index) => {
+                if (filterValue === '') return true;
+                const columns = [
+                    formatDate(kayit.cekimTarihi),
+                    kayit.anlatimTuru,
+                    kayit.videoKodu,
+                    kayit.brans,
+                    kayit.unite,
+                    kayit.bolum,
+                    kayit.ders,
+                    kayit.testAdi,
+                    kayit.soruSayisi,
+                    kayit.akademikIzlemeOgretmeni,
+                    formatDate(kayit.yazilimaYuklemeTarihi),
+                    kayit.yazilimYuklemeUyesi
+                ];
+                return (columns[index] || '').toString().toLowerCase().includes(filterValue);
+            });
+        });
+
+        filteredKayitlar.sort((a, b) => new Date(b.cekimTarihi) - new Date(a.cekimTarihi));
+        recordCountEl.textContent = `Toplam ${filteredKayitlar.length} kayıt bulundu.`;
+        noDataMessage.classList.toggle('hidden', filteredKayitlar.length > 0);
+        document.getElementById('cekim-tablosu').classList.toggle('hidden', filteredKayitlar.length === 0);
+        
+        displayPage(filteredKayitlar);
+        setupPagination(filteredKayitlar);
     }
 
     cekForm.addEventListener('submit', function(e) {
@@ -371,6 +410,12 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('selectedCekimId', id);
             window.location.href = 'akademik-izleme.html';
         }
+    });
+     document.querySelectorAll('.filter-input').forEach(input => {
+        input.addEventListener('keyup', () => { 
+            currentPage = 1; 
+            loadAndDisplayCekimler(); 
+        });
     });
     
     populateSelect('yazilim-yukleme-uyesi', yazilimYuklemeUyeleri);
