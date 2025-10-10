@@ -133,9 +133,13 @@
                                             <th class="p-2 border">Teknik İzleme Tarihi</th>
                                             <th class="p-2 border">Akademik İzl. Öğretmeni</th>
                                             <th class="p-2 border">Akademik İzl. Tarihi</th>
+                                            <th class="p-2 border">Yazılım Yükleme Üyesi</th>
+                                            <th class="p-2 border">Yazılıma Yükleme Tarihi</th>
                                             <th class="p-2 border">İşlemler</th>
                                         </tr>
                                         <tr>
+                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
                                             <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
                                             <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
                                             <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
@@ -392,70 +396,72 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function displayPage(items) {
-        tableBody.innerHTML = '';
-        const start = (currentPage - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-        const paginatedItems = items.slice(start, end);
+     tableBody.innerHTML = '';
+     const start = (currentPage - 1) * rowsPerPage;
+     const end = start + rowsPerPage;
+     const paginatedItems = items.slice(start, end);
 
-        paginatedItems.forEach(data => {
-            const newRow = tableBody.insertRow();
-            newRow.className = 'hover:bg-indigo-50 transition-colors duration-200 text-xs';
-            let statusClass = '';
-            switch(data.kurguDurumu) {
-                case 'Sırada': statusClass = 'status-sirada'; break;
-                case 'Kurguda': statusClass = 'status-kurguda'; break;
-                case 'Tamamlandı': statusClass = 'status-tamamlandi'; break;
-                case 'Revize': statusClass = 'status-revize'; break;
-            }
+     paginatedItems.forEach(data => {
+         const newRow = tableBody.insertRow();
+         newRow.className = 'hover:bg-indigo-50 transition-colors duration-200 text-xs';
+         let statusClass = '';
+         switch(data.kurguDurumu) {
+             case 'Sırada': statusClass = 'status-sirada'; break;
+             case 'Kurguda': statusClass = 'status-kurguda'; break;
+             case 'Tamamlandı': statusClass = 'status-tamamlandi'; break;
+             case 'Revize': statusClass = 'status-revize'; break;
+         }
             
             const timecodeFileIcon = (data.timecodeFiles && data.timecodeFiles.length > 0) ? `<button class="download-files-btn ml-2 text-indigo-500 hover:text-indigo-700" title="Time Code Dosyalarını İndir" data-id="${data.id}"><i class="fas fa-download"></i></button>` : '';
-            
-            const teknikIzlemeYapildi = data.teknikIzlemeDurumu === 'Yapıldı';
-            const revizyonNotuIcon = teknikIzlemeYapildi && data.revizyonNotu && data.revizyonNotu.content ? `<button class="download-notes-btn ml-2 text-green-500 hover:text-green-700" title="Revizyon Notunu İndir" data-id="${data.id}"><i class="fas fa-file-alt"></i></button>` : '';
-            const teknikEkipUyesiHtml = teknikIzlemeYapildi ? `${data.teknikEkipUyesi || ''}${revizyonNotuIcon}` : '';
-            const teknikIzlemeTarihiHtml = teknikIzlemeYapildi ? formatDate(data.teknikIzlemeTarihi) : '';
+         
+         const teknikIzlemeYapildi = data.teknikIzlemeDurumu === 'Yapıldı';
+         const revizyonNotuIcon = teknikIzlemeYapildi && data.revizyonNotu && data.revizyonNotu.content ? `<button class="download-notes-btn ml-2 text-green-500 hover:text-green-700" title="Revizyon Notunu İndir" data-id="${data.id}"><i class="fas fa-file-alt"></i></button>` : '';
+         const teknikEkipUyesiHtml = teknikIzlemeYapildi ? `${data.teknikEkipUyesi || ''}${revizyonNotuIcon}` : '';
+         const teknikIzlemeTarihiHtml = teknikIzlemeYapildi ? formatDate(data.teknikIzlemeTarihi) : '';
 
             // DÜZELTİLMİŞ KISIM BURADA
             const akademikIzlemeYapildi = data.akademikIzlemeDurumu === 'Yapıldı';
-            const akademikNotuIcon = akademikIzlemeYapildi && data.akademikIzlemeNotu && data.akademikIzlemeNotu.content 
-                ? `<button class="download-akademik-notes-btn ml-2 text-green-500 hover:text-green-700" title="Akademik Notu İndir" data-id="${data.id}"><i class="fas fa-file-alt"></i></button>` 
-                : '';
-            const akademikOgretmenHtml = akademikIzlemeYapildi ? `${data.akademikIzlemeOgretmeni || ''}${akademikNotuIcon}` : '';
-            const akademikTarihHtml = akademikIzlemeYapildi ? formatDate(data.akademikIzlemeTarihi) : '';
+         const akademikNotuIcon = akademikIzlemeYapildi && data.akademikIzlemeNotu && data.akademikIzlemeNotu.content 
+             ? `<button class="download-akademik-notes-btn ml-2 text-green-500 hover:text-green-700" title="Akademik Notu İndir" data-id="${data.id}"><i class="fas fa-file-alt"></i></button>` 
+             : '';
+         const akademikOgretmenHtml = akademikIzlemeYapildi ? `${data.akademikIzlemeOgretmeni || ''}${akademikNotuIcon}` : '';
+         const akademikTarihHtml = akademikIzlemeYapildi ? formatDate(data.akademikIzlemeTarihi) : '';
             // DÜZELTME BİTTİ
 
             newRow.innerHTML = `
-                <td class="p-2 align-middle border">${formatDate(data.cekimTarihi)}</td>
-                <td class="p-2 align-middle border">${data.sinavTuru || ''}</td>
-                <td class="p-2 align-middle border">${data.anlatimTuru || ''}</td>
-                <td class="p-2 align-middle border">${data.videoKodu || ''}</td>
-                <td class="p-2 align-middle border">${data.brans || ''}</td>
-                <td class="p-2 align-middle border">${data.unite || ''}</td>
-                <td class="p-2 align-middle border">${data.bolum || ''}</td>
-                <td class="p-2 align-middle border">${data.ders || ''}</td>
-                <td class="p-2 align-middle border">${data.testAdi || ''}</td>
-                <td class="p-2 align-middle border">${data.soruSayisi || ''}</td>
-                <td class="p-2 align-middle border"><div class="max-w-[100px] mx-auto whitespace-nowrap overflow-hidden text-ellipsis" title="${data.not || ''}">${(data.not || '').substring(0,15)}${(data.not || '').length > 15 ? '...' : ''}</div></td>
-                <td class="p-2 align-middle border">${data.anlaticiOgretmen || ''}</td>
-                <td class="p-2 align-middle border">${data.yonetmen || ''}${timecodeFileIcon}</td>
-                <td class="p-2 align-middle border">${data.akademikDinleyici || ''}</td>
-                <td class="p-2 align-middle border">${formatDate(data.kurguBaslamaTarihi)}</td>
-                <td class="p-2 align-middle border">${formatDate(data.kurguBitisTarihi)}</td>
-                <td class="p-2 align-middle border">${data.kurguOperatoru || ''}</td>
-                <td class="p-2 align-middle border">${data.kurguDurumu ? `<span class="status-badge ${statusClass}">${data.kurguDurumu}</span>` : ''}</td>
-                <td class="p-2 align-middle border">${teknikEkipUyesiHtml}</td>
-                <td class="p-2 align-middle border">${teknikIzlemeTarihiHtml}</td>
-                <td class="p-2 align-middle border">${akademikOgretmenHtml}</td>
-                <td class="p-2 align-middle border">${akademikTarihHtml}</td>
-                <td class="p-2 align-middle border">
-                    <div class="flex items-center justify-center space-x-2">
-                        <button title="Düzenle" class="text-indigo-600 hover:text-indigo-900 p-2 rounded-full hover:bg-indigo-100 edit-row" data-id="${data.id}"><i class="fas fa-edit"></i></button>
-                        <button title="Sil" class="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-100 delete-row" data-id="${data.id}"><i class="fas fa-trash"></i></button>
-                    </div>
-                </td>
-            `;
-        });
-    }
+             <td class="p-2 align-middle border">${formatDate(data.cekimTarihi)}</td>
+             <td class="p-2 align-middle border">${data.sinavTuru || ''}</td>
+             <td class="p-2 align-middle border">${data.anlatimTuru || ''}</td>
+             <td class="p-2 align-middle border">${data.videoKodu || ''}</td>
+             <td class="p-2 align-middle border">${data.brans || ''}</td>
+             <td class="p-2 align-middle border">${data.unite || ''}</td>
+             <td class="p-2 align-middle border">${data.bolum || ''}</td>
+             <td class="p-2 align-middle border">${data.ders || ''}</td>
+             <td class="p-2 align-middle border">${data.testAdi || ''}</td>
+             <td class="p-2 align-middle border">${data.soruSayisi || ''}</td>
+             <td class="p-2 align-middle border"><div class="max-w-[100px] mx-auto whitespace-nowrap overflow-hidden text-ellipsis" title="${data.not || ''}">${(data.not || '').substring(0,15)}${(data.not || '').length > 15 ? '...' : ''}</div></td>
+             <td class="p-2 align-middle border">${data.anlaticiOgretmen || ''}</td>
+             <td class="p-2 align-middle border">${data.yonetmen || ''}${timecodeFileIcon}</td>
+             <td class="p-2 align-middle border">${data.akademikDinleyici || ''}</td>
+             <td class="p-2 align-middle border">${formatDate(data.kurguBaslamaTarihi)}</td>
+             <td class="p-2 align-middle border">${formatDate(data.kurguBitisTarihi)}</td>
+             <td class="p-2 align-middle border">${data.kurguOperatoru || ''}</td>
+             <td class="p-2 align-middle border">${data.kurguDurumu ? `<span class="status-badge ${statusClass}">${data.kurguDurumu}</span>` : ''}</td>
+             <td class="p-2 align-middle border">${teknikEkipUyesiHtml}</td>
+             <td class="p-2 align-middle border">${teknikIzlemeTarihiHtml}</td>
+             <td class="p-2 align-middle border">${akademikOgretmenHtml}</td>
+             <td class="p-2 align-middle border">${akademikTarihHtml}</td>
+             <td class="p-2 align-middle border">${data.yazilimYuklemeUyesi || ''}</td>
+             <td class="p-2 align-middle border">${formatDate(data.yazilimaYuklemeTarihi)}</td>
+             <td class="p-2 align-middle border">
+                 <div class="flex items-center justify-center space-x-2">
+                     <button title="Düzenle" class="text-indigo-600 hover:text-indigo-900 p-2 rounded-full hover:bg-indigo-100 edit-row" data-id="${data.id}"><i class="fas fa-edit"></i></button>
+                     <button title="Sil" class="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-100 delete-row" data-id="${data.id}"><i class="fas fa-trash"></i></button>
+                 </div>
+             </td>
+         `;
+     });
+ }
 
     function setupPagination(items) {
         paginationControlsEl.innerHTML = '';
@@ -490,34 +496,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderTable(clearFilters = false) {
-        if (clearFilters) filterInputs.forEach(input => input.value = '');
-        
-        let cekimler = getCekimlerFromStorage();
-        const filters = Array.from(filterInputs).map(i => i.value.toLowerCase());
-        
-        const filteredCekimler = cekimler.filter(row => {
-            return filters.every((filter, index) => {
-                if (!filter) return true;
-                const columns = [
-                    formatDate(row.cekimTarihi), row.sinavTuru, row.anlatimTuru, row.videoKodu, row.brans, row.unite, row.bolum, row.ders, row.testAdi,
-                    row.soruSayisi, row.not, row.anlaticiOgretmen, row.yonetmen, row.akademikDinleyici, formatDate(row.kurguBaslamaTarihi),
-                    formatDate(row.kurguBitisTarihi), row.kurguOperatoru, row.kurguDurumu,
-                    (row.teknikIzlemeDurumu === 'Yapıldı' ? row.teknikEkipUyesi : ''), 
-                    (row.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(row.teknikIzlemeTarihi) : ''),
-                    (row.akademikIzlemeDurumu === 'Yapıldı' ? row.akademikIzlemeOgretmeni : ''),
-                    (row.akademikIzlemeDurumu === 'Yapıldı' ? formatDate(row.akademikIzlemeTarihi) : '')
-                ];
-                return (columns[index] || '').toString().toLowerCase().includes(filter);
-            });
-        });
+     if (clearFilters) filterInputs.forEach(input => input.value = '');
+     
+     let cekimler = getCekimlerFromStorage();
+     const filters = Array.from(filterInputs).map(i => i.value.toLowerCase());
+     
+     const filteredCekimler = cekimler.filter(row => {
+         return filters.every((filter, index) => {
+             if (!filter) return true;
+             const columns = [
+                 formatDate(row.cekimTarihi), row.sinavTuru, row.anlatimTuru, row.videoKodu, row.brans, row.unite, row.bolum, row.ders, row.testAdi,
+                 row.soruSayisi, row.not, row.anlaticiOgretmen, row.yonetmen, row.akademikDinleyici, formatDate(row.kurguBaslamaTarihi),
+                 formatDate(row.kurguBitisTarihi), row.kurguOperatoru, row.kurguDurumu,
+                 (row.teknikIzlemeDurumu === 'Yapıldı' ? row.teknikEkipUyesi : ''), 
+                 (row.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(row.teknikIzlemeTarihi) : ''),
+                 (row.akademikIzlemeDurumu === 'Yapıldı' ? row.akademikIzlemeOgretmeni : ''),
+                 (row.akademikIzlemeDurumu === 'Yapıldı' ? formatDate(row.akademikIzlemeTarihi) : ''),
+                 row.yazilimYuklemeUyesi,
+                 formatDate(row.yazilimaYuklemeTarihi)
+             ];
+             return (columns[index] || '').toString().toLowerCase().includes(filter);
+         });
+     });
 
-        filteredCekimler.sort((a, b) => new Date(b.cekimTarihi) - new Date(a.cekimTarihi));
-        recordCountEl.textContent = `Toplam ${filteredCekimler.length} kayıt bulundu.`;
-        displayPage(filteredCekimler);
-        setupPagination(filteredCekimler);
-        updateCollapsibleHeight(document.getElementById('liste-tablo-alani'));
-        updateCollapsibleHeight(document.getElementById('cekim-ekle-form'));
-    }
+     filteredCekimler.sort((a, b) => new Date(b.cekimTarihi) - new Date(a.cekimTarihi));
+     recordCountEl.textContent = `Toplam ${filteredCekimler.length} kayıt bulundu.`;
+     displayPage(filteredCekimler);
+     setupPagination(filteredCekimler);
+     updateCollapsibleHeight(document.getElementById('liste-tablo-alani'));
+     updateCollapsibleHeight(document.getElementById('cekim-ekle-form'));
+ }
 
     function resetForm() {
         cekForm.reset();
@@ -690,5 +698,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
 
