@@ -101,38 +101,9 @@
     </div>
     
 <script>
-function populateFormById(id) {
-     const kayit = getCekimlerFromStorage().find(k => k.id == id);
-     if (kayit) {
-         editingIdInput.value = kayit.id;
-         
-         Object.keys(cekForm.elements).forEach(key => {
-             const element = cekForm.elements[key];
-             if(element.name && kayit[element.name] !== undefined) {
-                  updateSelectDisplay(element, kayit[element.name]);
-             }
-         });
-
-         document.getElementById('akademik-izleme-notu').value = (kayit.akademikIzlemeNotu && kayit.akademikIzlemeNotu.content) ? kayit.akademikIzlemeNotu.content : '';
-         document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
-     }
- }    
 document.addEventListener('DOMContentLoaded', () => {
     let currentPage = 1;
     const rowsPerPage = 15;
- const selectedId = localStorage.getItem('selectedCekimId');
-     if (selectedId) {
-         // Panelin açık olduğundan emin ol
-         const formContent = document.querySelector('.collapsible-content');
-         const icon = formContent.previousElementSibling.querySelector('i:last-child');
-         if (!formContent.style.maxHeight || formContent.style.maxHeight === '0px') {
-             formContent.style.maxHeight = formContent.scrollHeight + "px";
-             if(icon) icon.classList.add('rotate-180');
-         }
-         
-         populateFormById(selectedId);
-         localStorage.removeItem('selectedCekimId');
-     }
     
     const yazilimYuklemeUyeleri = ["Sümeyye Özçelik", "Sevgi Aktan", "Mehmet Dursun"];
 
@@ -278,40 +249,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayPage(items) {
-     tableBody.innerHTML = '';
-     const start = (currentPage - 1) * rowsPerPage;
-     const end = start + rowsPerPage;
-     const paginatedItems = items.slice(start, end);
+    tableBody.innerHTML = '';
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const paginatedItems = items.slice(start, end);
 
-     paginatedItems.forEach(kayit => {
-         const row = tableBody.insertRow();
-         row.dataset.id = kayit.id;
-         
-         let durumClass = kayit.akademikIzlemeDurumu === 'Yapıldı' ? 'status-yapildi' : 'status-yapilmadi';
-         const noteIcon = (kayit.akademikIzlemeNotu && kayit.akademikIzlemeNotu.content) 
-             ? `<button class="download-note-btn ml-2 text-green-500 hover:text-green-700" title="Akademik Notu İndir" data-id="${kayit.id}"><i class="fas fa-file-alt"></i></button>` 
-             : '';
-         const viewIcon = `<button class="view-akademik-btn ml-2 text-gray-500 hover:text-blue-600" title="Bu Kaydı Formda Görüntüle" data-id="${kayit.id}"><i class="fas fa-eye"></i></button>`;
+    paginatedItems.forEach(kayit => {
+        const row = tableBody.insertRow();
+        row.dataset.id = kayit.id;
 
-         row.innerHTML = `
-             <td>${formatDate(kayit.cekimTarihi)}</td>
-             <td>${kayit.anlatimTuru || ''}</td>
-             <td>${kayit.videoKodu || ''}</td>
-             <td>${kayit.brans || ''}</td>
-             <td>${kayit.unite || ''}</td>
-             <td>${kayit.bolum || ''}</td>
-             <td>${kayit.ders || ''}</td>
-             <td>${kayit.testAdi || ''}</td>
-             <td>${kayit.soruSayisi || ''}</td>
-             <td>${kayit.akademikIzlemeOgretmeni || ''}${noteIcon}${viewIcon}</td>
-             <td>${formatDate(kayit.akademikIzlemeTarihi)}</td>
-             <td><span class="status-badge ${durumClass}">${kayit.akademikIzlemeDurumu || 'Belirtilmedi'}</span></td>
-             <td>
-                 <button class="edit-row text-blue-500 hover:text-blue-700" title="Düzenle"><i class="fas fa-pencil-alt"></i></button>
-             </td>
-         `;
-     });
- }
+        const viewAkademikIcon = kayit.akademikIzlemeOgretmeni ? `<button class="view-akademik-btn ml-2 text-gray-500 hover:text-blue-600" title="Akademik İzleme Sayfasına Git" data-id="${kayit.id}"><i class="fas fa-eye"></i></button>` : '';
+
+        row.innerHTML = `
+            <td class="p-2 border">${formatDate(kayit.cekimTarihi)}</td>
+            <td class="p-2 border">${kayit.anlatimTuru || ''}</td>
+            <td class="p-2 border">${kayit.videoKodu || ''}</td>
+            <td class="p-2 border">${kayit.brans || ''}</td>
+            <td class="p-2 border">${kayit.unite || ''}</td>
+            <td class="p-2 border">${kayit.bolum || ''}</td>
+            <td class="p-2 border">${kayit.ders || ''}</td>
+            <td class="p-2 border">${kayit.testAdi || ''}</td>
+            <td class="p-2 border">${kayit.soruSayisi || ''}</td>
+            <td class="p-2 border">${(kayit.akademikIzlemeOgretmeni || '') + viewAkademikIcon}</td>
+            <td class="p-2 border">${formatDate(kayit.yazilimaYuklemeTarihi)}</td>
+            <td class="p-2 border">${kayit.yazilimYuklemeUyesi || ''}</td>
+            <td class="p-2 border">
+                <button class="edit-row text-blue-500 hover:text-blue-700 p-2" title="İşlem Yap"><i class="fas fa-pencil-alt"></i></button>
+            </td>
+        `;
+    });
+}
 
     function setupPagination(items) {
         paginationControlsEl.innerHTML = '';
@@ -379,37 +346,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     tableBody.addEventListener('click', function(e) {
-     const editButton = e.target.closest('.edit-row');
-     const downloadNoteButton = e.target.closest('.download-note-btn');
-     const viewAkademikBtn = e.target.closest('.view-akademik-btn');
-
-     if (viewAkademikBtn) {
-         e.preventDefault();
-         const id = viewAkademikBtn.dataset.id;
-         populateFormById(id);
-     }
-     
-     if (editButton) {
-         e.preventDefault();
-         const id = editButton.closest('tr').dataset.id;
-         populateFormById(id);
-     }
-     
-     if (downloadNoteButton) {
-         e.preventDefault();
-         const id = downloadNoteButton.dataset.id;
-         const kayit = getCekimlerFromStorage().find(k => k.id === id);
-         if (kayit && kayit.akademikIzlemeNotu && kayit.akademikIzlemeNotu.content) {
-             const blob = new Blob([kayit.akademikIzlemeNotu.content], { type: 'text/plain;charset=utf-8' });
-             const link = document.createElement('a');
-             link.href = URL.createObjectURL(blob);
-             link.download = kayit.akademikIzlemeNotu.fileName || 'akademik_not.txt';
-             document.body.appendChild(link);
-             link.click();
-             document.body.removeChild(link);
-         }
-     }
- });
+        const editButton = e.target.closest('.edit-row');
+        if (editButton) {
+            e.preventDefault();
+            const row = editButton.closest('tr');
+            const id = row.dataset.id;
+            const kayit = getCekimlerFromStorage().find(k => k.id == id);
+            if (kayit) {
+                editingIdInput.value = kayit.id;
+                document.getElementById('yazilim-yukleme-uyesi').value = kayit.yazilimYuklemeUyesi || '';
+                document.getElementById('yazilima-yukleme-tarihi').value = kayit.yazilimaYuklemeTarihi || '';
+                
+                updateSelectDisplay(document.getElementById('yazilim-yukleme-uyesi'));
+                
+                document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
+            }
+            const viewAkademikBtn = e.target.closest('.view-akademik-btn');
+    if (viewAkademikBtn) {
+        e.preventDefault();
+        const id = viewAkademikBtn.dataset.id;
+        localStorage.setItem('selectedCekimId', id);
+        window.location.href = 'akademik-izleme.html';
+        }
+        }
+    });
     
     populateSelect('yazilim-yukleme-uyesi', yazilimYuklemeUyeleri);
     createSearchableDropdown(document.getElementById('yazilim-yukleme-uyesi'));
