@@ -346,7 +346,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     tableBody.addEventListener('click', function(e) {
+        // Buton hedeflerini ayrı ayrı tanımlıyoruz
         const editButton = e.target.closest('.edit-row');
+        const viewAkademikBtn = e.target.closest('.view-akademik-btn');
+
+        // Düzenleme butonu için kontrol
         if (editButton) {
             e.preventDefault();
             const row = editButton.closest('tr');
@@ -361,13 +365,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
             }
-            const viewAkademikBtn = e.target.closest('.view-akademik-btn');
-    if (viewAkademikBtn) {
-        e.preventDefault();
-        const id = viewAkademikBtn.dataset.id;
-        localStorage.setItem('selectedCekimId', id);
-        window.location.href = 'akademik-izleme.html';
         }
+
+        // Göz ikonu için KENDİ BAŞINA çalışan ayrı bir kontrol
+        if (viewAkademikBtn) {
+            e.preventDefault();
+            const id = viewAkademikBtn.dataset.id;
+            localStorage.setItem('selectedCekimId', id); // Yazım hatası düzeltildi
+            window.location.href = 'akademik-izleme.html';
         }
     });
     
