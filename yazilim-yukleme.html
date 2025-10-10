@@ -332,8 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (kayitIndex > -1) {
             cek_kayitlari[kayitIndex].yazilimYuklemeUyesi = document.getElementById('yazilim-yukleme-uyesi').value;
             cek_kayitlari[kayitIndex].yazilimaYuklemeTarihi = document.getElementById('yazilima-yukleme-tarihi').value;
-            // İşlem tamamlandığında durumu değiştirerek listeden düşmesini sağlıyoruz.
-            cek_kayitlari[kayitIndex].yuklenmeDurumu = 'Yüklendi'; 
+            // İşlem tamamlandığında durumu değiştirerek listeden düşmesini sağlıyoruz. 
             
             saveCekimlerToStorage(cek_kayitlari);
             loadAndDisplayCekimler();
