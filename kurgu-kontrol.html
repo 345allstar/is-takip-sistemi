@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const teknikIzlemeTarihiHtml = teknikIzlemeYapildi ? formatDate(kayit.teknikIzlemeTarihi) : '';
 
             const akademikIzlemeYapildi = kayit.akademikIzlemeDurumu === 'Yapıldı';
-            let akademikOgretmenHtml = ''; // Değişkeni başlangıçta boş olarak ayarlıyoruz
+            let akademikOgretmenHtml = '';
             if (akademikIzlemeYapildi) {
                 const akademikNotuIcon = kayit.akademikIzlemeNotu && kayit.akademikIzlemeNotu.content ? `<button class="download-academic-notes-btn ml-2 text-green-500 hover:text-green-700" title="Akademik Notu İndir" data-id="${kayit.id}"><i class="fas fa-file-alt"></i></button>` : '';
                 const viewAkademikIcon = kayit.akademikIzlemeOgretmeni ? `<button class="view-akademik-btn ml-2 text-gray-500 hover:text-blue-600" title="Akademik İzleme Sayfasına Git" data-id="${kayit.id}"><i class="fas fa-eye"></i></button>` : '';
@@ -371,7 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     (kayit.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(kayit.teknikIzlemeTarihi) : ''),
                     kayit.akademikIzlemeYapilabilirligi,
                     (kayit.akademikIzlemeDurumu === 'Yapıldı' ? kayit.akademikIzlemeOgretmeni : ''),
-                    (kayit.akademikIzlemeDurumu === 'Yapıldı' ? formatDate(kayit.akademikIzlemeTarihi) : '')
+                    (kayit.akademikIzlemeDurumu === 'Yapıldı' ? formatDate(kayit.akademikIzlemeTarihi) : ''),
                     kayit.yuklenmeDurumu
                 ];
                 return (columns[index] || '').toString().toLowerCase().includes(filterValue);
