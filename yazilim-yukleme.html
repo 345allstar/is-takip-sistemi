@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yazılım Yükleme Paneli - ÜDB All Star</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; } .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; } .searchable-select-container { position: relative; } #table-container { max-height: 800px; overflow-y: auto; } .searchable-select-dropdown { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; max-height: 200px; overflow-y: auto; } .pagination-button { padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; background-color: white; color: #374151; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s; } .pagination-button:hover:not(:disabled) { background-color: #f3f4f6; } .pagination-button.active { background-color: #4f46e5; color: white; border-color: #4f46e5; } .pagination-button:disabled { cursor: not-allowed; opacity: 0.5; } .notification { position: fixed; top: 1.25rem; right: 1.25rem; padding: 1rem; border-radius: 0.5rem; color: white; display: flex; align-items: center; gap: 0.75rem; z-index: 1000; opacity: 0; transform: translateX(100%); transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); } .notification.show { opacity: 1; transform: translateX(0); } .notification.success { background-color: #22c55e; } .notification.error { background-color: #ef4444; } .form-label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; } .form-input-base { margin-top: 0.25rem; width: 100%; padding: 0.5rem 0.75rem; background-color: #f9fafb; border: 1px solid #d1d5db; border-radius: 0.5rem; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); color: #111827; } .form-input-base:focus-within, .form-input-base:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 1px #6366f1; }
+    </style>
+</head>
+<body class="bg-slate-50 text-gray-800">
+
+    <div id="notification-container"></div>
+
+    <div class="min-h-screen flex flex-col">
+        <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-40">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <a href="index.html" class="flex items-center space-x-2">
+                        <span class="text-xl font-bold bg-indigo-600 text-white px-2 py-1 rounded-lg">ÜDB</span>
+                        <span class="text-lg font-semibold text-gray-700">All Star İş Takip Programı</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+        
+        <main class="flex-grow p-4 sm:p-6 lg:p-8">
+            <div id="form-container" class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg mb-8">
+                <div class="collapsible-trigger flex justify-between items-center cursor-pointer">
+                    <h2 class="text-xl font-bold text-gray-800 flex items-center"><i class="fas fa-upload mr-3 text-indigo-500"></i><span id="form-title">Yazılım Yükleme Detayları</span></h2>
+                    <i class="fas fa-chevron-down transform transition-transform text-gray-500"></i>
+                </div>
+                <div class="collapsible-content mt-6">
+                    <form id="cek-form" class="space-y-6">
+                        <input type="hidden" id="editing-row-id">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <label class="form-label">Yazılım Yükleme Üyesi</label>
+                                <select id="yazilim-yukleme-uyesi" name="yazilimYuklemeUyesi" class="searchable-select">
+                                    <option value="">Seçiniz...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Yazılıma Yükleme Tarihi</label>
+                                <input type="date" id="yazilima-yukleme-tarihi" name="yazilimaYuklemeTarihi" class="form-input-base">
+                            </div>
+                            <div class="flex items-end">
+                                <button type="submit" id="submit-button" class="w-full bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700">
+                                    <i class="fas fa-check mr-2"></i>Yüklemeyi Tamamla
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg">
+                <div class="collapsible-trigger flex justify-between items-center cursor-pointer">
+                    <h2 class="text-xl font-bold text-gray-800 flex items-center"><i class="fas fa-list-ul mr-3 text-indigo-500"></i>Yüklenmeye Hazır Çekimler</h2>
+                    <i class="fas fa-chevron-down transform transition-transform text-gray-500"></i>
+                </div>
+                <div class="collapsible-content mt-4">
+                    <div id="table-container" class="overflow-x-auto">
+                        <table id="cekim-tablosu" class="min-w-full">
+                            <thead class="bg-gray-100 text-xs">
+                                <tr>
+                                    <th class="p-2 border">Çekim Tarihi</th>
+                                    <th class="p-2 border">Anlatım Türü</th>
+                                    <th class="p-2 border">Video Kodu</th>
+                                    <th class="p-2 border">Branş</th>
+                                    <th class="p-2 border">Ünite</th>
+                                    <th class="p-2 border">Bölüm</th>
+                                    <th class="p-2 border">Ders</th>
+                                    <th class="p-2 border">Test Adı</th>
+                                    <th class="p-2 border">Soru Sayısı</th>
+                                    <th class="p-2 border">Akademik İzl. Öğretmeni</th>
+                                    <th class="p-2 border">Yazılıma Yükleme Tarihi</th>
+                                    <th class="p-2 border">Yazılım Yükleme Üyesi</th>
+                                    <th class="p-2 border">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cekim-tablosu-body" class="divide-y divide-gray-200 text-xs"></tbody>
+                        </table>
+                        <div id="no-data" class="text-center py-8 text-gray-500 hidden">
+                            <i class="fas fa-folder-open fa-3x mb-2"></i>
+                            <p>Yüklenmeye hazır kayıt bulunmuyor.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between mt-4 p-2 border-t">
+                        <span id="record-count" class="text-sm text-gray-600"></span>
+                        <div id="pagination-controls" class="flex items-center space-x-1"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    let currentPage = 1;
+    const rowsPerPage = 15;
+    
+    const yazilimYuklemeUyeleri = ["Sümeyye Özçelik", "Sevgi Aktan", "Mehmet Dursun"];
+
+    const cekForm = document.getElementById('cek-form');
+    const tableBody = document.getElementById('cekim-tablosu-body');
+    const editingIdInput = document.getElementById('editing-row-id');
+    const noDataMessage = document.getElementById('no-data');
+    const recordCountEl = document.getElementById('record-count');
+    const paginationControlsEl = document.getElementById('pagination-controls');
+
+    function showNotification(message, type = 'success') {
+        const container = document.getElementById('notification-container');
+        if (!container) return;
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-times-circle'}"></i><span>${message}</span>`;
+        container.appendChild(notification);
+        setTimeout(() => notification.classList.add('show'), 10);
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => { if (notification.parentNode === container) container.removeChild(notification); }, 500);
+        }, 3000);
+    }
+
+    function getCekimlerFromStorage() { return JSON.parse(localStorage.getItem('cekimListesi') || '[]'); }
+    function saveCekimlerToStorage(cek_kayitlari) { localStorage.setItem('cekimListesi', JSON.stringify(cek_kayitlari)); }
+    const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString + 'T00:00:00');
+        return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+    };
+    
+    document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
+        trigger.addEventListener('click', () => {
+            const content = trigger.nextElementSibling;
+            const icon = trigger.querySelector('i:last-child');
+            if (icon) icon.classList.toggle('rotate-180');
+            if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                content.style.maxHeight = null;
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+        });
+        setTimeout(() => {
+             const content = trigger.nextElementSibling;
+             if(content) {
+                content.style.maxHeight = content.scrollHeight + "px";
+                const icon = trigger.querySelector('i:last-child');
+                if(icon) icon.classList.add('rotate-180');
+             }
+        }, 200);
+    });
+
+    function createSearchableDropdown(selectElement) {
+        const container = document.createElement('div');
+        container.className = 'searchable-select-container relative';
+        selectElement.parentNode.insertBefore(container, selectElement);
+        selectElement.style.display = 'none';
+        container.appendChild(selectElement);
+        const displayButton = document.createElement('button');
+        displayButton.type = 'button';
+        displayButton.className = 'form-input-base text-left flex justify-between items-center';
+        const displaySpan = document.createElement('span');
+        displaySpan.className = 'truncate';
+        displayButton.appendChild(displaySpan);
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-chevron-down text-gray-400';
+        displayButton.appendChild(icon);
+        container.appendChild(displayButton);
+        const dropdown = document.createElement('div');
+        dropdown.className = 'searchable-select-dropdown absolute hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg';
+        const searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.placeholder = 'Ara...';
+        searchInput.className = 'block w-full p-2 border-b border-gray-200 focus:outline-none';
+        dropdown.appendChild(searchInput);
+        const optionsList = document.createElement('div');
+        optionsList.className = 'p-1 max-h-48 overflow-y-auto';
+        dropdown.appendChild(optionsList);
+        container.appendChild(dropdown);
+        const updateOptions = () => {
+            optionsList.innerHTML = '';
+            Array.from(selectElement.options).forEach(option => {
+                if (option.value === "" && option.textContent.includes('Seçiniz')) return;
+                const optionDiv = document.createElement('div');
+                optionDiv.textContent = option.textContent;
+                optionDiv.dataset.value = option.value;
+                optionDiv.className = 'p-2 cursor-pointer hover:bg-indigo-100 rounded text-sm';
+                optionDiv.addEventListener('click', () => {
+                    selectElement.value = option.value;
+                    displaySpan.textContent = option.textContent;
+                    displaySpan.classList.remove('text-gray-400');
+                    dropdown.classList.add('hidden');
+                    selectElement.dispatchEvent(new Event('change'));
+                });
+                optionsList.appendChild(optionDiv);
+            });
+            const selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`) || selectElement.options[0];
+            if (selectedOption) {
+                displaySpan.textContent = selectedOption.textContent;
+                if(selectedOption.value === "") displaySpan.classList.add('text-gray-400');
+                else displaySpan.classList.remove('text-gray-400');
+            }
+        };
+        searchInput.addEventListener('input', () => {
+            const filter = searchInput.value.toLowerCase();
+            optionsList.querySelectorAll('div').forEach(optionDiv => {
+                const text = optionDiv.textContent.toLowerCase();
+                optionDiv.style.display = text.includes(filter) ? '' : 'none';
+            });
+        });
+        displayButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (selectElement.disabled) return;
+            document.querySelectorAll('.searchable-select-dropdown').forEach(d => { if(d !== dropdown) d.classList.add('hidden'); });
+            dropdown.classList.toggle('hidden');
+            if(!dropdown.classList.contains('hidden')) {
+                searchInput.value = '';
+                searchInput.dispatchEvent(new Event('input'));
+                searchInput.focus();
+            }
+        });
+        selectElement.updateDropdown = updateOptions;
+        updateOptions();
+    }
+    
+    const updateSelectDisplay = (selectElement) => {
+        if(selectElement && selectElement.updateDropdown) {
+           selectElement.updateDropdown();
+        }
+    }
+    
+    function populateSelect(selectId, data) {
+        const select = document.getElementById(selectId);
+        if(!select) return;
+        data.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item;
+            option.textContent = item;
+            select.appendChild(option);
+        });
+        updateSelectDisplay(select);
+    }
+
+    function displayPage(items) {
+        tableBody.innerHTML = '';
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const paginatedItems = items.slice(start, end);
+
+        paginatedItems.forEach(kayit => {
+            const row = tableBody.insertRow();
+            row.dataset.id = kayit.id;
+            
+            row.innerHTML = `
+                <td class="p-2 border">${formatDate(kayit.cekimTarihi)}</td>
+                <td class="p-2 border">${kayit.anlatimTuru || ''}</td>
+                <td class="p-2 border">${kayit.videoKodu || ''}</td>
+                <td class="p-2 border">${kayit.brans || ''}</td>
+                <td class="p-2 border">${kayit.unite || ''}</td>
+                <td class="p-2 border">${kayit.bolum || ''}</td>
+                <td class="p-2 border">${kayit.ders || ''}</td>
+                <td class="p-2 border">${kayit.testAdi || ''}</td>
+                <td class="p-2 border">${kayit.soruSayisi || ''}</td>
+                <td class="p-2 border">${kayit.akademikIzlemeOgretmeni || ''}</td>
+                <td class="p-2 border">${formatDate(kayit.yazilimaYuklemeTarihi)}</td>
+                <td class="p-2 border">${kayit.yazilimYuklemeUyesi || ''}</td>
+                <td class="p-2 border">
+                    <button class="edit-row text-blue-500 hover:text-blue-700 p-2" title="İşlem Yap"><i class="fas fa-pencil-alt"></i></button>
+                </td>
+            `;
+        });
+    }
+
+    function setupPagination(items) {
+        paginationControlsEl.innerHTML = '';
+        const pageCount = Math.ceil(items.length / rowsPerPage);
+        if (pageCount <= 1) return;
+        
+        const prevButton = document.createElement('button');
+        prevButton.innerHTML = `<i class="fas fa-chevron-left"></i>`;
+        prevButton.className = 'pagination-button';
+        prevButton.disabled = currentPage === 1;
+        prevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; loadAndDisplayCekimler(); } });
+        paginationControlsEl.appendChild(prevButton);
+
+        for (let i = 1; i <= pageCount; i++) {
+            const btn = document.createElement('button');
+            btn.innerText = i;
+            btn.className = 'pagination-button';
+            if (i === currentPage) btn.classList.add('active');
+            btn.addEventListener('click', () => { currentPage = i; loadAndDisplayCekimler(); });
+            paginationControlsEl.appendChild(btn);
+        }
+        
+        const nextButton = document.createElement('button');
+        nextButton.innerHTML = `<i class="fas fa-chevron-right"></i>`;
+        nextButton.className = 'pagination-button';
+        nextButton.disabled = currentPage === pageCount;
+        nextButton.addEventListener('click', () => { if (currentPage < pageCount) { currentPage++; loadAndDisplayCekimler(); } });
+        paginationControlsEl.appendChild(nextButton);
+    }
+
+    function loadAndDisplayCekimler() {
+        const allCekimler = getCekimlerFromStorage();
+        const yuklenecekCekimler = allCekimler.filter(k => k.yuklenmeDurumu === 'Yüklenmeye Hazır');
+
+        yuklenecekCekimler.sort((a, b) => new Date(b.cekimTarihi) - new Date(a.cekimTarihi));
+        recordCountEl.textContent = `Toplam ${yuklenecekCekimler.length} kayıt bulundu.`;
+        noDataMessage.classList.toggle('hidden', yuklenecekCekimler.length > 0);
+        document.getElementById('cekim-tablosu').classList.toggle('hidden', yuklenecekCekimler.length === 0);
+        
+        displayPage(yuklenecekCekimler);
+        setupPagination(yuklenecekCekimler);
+    }
+
+    cekForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const id = editingIdInput.value;
+        if (!id) {
+            showNotification("Lütfen işlem yapmak için bir kayıt seçin.", "error");
+            return;
+        }
+        let cek_kayitlari = getCekimlerFromStorage();
+        const kayitIndex = cek_kayitlari.findIndex(k => k.id == id);
+        if (kayitIndex > -1) {
+            cek_kayitlari[kayitIndex].yazilimYuklemeUyesi = document.getElementById('yazilim-yukleme-uyesi').value;
+            cek_kayitlari[kayitIndex].yazilimaYuklemeTarihi = document.getElementById('yazilima-yukleme-tarihi').value;
+            // İşlem tamamlandığında durumu değiştirerek listeden düşmesini sağlıyoruz.
+            cek_kayitlari[kayitIndex].yuklenmeDurumu = 'Yüklendi'; 
+            
+            saveCekimlerToStorage(cek_kayitlari);
+            loadAndDisplayCekimler();
+            cekForm.reset();
+            updateSelectDisplay(document.getElementById('yazilim-yukleme-uyesi'));
+            editingIdInput.value = '';
+            showNotification('Yükleme bilgileri kaydedildi!');
+        }
+    });
+
+    tableBody.addEventListener('click', function(e) {
+        const editButton = e.target.closest('.edit-row');
+        if (editButton) {
+            e.preventDefault();
+            const row = editButton.closest('tr');
+            const id = row.dataset.id;
+            const kayit = getCekimlerFromStorage().find(k => k.id == id);
+            if (kayit) {
+                editingIdInput.value = kayit.id;
+                document.getElementById('yazilim-yukleme-uyesi').value = kayit.yazilimYuklemeUyesi || '';
+                document.getElementById('yazilima-yukleme-tarihi').value = kayit.yazilimaYuklemeTarihi || '';
+                
+                updateSelectDisplay(document.getElementById('yazilim-yukleme-uyesi'));
+                
+                document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    });
+    
+    populateSelect('yazilim-yukleme-uyesi', yazilimYuklemeUyeleri);
+    createSearchableDropdown(document.getElementById('yazilim-yukleme-uyesi'));
+
+    loadAndDisplayCekimler();
+    window.addEventListener('storage', loadAndDisplayCekimler);
+});
+</script>
+
+</body>
+</html>
