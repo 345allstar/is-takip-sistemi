@@ -39,6 +39,23 @@
         .form-file-input::-webkit-file-upload-button:hover { background-color: #e0e7ff; }
         .file-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; padding: 0.25rem 0; }
         .delete-file { cursor: pointer; color: #ef4444; margin-left: 8px; }
+        /* YENİ EKLENEN KODLAR */
+        #cekim-tablosu-body tr {
+            transition: background-color 0.2s ease-out;
+            cursor: pointer;
+        }
+
+        /* Fare ile üzerine gelince satırın arkaplan rengini değiştirir */
+        #cekim-tablosu-body tr:hover {
+            background-color: #eef2ff; /* indigo-100 */
+        }
+
+        /* Tıklanan satıra kırmızı çerçeve ekler */
+        #cekim-tablosu-body tr.satir-secili {
+            outline: 2px solid #ef4444; /* red-500 */
+            outline-offset: -2px; /* Çerçevenin içeriye doğru olmasını sağlar */
+        }
+        /* YENİ EKLENEN KODLARIN SONU */
     </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
@@ -317,6 +334,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     tableBody.addEventListener('click', async function(e) {
+        // YENİ EKLENEN KISIM BAŞLANGICI
+        const clickedRow = e.target.closest('tr');
+        if (clickedRow) {
+            // Sadece düzenle/sil/indir butonlarına tıklanmadığında çerçeve ekle
+            if (!e.target.closest('button')) {
+                const currentlySelected = tableBody.querySelector('.satir-secili');
+                if (currentlySelected) {
+                    currentlySelected.classList.remove('satir-secili');
+                }
+                clickedRow.classList.add('satir-secili');
+            }
+        }
+        // YENİ EKLENEN KISIM SONU
         if (e.target.classList.contains('delete-file')) {
             const id = editingIdInput.value;
             const fileNameToDelete = e.target.dataset.filename;
@@ -397,6 +427,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
 
 
