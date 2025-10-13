@@ -30,22 +30,6 @@
             outline-offset: -2px; /* Çerçevenin içeriye doğru olmasını sağlar */
         }
         /* YENİ EKLENEN KODLARIN SONU */
-        /* YENİ EKLENEN KODLAR (GRUPLAMA İÇİN) */
-        .expand-icon {
-            cursor: pointer;
-            color: #4f46e5; /* indigo-600 */
-            transition: transform 0.2s;
-        }
-        .expand-icon.expanded {
-            transform: rotate(90deg);
-        }
-        .child-row {
-            background-color: #f9fafb; /* gray-50 */
-        }
-        .hidden-row {
-            display: none;
-        }
-        /* YENİ EKLENEN KODLARIN SONU */
     </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
@@ -497,38 +481,18 @@ document.addEventListener('DOMContentLoaded', () => {
         tableBody.innerHTML = '';
         const start = (currentPage - 1) * rowsPerPage;
         const end = start + rowsPerPage;
-        
-        // 1. Verileri videoKodu'na göre grupla
-        const groupedData = items.reduce((acc, item) => {
-            const key = item.videoKodu || `no-code-${item.id}`; // Kodu olmayanlar için benzersiz bir anahtar
-            if (!acc[key]) {
-                acc[key] = [];
-            }
-            acc[key].push(item);
-            return acc;
-        }, {});
+        const paginatedItems = items.slice(start, end);
 
-        // Sayfalandırma için grupları dilimle
-        const paginatedGroups = Object.values(groupedData).slice(start, end);
-
-        paginatedGroups.forEach(group => {
-            // Grubun ilk satırı (ana satır)
-            const mainRecord = group[0];
-            const mainRow = tableBody.insertRow();
-            mainRow.dataset.id = mainRecord.id;
-            mainRow.dataset.groupCode = mainRecord.videoKodu || `no-code-${mainRecord.id}`;
-            mainRow.classList.add('parent-row');
-
+        paginatedItems.forEach(data => {
+            const newRow = tableBody.insertRow();
+            newRow.className = 'hover:bg-indigo-50 transition-colors duration-200 text-xs';
             let statusClass = '';
-            switch(mainRecord.kurguDurumu) { case 'Sırada': statusClass = 'status-sirada'; break; case 'Kurguda': statusClass = 'status-kurguda'; break; case 'Tamamlandı': statusClass = 'status-tamamlandi'; break; case 'Revize': statusClass = 'status-revize'; break; }
-            
-            // Genişletme ikonu
-            const expandIconCell = document.createElement('td');
-            expandIconCell.className = 'p-2 align-middle border';
-            if (group.length > 1) { // Sadece birden fazla kayıt varsa ikon ekle
-                expandIconCell.innerHTML = `<i class="fas fa-plus-circle expand-icon" title="Grubu Genişlet"></i>`;
+            switch(data.kurguDurumu) {
+                case 'Sırada': statusClass = 'status-sirada'; break;
+                case 'Kurguda': statusClass = 'status-kurguda'; break;
+                case 'Tamamlandı': statusClass = 'status-tamamlandi'; break;
+                case 'Revize': statusClass = 'status-revize'; break;
             }
-            mainRow.appendChild(expandIconCell);
 
             const timecodeFileIcon = (data.timecodeFiles && data.timecodeFiles.length > 0) ? `<button class="download-files-btn ml-2 text-indigo-500 hover:text-indigo-700" title="Time Code Dosyalarını İndir" data-id="${data.id}"><i class="fas fa-download"></i></button>` : '';
             const teknikIzlemeYapildi = data.teknikIzlemeDurumu === 'Yapıldı';
@@ -541,50 +505,38 @@ document.addEventListener('DOMContentLoaded', () => {
             const akademikOgretmenHtml = akademikIzlemeYapildi ? `${data.akademikIzlemeOgretmeni || ''}${akademikNotuIcon}${viewAkademikIcon}` : (data.akademikIzlemeOgretmeni ? `${data.akademikIzlemeOgretmeni}${viewAkademikIcon}`: '');
             const akademikTarihHtml = akademikIzlemeYapildi ? formatDate(data.akademikIzlemeTarihi) : '';
 
-            mainRow.innerHTML += `
-                <td class="p-2 align-middle border">${formatDate(mainRecord.cekimTarihi)}</td>
-                <td class="p-2 align-middle border">${mainRecord.sinavTuru || ''}</td>
-                <td class="p-2 align-middle border">${mainRecord.anlatimTuru || ''}</td>
-                <td class="p-2 align-middle border">${mainRecord.videoKodu || ''}</td>
-                <td class="p-2 align-middle border">${mainRecord.brans || ''}</td>
-                <td class="p-2 align-middle border">${mainRecord.unite || ''}</td>
-                <td class="p-2 align-middle border">${mainRecord.bolum || ''}</td>
-                <td class="p-2 align-middle border">${mainRecord.ders || ''}</td>
-                <td class="p-2 align-middle border">${mainRecord.testAdi || ''}</td>
-                <td class="p-2 align-middle border">${mainRecord.soruSayisi || ''}</td>
-                <td class="p-2 align-middle border"><div class="max-w-[100px] mx-auto whitespace-nowrap overflow-hidden text-ellipsis" title="${mainRecord.not || ''}">${(mainRecord.not || '').substring(0,15)}${(mainRecord.not || '').length > 15 ? '...' : ''}</div></td>
-                <td class="p-2 align-middle border">${mainRecord.anlaticiOgretmen || ''}</td>
-                <td class="p-2 align-middle border">${mainRecord.yonetmen || ''}</td>
-                <td class="p-2 align-middle border">${mainRecord.akademikDinleyici || ''}</td>
-                <td class="p-2 align-middle border">${formatDate(mainRecord.kurguBaslamaTarihi)}</td>
-                <td class="p-2 align-middle border">${formatDate(mainRecord.kurguBitisTarihi)}</td>
-                <td class="p-2 align-middle border">${mainRecord.kurguOperatoru || ''}</td>
-                <td class="p-2 align-middle border">${mainRecord.kurguDurumu ? `<span class="status-badge ${statusClass}">${mainRecord.kurguDurumu}</span>` : ''}</td>
-                <td class="p-2 align-middle border">${mainRecord.teknikEkipUyesi || ''}</td>
-                <td class="p-2 align-middle border">${formatDate(mainRecord.teknikIzlemeTarihi)}</td>
-                <td class="p-2 align-middle border">${mainRecord.akademikIzlemeOgretmeni || ''}</td>
-                <td class="p-2 align-middle border">${formatDate(mainRecord.akademikIzlemeTarihi)}</td>
-                <td class="p-2 align-middle border">${mainRecord.yazilimYuklemeUyesi || ''}</td>
-                <td class="p-2 align-middle border">${formatDate(mainRecord.yazilimaYuklemeTarihi)}</td>
+            newRow.innerHTML = `
+                <td class="p-2 align-middle border">${formatDate(data.cekimTarihi)}</td>
+                <td class="p-2 align-middle border">${data.sinavTuru || ''}</td>
+                <td class="p-2 align-middle border">${data.anlatimTuru || ''}</td>
+                <td class="p-2 align-middle border">${data.videoKodu || ''}</td>
+                <td class="p-2 align-middle border">${data.brans || ''}</td>
+                <td class="p-2 align-middle border">${data.unite || ''}</td>
+                <td class="p-2 align-middle border">${data.bolum || ''}</td>
+                <td class="p-2 align-middle border">${data.ders || ''}</td>
+                <td class="p-2 align-middle border">${data.testAdi || ''}</td>
+                <td class="p-2 align-middle border">${data.soruSayisi || ''}</td>
+                <td class="p-2 align-middle border"><div class="max-w-[100px] mx-auto whitespace-nowrap overflow-hidden text-ellipsis" title="${data.not || ''}">${(data.not || '').substring(0,15)}${(data.not || '').length > 15 ? '...' : ''}</div></td>
+                <td class="p-2 align-middle border">${data.anlaticiOgretmen || ''}</td>
+                <td class="p-2 align-middle border">${data.yonetmen || ''}${timecodeFileIcon}</td>
+                <td class="p-2 align-middle border">${data.akademikDinleyici || ''}</td>
+                <td class="p-2 align-middle border">${formatDate(data.kurguBaslamaTarihi)}</td>
+                <td class="p-2 align-middle border">${formatDate(data.kurguBitisTarihi)}</td>
+                <td class="p-2 align-middle border">${data.kurguOperatoru || ''}</td>
+                <td class="p-2 align-middle border">${data.kurguDurumu ? `<span class="status-badge ${statusClass}">${data.kurguDurumu}</span>` : ''}</td>
+                <td class="p-2 align-middle border">${teknikEkipUyesiHtml}</td>
+                <td class="p-2 align-middle border">${teknikIzlemeTarihiHtml}</td>
+                <td class="p-2 align-middle border">${akademikOgretmenHtml}</td>
+                <td class="p-2 align-middle border">${akademikTarihHtml}</td>
+                <td class="p-2 align-middle border">${data.yazilimYuklemeUyesi || ''}</td>
+                <td class="p-2 align-middle border">${formatDate(data.yazilimaYuklemeTarihi)}</td>
                 <td class="p-2 align-middle border">
                     <div class="flex items-center justify-center space-x-2">
-                        <button title="Düzenle" class="text-indigo-600 hover:text-indigo-900 p-2 rounded-full hover:bg-indigo-100 edit-row" data-id="${mainRecord.id}"><i class="fas fa-edit"></i></button>
-                        <button title="Sil" class="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-100 delete-row" data-id="${mainRecord.id}"><i class="fas fa-trash"></i></button>
+                        <button title="Düzenle" class="text-indigo-600 hover:text-indigo-900 p-2 rounded-full hover:bg-indigo-100 edit-row" data-id="${data.id}"><i class="fas fa-edit"></i></button>
+                        <button title="Sil" class="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-100 delete-row" data-id="${data.id}"><i class="fas fa-trash"></i></button>
                     </div>
                 </td>
             `;
-            
-        // Grubun diğer elemanları (gizli çocuk satırlar)
-            if (group.length > 1) {
-                group.slice(1).forEach(childRecord => {
-                    const childRow = tableBody.insertRow();
-                    childRow.dataset.id = childRecord.id;
-                    childRow.dataset.parentCode = mainRecord.videoKodu || `no-code-${mainRecord.id}`;
-                    childRow.classList.add('child-row', 'hidden-row'); // Başlangıçta gizli
-                    //... (içerik aynı şekilde doldurulur)
-                    childRow.innerHTML = `<td class="p-2 border"></td><td>${formatDate(childRecord.cekimTarihi)}</td><td>${childRecord.sinavTuru || ''}</td><td>${childRecord.anlatimTuru || ''}</td><td>${childRecord.videoKodu || ''}</td><td>${childRecord.brans || ''}</td><td>${childRecord.unite || ''}</td><td>${childRecord.bolum || ''}</td><td>${childRecord.ders || ''}</td><td>${childRecord.testAdi || ''}</td><td>${childRecord.soruSayisi || ''}</td><td>...</td><td>${childRecord.anlaticiOgretmen || ''}</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td><div class="flex items-center justify-center space-x-2"><button title="Düzenle" class="text-indigo-600 hover:text-indigo-900 p-2 rounded-full hover:bg-indigo-100 edit-row" data-id="${childRecord.id}"><i class="fas fa-edit"></i></button><button title="Sil" class="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-100 delete-row" data-id="${childRecord.id}"><i class="fas fa-trash"></i></button></div></td>`;
-                });
-            }
         });
     }
 
@@ -641,23 +593,6 @@ document.addEventListener('DOMContentLoaded', () => {
     tableBody.addEventListener('click', async function(e) {
         // YENİ EKLENEN KISIM BAŞLANGICI
         const clickedRow = e.target.closest('tr');
-         // YENİ EKLENEN KISIM BAŞLANGICI (Genişletme ikonu için)
-        if (e.target.classList.contains('expand-icon')) {
-            e.stopPropagation(); // Diğer tıklama olaylarını engelle
-            const icon = e.target;
-            const parentRow = icon.closest('.parent-row');
-            const groupCode = parentRow.dataset.groupCode;
-            const childRows = tableBody.querySelectorAll(`tr[data-parent-code="${groupCode}"]`);
-            
-            childRows.forEach(row => {
-                row.classList.toggle('hidden-row');
-            });
-
-            icon.classList.toggle('fa-plus-circle');
-            icon.classList.toggle('fa-minus-circle');
-            return; // İşlemi burada bitir
-        }
-        // YENİ EKLENEN KISIM SONU
         if (clickedRow) {
             // Önce varsa başka bir seçili satırdan çerçeveyi kaldır
             const currentlySelected = tableBody.querySelector('.satir-secili');
@@ -797,6 +732,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
-
 
 
