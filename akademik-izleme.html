@@ -174,7 +174,7 @@
     
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. SUPABASE BAĞLANTISI EKLENDİ
+    // 1. SUPABASE BAĞLANTISI
     const SUPABASE_URL = 'https://nwxgigtsadesqjgflblr.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -197,7 +197,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     const paginationControlsEl = document.getElementById('pagination-controls');
     const kaydetNotuBtn = document.getElementById('kaydet-notu-btn');
 
-    // Initialize Page
+    async function initializePage() {
+        populateSelect('akademik-izleme-ogretmeni', akademikIzlemeOgretmenleri);
+        populateSelect('kazanim-kodu', kazanimKodlari);
+        
+        ['akademik-izleme-ogretmeni', 'akademik-izleme-durumu', 'zorluk-derecesi'].forEach(id => {
+            const selectElement = document.getElementById(id);
+            if (selectElement) createSearchableDropdown(selectElement);
+        });
+
+        const multiSelect = document.getElementById('kazanim-kodu');
+        if(multiSelect) createMultiSelectDropdown(multiSelect);
+
+        await loadAndDisplayCekimler();
+
+        const selectedId = localStorage.getItem('selectedCekimId');
+        if (selectedId) {
+            const formContent = document.querySelector('.collapsible-content');
+            const icon = formContent.previousElementSibling.querySelector('i:last-child');
+            
+            setTimeout(async () => {
+                 if (!formContent.style.maxHeight || formContent.style.maxHeight === '0px') {
+                    formContent.style.maxHeight = formContent.scrollHeight + "px";
+                    if(icon) icon.classList.add('rotate-180');
+                 }
+                await populateFormById(selectedId);
+                localStorage.removeItem('selectedCekimId');
+            }, 300); 
+        }
+    }
+
     initializePage();
 });
 </script>
