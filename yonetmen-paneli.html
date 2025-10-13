@@ -153,30 +153,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     // 1. SUPABASE BAĞLANTISI
     const SUPABASE_URL = 'https://nwxgigtsadesqjgflblr.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq_X-s_AbjJ1maioProPjPh-nNn1f4';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
-    // --- Orijinal kodunuzdaki tüm değişkenler ve fonksiyonlar korundu ---
+    // --- Orijinal kodunuzdaki tüm değişkenler korundu ---
     let currentPage = 1;
     const rowsPerPage = 10;
     let allCekimler = []; // Global kayıt listesi
 
-    function showNotification(message, type = 'success') {
-        const container = document.getElementById('notification-container');
-        if (!container) return;
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        const iconClass = type === 'success' ? 'fa-check-circle' : 'fa-times-circle';
-        notification.innerHTML = `<i class="fas ${iconClass}"></i><span>${message}</span>`;
-        container.appendChild(notification);
-        setTimeout(() => notification.classList.add('show'), 10);
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                if (notification.parentNode === container) container.removeChild(notification);
-            }, 500);
-        }, 3000);
-    }
+    function showNotification(message, type = 'success') { const container = document.getElementById('notification-container'); if (!container) return; const notification = document.createElement('div'); notification.className = `notification ${type}`; const iconClass = type === 'success' ? 'fa-check-circle' : 'fa-times-circle'; notification.innerHTML = `<i class="fas ${iconClass}"></i><span>${message}</span>`; container.appendChild(notification); setTimeout(() => notification.classList.add('show'), 10); setTimeout(() => { notification.classList.remove('show'); setTimeout(() => { if (notification.parentNode === container) container.removeChild(notification); }, 500); }, 3000); }
 
     const cekForm = document.getElementById('cek-form');
     const tableBody = document.getElementById('cekim-tablosu-body');
@@ -188,6 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const yonetmenler = ["Sait Eralkan", "Anıl Kolay", "Batuhan Gültekin", "Nurdan Özveren", "Merve Çoklar", "Gözde Bulut", "Ali Yıldırım", "Raşit Güngör"];
     const akademikDinleyiciler = ["Ali Yıldırım", "İsmail Tolga Aktaş", "Rahim Ural", "Burak Onay", "Betül Çiçek", "Sinem Şentürk", "Ahmet Ölmez", "Barış Özcan", "Cem Oğuz Büke", "Cihat Çiçek", "Didem Özbay Sarıaydın", "Eda Güney", "Edip İçli", "Elif Bozkurt", "Emine Bolat Kırbıyık", "Esra Dindar", "Esra Şahin", "Esra Yurttaş", "Firdevs Bozkurt", "Fuat Ses", "Hülya Güçkan Taşkın", "İbrahim Atakuru", "İbrahim Halil Kesici", "Koray Dindar", "Mehmet Bademli", "Mehmet Kırbıyık", "Muharrem Akbaş", "Özcan Kulaksız", "Raziye İnal", "Sabri Bingöl", "Semih Sunucuoğlu", "Serkan Yıldız", "Serpil Tunç İçli", "Suat Emre", "Tuğba Bostancı", "Yasin Baş", "Yavuz Selim Yıldız", "Yok"];
     
+    // Orijinal collapsible aç/kapa mantığı
     document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
         trigger.addEventListener('click', () => {
             const content = trigger.nextElementSibling;
@@ -205,6 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
+    // DÜZELTME: Senin orijinal kodundaki çalışan zamanlama mantığı geri getirildi.
     setTimeout(() => {
         document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
             const content = trigger.nextElementSibling;
@@ -215,91 +202,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon.classList.add('rotate-180');
             }
         });
-    }, 200);
+    }, 300); // 300ms'ye çıkarıldı, daha garantili olsun diye.
 
-    function populateSelect(selectId, data) {
-        const select = document.getElementById(selectId);
-        if (!select) return;
-        const existingOptions = select.querySelectorAll('option:not([value=""])');
-        existingOptions.forEach(opt => opt.remove());
-        data.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item;
-            option.textContent = item;
-            select.appendChild(option);
-        });
-    }
+    // Orijinal kodunuzdaki diğer tüm arayüz fonksiyonları korundu
+    function populateSelect(selectId, data) { const select = document.getElementById(selectId); if (!select) return; data.sort(); const existingOptions = select.querySelectorAll('option:not([value=""])'); existingOptions.forEach(opt => opt.remove()); data.forEach(item => { const option = document.createElement('option'); option.value = item; option.textContent = item; select.appendChild(option); }); }
     populateSelect('yonetmen', yonetmenler);
     populateSelect('akademik-dinleyici', akademikDinleyiciler);
-
-    function closeAllDropdowns() {
-        document.querySelectorAll('.searchable-select-dropdown').forEach(d => d.classList.add('hidden'));
-        if (formContainer) formContainer.classList.remove('is-active');
-    }
+    function closeAllDropdowns() { document.querySelectorAll('.searchable-select-dropdown').forEach(d => d.classList.add('hidden')); if (formContainer) formContainer.classList.remove('is-active'); }
     document.addEventListener('click', closeAllDropdowns);
-
-    function createSearchableDropdown(selectElement) {
-        const container = document.createElement('div'); container.className = 'searchable-select-container relative'; selectElement.parentNode.insertBefore(container, selectElement); selectElement.style.display = 'none'; container.appendChild(selectElement); const displayButton = document.createElement('button'); displayButton.type = 'button'; displayButton.className = 'form-input-base text-left flex justify-between items-center'; const displaySpan = document.createElement('span'); displaySpan.className = 'truncate'; displayButton.appendChild(displaySpan); const icon = document.createElement('i'); icon.className = 'fas fa-chevron-down text-gray-400'; displayButton.appendChild(icon); container.appendChild(displayButton); const dropdown = document.createElement('div'); dropdown.className = 'searchable-select-dropdown absolute hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg'; const searchInput = document.createElement('input'); searchInput.type = 'text'; searchInput.placeholder = 'Ara...'; searchInput.className = 'block w-full p-2 border-b border-gray-200 focus:outline-none'; dropdown.appendChild(searchInput); const optionsList = document.createElement('div'); optionsList.className = 'p-1 max-h-48 overflow-y-auto'; dropdown.appendChild(optionsList); container.appendChild(dropdown); dropdown.addEventListener('click', (e) => e.stopPropagation());
-        const updateOptions = () => { optionsList.innerHTML = ''; Array.from(selectElement.options).forEach(option => { if (option.value === "" && option.textContent.includes('Seçiniz')) return; const optionDiv = document.createElement('div'); optionDiv.textContent = option.textContent; optionDiv.dataset.value = option.value; optionDiv.className = 'p-2 cursor-pointer hover:bg-indigo-100 rounded text-sm'; optionDiv.addEventListener('click', () => { selectElement.value = option.value; displaySpan.textContent = option.textContent; displaySpan.classList.remove('text-gray-400'); closeAllDropdowns(); selectElement.dispatchEvent(new Event('change')); }); optionsList.appendChild(optionDiv); }); const selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`) || selectElement.options[0]; if (selectedOption) { displaySpan.textContent = selectedOption.textContent; if(selectedOption.value === "") displaySpan.classList.add('text-gray-400'); else displaySpan.classList.remove('text-gray-400'); } };
-        searchInput.addEventListener('input', () => { const filter = searchInput.value.toLowerCase(); optionsList.querySelectorAll('div').forEach(optionDiv => { const text = optionDiv.textContent.toLowerCase(); optionDiv.style.display = text.includes(filter) ? '' : 'none'; }); });
-        displayButton.addEventListener('click', (e) => { e.stopPropagation(); if (selectElement.disabled) return; const isCurrentlyHidden = dropdown.classList.contains('hidden'); closeAllDropdowns(); if (isCurrentlyHidden) { dropdown.classList.remove('hidden'); if(formContainer) formContainer.classList.add('is-active'); searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); searchInput.focus(); } }); selectElement.updateDropdown = updateOptions; updateOptions();
-    }
+    function createSearchableDropdown(selectElement) { const container = document.createElement('div'); container.className = 'searchable-select-container relative'; selectElement.parentNode.insertBefore(container, selectElement); selectElement.style.display = 'none'; container.appendChild(selectElement); const displayButton = document.createElement('button'); displayButton.type = 'button'; displayButton.className = 'form-input-base text-left flex justify-between items-center'; const displaySpan = document.createElement('span'); displaySpan.className = 'truncate'; displayButton.appendChild(displaySpan); const icon = document.createElement('i'); icon.className = 'fas fa-chevron-down text-gray-400'; displayButton.appendChild(icon); container.appendChild(displayButton); const dropdown = document.createElement('div'); dropdown.className = 'searchable-select-dropdown absolute hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg'; const searchInput = document.createElement('input'); searchInput.type = 'text'; searchInput.placeholder = 'Ara...'; searchInput.className = 'block w-full p-2 border-b border-gray-200 focus:outline-none'; dropdown.appendChild(searchInput); const optionsList = document.createElement('div'); optionsList.className = 'p-1 max-h-48 overflow-y-auto'; dropdown.appendChild(optionsList); container.appendChild(dropdown); dropdown.addEventListener('click', (e) => e.stopPropagation()); const updateOptions = () => { optionsList.innerHTML = ''; Array.from(selectElement.options).forEach(option => { if (option.value === "" && option.textContent.includes('Seçiniz')) return; const optionDiv = document.createElement('div'); optionDiv.textContent = option.textContent; optionDiv.dataset.value = option.value; optionDiv.className = 'p-2 cursor-pointer hover:bg-indigo-100 rounded text-sm'; optionDiv.addEventListener('click', () => { selectElement.value = option.value; displaySpan.textContent = option.textContent; displaySpan.classList.remove('text-gray-400'); closeAllDropdowns(); selectElement.dispatchEvent(new Event('change')); }); optionsList.appendChild(optionDiv); }); const selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`) || selectElement.options[0]; if (selectedOption) { displaySpan.textContent = selectedOption.textContent; if(selectedOption.value === "") displaySpan.classList.add('text-gray-400'); else displaySpan.classList.remove('text-gray-400'); } }; searchInput.addEventListener('input', () => { const filter = searchInput.value.toLowerCase(); optionsList.querySelectorAll('div').forEach(optionDiv => { const text = optionDiv.textContent.toLowerCase(); optionDiv.style.display = text.includes(filter) ? '' : 'none'; }); }); displayButton.addEventListener('click', (e) => { e.stopPropagation(); if (selectElement.disabled) return; const isCurrentlyHidden = dropdown.classList.contains('hidden'); closeAllDropdowns(); if (isCurrentlyHidden) { dropdown.classList.remove('hidden'); if(formContainer) formContainer.classList.add('is-active'); searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); searchInput.focus(); } }); selectElement.updateDropdown = updateOptions; updateOptions(); }
     document.querySelectorAll('.searchable-select').forEach(createSearchableDropdown);
-
     const updateSelectDisplay = (selectElement) => { if(selectElement && selectElement.updateDropdown) { selectElement.updateDropdown(); } }
-    
     function readFileAsDataURL(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve({ name: file.name, data: reader.result }); reader.onerror = (error) => reject(error); reader.readAsDataURL(file); }); }
+    
+    // --- VERİ İŞLEME FONKSİYONLARI ---
 
     function displayPage(items) {
         tableBody.innerHTML = '';
         const start = (currentPage - 1) * rowsPerPage;
         const end = start + rowsPerPage;
         const paginatedItems = items.slice(start, end);
-
         paginatedItems.forEach(kayit => {
             const row = tableBody.insertRow();
             row.dataset.id = kayit.id;
-            
-            // Tarih formatlama
             const date = new Date(kayit.cekimTarihi + 'T00:00:00');
             const formattedDate = kayit.cekimTarihi ? `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}` : '';
-            
-            // Dosya ikonu
-            const fileIcon = (kayit.timecodeFiles && kayit.timecodeFiles.length > 0)
-                ? `<button class="download-files-btn ml-2 text-indigo-500 hover:text-indigo-700" title="Time Code Dosyalarını İndir" data-id="${kayit.id}"><i class="fas fa-download"></i></button>`
-                : '';
-
-            // Yönetmen ve Akademik Dinleyici sütunları için stil (Atanmışsa yeşil ve kalın, değilse gri ve kalın)
-            const yonetmenDurum = kayit.yonetmen 
-                ? `<td class="font-semibold text-green-600 align-middle">${kayit.yonetmen}${fileIcon}</td>`
-                : `<td class="font-semibold text-gray-500 align-middle">Atanmadı</td>`;
-            
-            const akademikDinleyiciDurum = kayit.akademikDinleyici 
-                ? `<td class="font-semibold text-green-600 align-middle">${kayit.akademikDinleyici}</td>`
-                : `<td class="font-semibold text-gray-500 align-middle">Atanmadı</td>`;
-
+            const fileIcon = (kayit.timecodeFiles && kayit.timecodeFiles.length > 0) ? `<button class="download-files-btn ml-2 text-indigo-500 hover:text-indigo-700" title="Time Code Dosyalarını İndir" data-id="${kayit.id}"><i class="fas fa-download"></i></button>` : '';
+            const yonetmenDurum = kayit.yonetmen ? `<td class="font-semibold text-green-600 align-middle">${kayit.yonetmen}${fileIcon}</td>` : `<td class="font-semibold text-gray-500 align-middle">Atanmadı</td>`;
+            const akademikDinleyiciDurum = kayit.akademikDinleyici ? `<td class="font-semibold text-green-600 align-middle">${kayit.akademikDinleyici}</td>` : `<td class="font-semibold text-gray-500 align-middle">Atanmadı</td>`;
             const buttonTitle = kayit.yonetmen ? "Düzenle" : "Ata";
-
-            // SATIRIN HTML'İ OLUŞTURULUYOR - TÜM TD'LERDE "font-semibold" OLMADIĞINDAN EMİN OLUNUR
-            row.innerHTML = `
-                <td class="align-middle">${formattedDate || ''}</td>
-                <td class="align-middle">${kayit.sinavTuru || ''}</td>
-                <td class="align-middle">${kayit.anlatimTuru || ''}</td>
-                <td class="align-middle">${kayit.videoKodu || ''}</td>
-                <td class="align-middle">${kayit.brans || ''}</td>
-                <td class="align-middle">${kayit.unite || ''}</td>
-                <td class="align-middle">${kayit.bolum || ''}</td>
-                <td class="align-middle">${kayit.testAdi || ''}</td>
-                <td class="align-middle">${kayit.soruSayisi || ''}</td>
-                <td class="align-middle">${kayit.anlaticiOgretmen || ''}</td>
-                ${yonetmenDurum}
-                ${akademikDinleyiciDurum}
-                <td class="align-middle">
-                    <button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="${buttonTitle}">
-                        <i class="fas fa-pencil-alt"></i>
-                    </button>
-                </td>
-            `;
+            row.innerHTML = `<td class="align-middle">${formattedDate || ''}</td><td class="align-middle">${kayit.sinavTuru || ''}</td><td class="align-middle">${kayit.anlatimTuru || ''}</td><td class="align-middle">${kayit.videoKodu || ''}</td><td class="align-middle">${kayit.brans || ''}</td><td class="align-middle">${kayit.unite || ''}</td><td class="align-middle">${kayit.bolum || ''}</td><td class="align-middle">${kayit.testAdi || ''}</td><td class="align-middle">${kayit.soruSayisi || ''}</td><td class="align-middle">${kayit.anlaticiOgretmen || ''}</td>${yonetmenDurum}${akademikDinleyiciDurum}<td class="align-middle"><button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="${buttonTitle}"><i class="fas fa-pencil-alt"></i></button></td>`;
         });
     }
 
@@ -314,17 +246,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     async function loadAndDisplayCekimler() {
-        // 1. Supabase'den TÜM verileri çek.
+        // Supabase'den TÜM verileri çekiyoruz.
         const { data: cek_kayitlari, error } = await supabaseClient.from('cekimler').select('*').order('cekimTarihi', { ascending: false });
 
-        let allCekimler = []; // Her seferinde listeyi sıfırla
         if (error) {
             showNotification('Veri yüklenirken bir hata oluştu: ' + error.message, 'error');
+            allCekimler = [];
         } else {
             allCekimler = cek_kayitlari || [];
         }
 
-        // 2. YÖNETMEN FİLTRESİ KALDIRILDI. Tüm veriler üzerinde işlem yapılacak.
+        // Filtreleme işlemini tüm veriler üzerinde yapıyoruz.
         const filterInputs = document.querySelectorAll('.filter-input');
         const filterValues = Array.from(filterInputs).map(input => input.value.toLowerCase());
         
@@ -340,42 +272,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         recordCountEl.textContent = `Toplam ${filteredKayitlar.length} kayıt bulundu.`;
-        if (filteredKayitlar.length === 0) {
-            noDataMessage.classList.remove('hidden');
-            document.getElementById('cekim-tablosu').classList.add('hidden');
-            tableBody.innerHTML = '';
-        } else {
-            noDataMessage.classList.add('hidden');
-            document.getElementById('cekim-tablosu').classList.remove('hidden');
-            displayPage(filteredKayitlar);
-        }
+        noDataMessage.classList.toggle('hidden', filteredKayitlar.length > 0);
+        document.getElementById('cekim-tablosu').classList.toggle('hidden', filteredKayitlar.length === 0);
+        
+        displayPage(filteredKayitlar);
         setupPagination(filteredKayitlar);
-    }
-
-    async function getCekimlerFromSupabase() {
-        const { data, error } = await supabaseClient.from('cekimler').select('*');
-        if (error) {
-            console.error("Hata:", error);
-            return [];
-        }
-        return data || [];
     }
 
     cekForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         const id = editingIdInput.value;
-        if (!id) {
-            showNotification("Lütfen düzenlemek için bir çekim seçin.", "error");
-            return;
-        }
-
-        const allCekimler = await getCekimlerFromSupabase();
+        if (!id) { showNotification("Lütfen düzenlemek için bir çekim seçin.", "error"); return; }
+        
         const mevcutKayit = allCekimler.find(k => k.id == id);
         if (!mevcutKayit) return;
 
         const fileInput = document.getElementById('timecode-file');
         const newFiles = Array.from(fileInput.files);
-
         const updateData = {
             yonetmen: document.getElementById('yonetmen').value,
             akademikDinleyici: document.getElementById('akademik-dinleyici').value,
@@ -386,17 +299,13 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const uploadedFiles = await Promise.all(newFiles.map(readFileAsDataURL));
                 updateData.timecodeFiles.push(...uploadedFiles);
-            } catch (error) {
-                showNotification("Dosya yüklenirken bir hata oluştu.", "error");
-                return;
-            }
+            } catch (error) { showNotification("Dosya yüklenirken bir hata oluştu.", "error"); return; }
         }
         
         const { error } = await supabaseClient.from('cekimler').update(updateData).eq('id', id);
 
-        if (error) {
-            showNotification('Atama güncellenirken hata: ' + error.message, 'error');
-        } else {
+        if (error) { showNotification('Atama güncellenirken hata: ' + error.message, 'error'); } 
+        else {
             showNotification('Atama başarıyla güncellendi!');
             cekForm.reset();
             document.getElementById('current-files-list').innerHTML = '';
@@ -408,28 +317,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     tableBody.addEventListener('click', async function(e) {
-        const allCekimler = await getCekimlerFromSupabase();
-
         if (e.target.classList.contains('delete-file')) {
             const id = editingIdInput.value;
             const fileNameToDelete = e.target.dataset.filename;
             if (!id || !fileNameToDelete) return;
-            const kayit = allCekimler.find(k => k.id == id);
+            
+            const kayit = allCekimler.find(r => r.id === id);
             if (kayit && kayit.timecodeFiles) {
                 const updatedFiles = kayit.timecodeFiles.filter(f => f.name !== fileNameToDelete);
+                
                 const { error } = await supabaseClient.from('cekimler').update({ timecodeFiles: updatedFiles }).eq('id', id);
+                
                 if (error) {
                     showNotification('Dosya silinirken hata: ' + error.message, 'error');
                 } else {
+                    // DÜZELTME: Orijinal basit mantık geri getirildi
+                    kayit.timecodeFiles = updatedFiles; // Yerel listeyi güncelle
                     const currentFilesList = document.getElementById('current-files-list');
                     currentFilesList.innerHTML = '<strong>Mevcut Dosyalar:</strong>';
-                    if (updatedFiles.length > 0) {
-                        updatedFiles.forEach(file => { currentFilesList.innerHTML += `<div class="file-item"><span>${file.name}</span><i class="fas fa-trash-alt delete-file" data-filename="${file.name}"></i></div>`; });
+                    if (kayit.timecodeFiles && kayit.timecodeFiles.length > 0) {
+                        kayit.timecodeFiles.forEach(file => { currentFilesList.innerHTML += `<div class="file-item"><span>${file.name}</span><i class="fas fa-trash-alt delete-file" data-filename="${file.name}"></i></div>`; });
                     } else {
                         currentFilesList.innerHTML = 'Mevcut dosya bulunmuyor.';
                     }
                     showNotification('Dosya başarıyla silindi.', 'success');
-                    await loadAndDisplayCekimler();
+                    await loadAndDisplayCekimler(); // Tabloyu yenile
                 }
             }
         }
@@ -437,8 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const editButton = e.target.closest('.edit-row');
         if (editButton) {
             e.preventDefault();
-            const row = editButton.closest('tr');
-            const id = row.dataset.id;
+            const id = editButton.closest('tr').dataset.id;
             const kayit = allCekimler.find(k => k.id == id);
             if (kayit) {
                 editingIdInput.value = kayit.id;
@@ -479,11 +390,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
+    // Orijinal kodunuzdaki gibi sayfa yüklendiğinde listeyi çağırıyoruz
     loadAndDisplayCekimler();
 });
 </script>
 
 </body>
 </html>
+
 
 
