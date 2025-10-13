@@ -151,15 +151,16 @@
     
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. SUPABASE BAĞLANTISI EKLENDİ
+    // 1. SUPABASE BAĞLANTISI
     const SUPABASE_URL = 'https://nwxgigtsadesqjgflblr.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq_X-s_AbjJ1maioProPjPh-nNn1f4';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
     // --- Orijinal kodunuzdaki tüm değişkenler ve fonksiyonlar korundu ---
     let currentPage = 1;
     const rowsPerPage = 10;
-    
+    let allCekimler = []; // Global kayıt listesi
+
     function showNotification(message, type = 'success') {
         const container = document.getElementById('notification-container');
         if (!container) return;
@@ -247,10 +248,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const updateSelectDisplay = (selectElement) => { if(selectElement && selectElement.updateDropdown) { selectElement.updateDropdown(); } }
     
-    // getCekimlerFromStorage ve saveCekimlerToStorage fonksiyonları artık kullanılmayacak.
-    // function getCekimlerFromStorage() { return JSON.parse(localStorage.getItem('cekimListesi') || '[]'); }
-    // function saveCekimlerToStorage(cek_kayitlari) { localStorage.setItem('cekimListesi', JSON.stringify(cek_kayitlari)); }
-
     function readFileAsDataURL(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve({ name: file.name, data: reader.result }); reader.onerror = (error) => reject(error); reader.readAsDataURL(file); }); }
 
     function displayPage(items) {
@@ -281,23 +278,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const nextButton = document.createElement('button'); nextButton.innerHTML = `<i class="fas fa-chevron-right"></i>`; nextButton.className = 'pagination-button'; nextButton.disabled = currentPage === pageCount; nextButton.addEventListener('click', () => { if (currentPage < pageCount) { currentPage++; loadAndDisplayCekimler(); } }); paginationControlsEl.appendChild(nextButton);
     }
     
-    // 2. ANA LİSTELEME FONKSİYONU SUPABASE'DEN VERİ ÇEKECEK ŞEKİLDE GÜNCELLENDİ
     async function loadAndDisplayCekimler() {
-        const { data: all_records, error } = await supabaseClient.from('cekimler').select('*').order('cekimTarihi', { ascending: false });
+        // 1. Supabase'den TÜM verileri çek.
+        const { data: cek_kayitlari, error } = await supabaseClient.from('cekimler').select('*').order('cekimTarihi', { ascending: false });
 
+        let allCekimler = []; // Her seferinde listeyi sıfırla
         if (error) {
-            showNotification('Veri çekerken hata oluştu: ' + error.message, 'error');
-            allCekimler = []; // Hata durumunda listeyi boşalt
+            showNotification('Veri yüklenirken bir hata oluştu: ' + error.message, 'error');
         } else {
-            allCekimler = all_records || []; // Gelen veriyi global değişkene ata
+            allCekimler = cek_kayitlari || [];
         }
 
-        // JavaScript içinde filtreleme
-        const atamaBekleyenler = allCekimler.filter(kayit => !kayit.yonetmen);
-
+        // 2. YÖNETMEN FİLTRESİ KALDIRILDI. Tüm veriler üzerinde işlem yapılacak.
         const filterInputs = document.querySelectorAll('.filter-input');
         const filterValues = Array.from(filterInputs).map(input => input.value.toLowerCase());
-        const filteredKayitlar = atamaBekleyenler.filter(kayit => {
+        
+        const filteredKayitlar = allCekimler.filter(kayit => {
             return filterValues.every((filterValue, index) => {
                 if (filterValue === '') return true;
                 const columns = [ kayit.cekimTarihi, kayit.sinavTuru, kayit.anlatimTuru, kayit.videoKodu, kayit.brans, kayit.unite, kayit.bolum, kayit.testAdi, kayit.soruSayisi, kayit.anlaticiOgretmen, kayit.yonetmen, kayit.akademikDinleyici ];
@@ -321,7 +317,15 @@ document.addEventListener('DOMContentLoaded', () => {
         setupPagination(filteredKayitlar);
     }
 
-    // 3. FORM GÖNDERME İŞLEMİ SUPABASE'E GÜNCELLEME ATACAK ŞEKİLDE DEĞİŞTİRİLDİ
+    async function getCekimlerFromSupabase() {
+        const { data, error } = await supabaseClient.from('cekimler').select('*');
+        if (error) {
+            console.error("Hata:", error);
+            return [];
+        }
+        return data || [];
+    }
+
     cekForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         const id = editingIdInput.value;
@@ -330,27 +334,29 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const fileInput = document.getElementById('timecode-file');
-        const newFiles = Array.from(fileInput.files);
-        
+        const allCekimler = await getCekimlerFromSupabase();
         const mevcutKayit = allCekimler.find(k => k.id == id);
         if (!mevcutKayit) return;
+
+        const fileInput = document.getElementById('timecode-file');
+        const newFiles = Array.from(fileInput.files);
 
         const updateData = {
             yonetmen: document.getElementById('yonetmen').value,
             akademikDinleyici: document.getElementById('akademik-dinleyici').value,
-            timecodeFiles: mevcutKayit.timecodeFiles || [] // Mevcut dosyaları al
+            timecodeFiles: mevcutKayit.timecodeFiles || []
         };
 
         if (newFiles.length > 0) {
             try {
                 const uploadedFiles = await Promise.all(newFiles.map(readFileAsDataURL));
-                updateData.timecodeFiles.push(...uploadedFiles); // Yeni dosyaları ekle
+                updateData.timecodeFiles.push(...uploadedFiles);
             } catch (error) {
-                showNotification("Dosya yüklenirken bir hata oluştu.", "error"); return;
+                showNotification("Dosya yüklenirken bir hata oluştu.", "error");
+                return;
             }
         }
-
+        
         const { error } = await supabaseClient.from('cekimler').update(updateData).eq('id', id);
 
         if (error) {
@@ -366,36 +372,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 4. TABLO İÇİNDEKİ EVENT'LER SUPABASE'E GÖRE GÜNCELLENDİ
     tableBody.addEventListener('click', async function(e) {
+        const allCekimler = await getCekimlerFromSupabase();
+
         if (e.target.classList.contains('delete-file')) {
             const id = editingIdInput.value;
             const fileNameToDelete = e.target.dataset.filename;
             if (!id || !fileNameToDelete) return;
-
             const kayit = allCekimler.find(k => k.id == id);
             if (kayit && kayit.timecodeFiles) {
                 const updatedFiles = kayit.timecodeFiles.filter(f => f.name !== fileNameToDelete);
-                
                 const { error } = await supabaseClient.from('cekimler').update({ timecodeFiles: updatedFiles }).eq('id', id);
-
                 if (error) {
                     showNotification('Dosya silinirken hata: ' + error.message, 'error');
                 } else {
+                    const currentFilesList = document.getElementById('current-files-list');
+                    currentFilesList.innerHTML = '<strong>Mevcut Dosyalar:</strong>';
+                    if (updatedFiles.length > 0) {
+                        updatedFiles.forEach(file => { currentFilesList.innerHTML += `<div class="file-item"><span>${file.name}</span><i class="fas fa-trash-alt delete-file" data-filename="${file.name}"></i></div>`; });
+                    } else {
+                        currentFilesList.innerHTML = 'Mevcut dosya bulunmuyor.';
+                    }
                     showNotification('Dosya başarıyla silindi.', 'success');
                     await loadAndDisplayCekimler();
-                    
-                    // Formu güncel verilerle tekrar doldur
-                    const currentRecord = allCekimler.find(r => r.id === id);
-                    if (currentRecord) {
-                         const currentFilesList = document.getElementById('current-files-list');
-                         currentFilesList.innerHTML = '<strong>Mevcut Dosyalar:</strong>';
-                         if (currentRecord.timecodeFiles && currentRecord.timecodeFiles.length > 0) {
-                             currentRecord.timecodeFiles.forEach(file => { currentFilesList.innerHTML += `<div class="file-item"><span>${file.name}</span><i class="fas fa-trash-alt delete-file" data-filename="${file.name}"></i></div>`; });
-                         } else {
-                             currentFilesList.innerHTML = 'Mevcut dosya bulunmuyor.';
-                         }
-                    }
                 }
             }
         }
@@ -405,7 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const row = editButton.closest('tr');
             const id = row.dataset.id;
-            const kayit = allCekimler.find(k => k.id == id); // Global listeden bul
+            const kayit = allCekimler.find(k => k.id == id);
             if (kayit) {
                 editingIdInput.value = kayit.id;
                 document.getElementById('yonetmen').value = kayit.yonetmen || '';
@@ -444,9 +443,6 @@ document.addEventListener('DOMContentLoaded', () => {
             loadAndDisplayCekimler();
         });
     });
-
-    // `storage` event listener'ı localStorage için geçerliydi, artık gereksiz.
-    // window.addEventListener('storage', () => { loadAndDisplayCekimler(); });
     
     loadAndDisplayCekimler();
 });
@@ -454,4 +450,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
-
