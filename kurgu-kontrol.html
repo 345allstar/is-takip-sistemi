@@ -153,13 +153,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     // 1. SUPABASE BAĞLANTISI
     const SUPABASE_URL = 'https://nwxgigtsadesqjgflblr.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq_X-s_AbjJ1maioProPjPh-nNn1f4';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // --- Orijinal kodunuzdaki tüm değişkenler korundu ---
     let currentPage = 1;
     const rowsPerPage = 10;
-    let allCekimler = []; // Global kayıt listesi
+    let allCekimler = []; 
     
     const cekForm = document.getElementById('cek-form');
     const tableBody = document.getElementById('cekim-tablosu-body');
@@ -173,12 +173,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Orijinal kodunuzdaki tüm fonksiyonlar korundu ---
     function showNotification(message, type = 'success') { const container = document.getElementById('notification-container'); if (!container) return; const notification = document.createElement('div'); notification.className = `notification ${type}`; notification.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-times-circle'}"></i><span>${message}</span>`; container.appendChild(notification); setTimeout(() => notification.classList.add('show'), 10); setTimeout(() => { notification.classList.remove('show'); setTimeout(() => { if (notification.parentNode === container) container.removeChild(notification); }, 500); }, 3000); }
     const formatDate = (dateString) => { if (!dateString) return ''; const date = new Date(dateString + 'T00:00:00'); return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`; };
-    document.querySelectorAll('.collapsible-trigger').forEach(trigger => { trigger.addEventListener('click', () => { const content = trigger.nextElementSibling; const icon = trigger.querySelector('i:last-child'); if (icon) icon.classList.toggle('rotate-180'); if (content.style.maxHeight && content.style.maxHeight !== '0px') { content.style.maxHeight = null; } else { content.style.maxHeight = content.scrollHeight + "px"; } }); setTimeout(() => { const content = trigger.nextElementSibling; if(content) { content.style.maxHeight = content.scrollHeight + "px"; const icon = trigger.querySelector('i:last-child'); if (icon) icon.classList.add('rotate-180'); } }, 200); });
+    
+    // Collapsible aç/kapa mantığı
+    document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
+        trigger.addEventListener('click', () => {
+            const content = trigger.nextElementSibling;
+            const icon = trigger.querySelector('i:last-child');
+            if (icon) icon.classList.toggle('rotate-180');
+            if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                content.style.maxHeight = null;
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+        });
+    });
+
     function createSearchableDropdown(selectElement) { const container = document.createElement('div'); container.className = 'searchable-select-container relative'; selectElement.parentNode.insertBefore(container, selectElement); selectElement.style.display = 'none'; container.appendChild(selectElement); const displayButton = document.createElement('button'); displayButton.type = 'button'; displayButton.className = 'form-input-base text-left flex justify-between items-center'; const displaySpan = document.createElement('span'); displaySpan.className = 'truncate'; displayButton.appendChild(displaySpan); const icon = document.createElement('i'); icon.className = 'fas fa-chevron-down text-gray-400'; displayButton.appendChild(icon); container.appendChild(displayButton); const dropdown = document.createElement('div'); dropdown.className = 'searchable-select-dropdown absolute hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg'; const searchInput = document.createElement('input'); searchInput.type = 'text'; searchInput.placeholder = 'Ara...'; searchInput.className = 'block w-full p-2 border-b border-gray-200 focus:outline-none'; dropdown.appendChild(searchInput); const optionsList = document.createElement('div'); optionsList.className = 'p-1 max-h-48 overflow-y-auto'; dropdown.appendChild(optionsList); container.appendChild(dropdown); const updateOptions = () => { optionsList.innerHTML = ''; Array.from(selectElement.options).forEach(option => { if (option.value === "" && option.textContent.includes('Seçiniz')) return; const optionDiv = document.createElement('div'); optionDiv.textContent = option.textContent; optionDiv.dataset.value = option.value; optionDiv.className = 'p-2 cursor-pointer hover:bg-indigo-100 rounded text-sm'; optionDiv.addEventListener('click', () => { selectElement.value = option.value; displaySpan.textContent = option.textContent; displaySpan.classList.remove('text-gray-400'); dropdown.classList.add('hidden'); selectElement.dispatchEvent(new Event('change')); }); optionsList.appendChild(optionDiv); }); const selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`) || selectElement.options[0]; if (selectedOption) { displaySpan.textContent = selectedOption.textContent; if(selectedOption.value === "") displaySpan.classList.add('text-gray-400'); else displaySpan.classList.remove('text-gray-400'); } }; searchInput.addEventListener('input', () => { const filter = searchInput.value.toLowerCase(); optionsList.querySelectorAll('div').forEach(optionDiv => { const text = optionDiv.textContent.toLowerCase(); optionDiv.style.display = text.includes(filter) ? '' : 'none'; }); }); displayButton.addEventListener('click', (e) => { e.stopPropagation(); if (selectElement.disabled) return; document.querySelectorAll('.searchable-select-dropdown').forEach(d => { if(d !== dropdown) d.classList.add('hidden'); }); dropdown.classList.toggle('hidden'); if(!dropdown.classList.contains('hidden')) { searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); searchInput.focus(); } }); selectElement.updateDropdown = updateOptions; updateOptions(); }
     const updateSelectDisplay = (selectElement) => { if(selectElement && selectElement.updateDropdown) { selectElement.updateDropdown(); } }
     function populateSelect(selectId, data) { const select = document.getElementById(selectId); data.forEach(item => { const option = document.createElement('option'); option.value = item; option.textContent = item; select.appendChild(option); }); }
     
-    // 2. ANA LİSTELEME FONKSİYONU SUPABASE'E GÖRE GÜNCELLENDİ
+    // 2. ANA LİSTELEME FONKSİYONU
     async function loadAndDisplayCekimler() {
         const { data, error } = await supabaseClient.from('cekimler').select('*').order('cekimTarihi', { ascending: false });
 
@@ -189,7 +203,6 @@ document.addEventListener('DOMContentLoaded', () => {
             allCekimler = data || [];
         }
 
-        // JavaScript içinde yönetmeni olanları filtrele
         const cekimlerWithYonetmen = allCekimler.filter(kayit => kayit.yonetmen);
         const filterValues = Array.from(document.querySelectorAll('.filter-input')).map(input => input.value.toLowerCase());
         
@@ -207,6 +220,17 @@ document.addEventListener('DOMContentLoaded', () => {
         
         displayPage(filteredKayitlar);
         setupPagination(filteredKayitlar);
+
+        // *** DÜZELTME BURADA ***
+        // Tablo dolduktan SONRA, collapsible'ları aç ve yüksekliği doğru ayarla
+        document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
+            const content = trigger.nextElementSibling;
+            if (content && (!content.style.maxHeight || content.style.maxHeight === '0px')) { // Sadece kapalıysa aç
+                const icon = trigger.querySelector('i:last-child');
+                content.style.maxHeight = content.scrollHeight + "px";
+                if (icon) icon.classList.add('rotate-180');
+            }
+        });
     }
     
     function displayPage(items) {
@@ -245,14 +269,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const nextButton = document.createElement('button'); nextButton.innerHTML = `<i class="fas fa-chevron-right"></i>`; nextButton.className = 'pagination-button'; nextButton.disabled = currentPage === pageCount; nextButton.addEventListener('click', () => { if (currentPage < pageCount) { currentPage++; loadAndDisplayCekimler(); } }); paginationControlsEl.appendChild(nextButton);
     }
     
-    // 3. FORM GÖNDERME İŞLEMİ SUPABASE'E GÖRE GÜNCELLENDİ
     cekForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         const id = editingIdInput.value;
-        if (!id) {
-            showNotification("Lütfen düzenlemek için bir çekim seçin.", "error");
-            return;
-        }
+        if (!id) { showNotification("Lütfen düzenlemek için bir çekim seçin.", "error"); return; }
         
         const updateData = {
             kurguBaslamaTarihi: document.getElementById('kurgu-baslama-tarihi').value || null,
@@ -265,9 +285,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const { error } = await supabaseClient.from('cekimler').update(updateData).eq('id', id);
 
-        if (error) {
-            showNotification('Kurgu bilgileri güncellenirken hata: ' + error.message, 'error');
-        } else {
+        if (error) { showNotification('Kurgu bilgileri güncellenirken hata: ' + error.message, 'error'); } 
+        else {
             showNotification('Kurgu bilgileri başarıyla güncellendi!');
             cekForm.reset();
             editingIdInput.value = '';
@@ -276,7 +295,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 4. TABLO İÇİNDEKİ EVENT'LER SUPABASE'E GÖRE GÜNCELLENDİ
     tableBody.addEventListener('click', function(e) {
         const editButton = e.target.closest('.edit-row');
         const notesBtn = e.target.closest('.download-notes-btn');
@@ -289,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (editButton) {
             e.preventDefault();
             const id = editButton.closest('tr').dataset.id;
-            const kayit = allCekimler.find(k => k.id == id); // Global listeden bul
+            const kayit = allCekimler.find(k => k.id == id);
             if (kayit) {
                 editingIdInput.value = kayit.id;
                 document.getElementById('kurgu-baslama-tarihi').value = kayit.kurguBaslamaTarihi || '';
