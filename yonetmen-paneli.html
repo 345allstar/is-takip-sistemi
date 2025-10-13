@@ -255,16 +255,51 @@ document.addEventListener('DOMContentLoaded', () => {
         const start = (currentPage - 1) * rowsPerPage;
         const end = start + rowsPerPage;
         const paginatedItems = items.slice(start, end);
+
         paginatedItems.forEach(kayit => {
             const row = tableBody.insertRow();
             row.dataset.id = kayit.id;
+            
+            // Tarih formatlama
             const date = new Date(kayit.cekimTarihi + 'T00:00:00');
             const formattedDate = kayit.cekimTarihi ? `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}` : '';
-            const fileIcon = (kayit.timecodeFiles && kayit.timecodeFiles.length > 0) ? `<button class="download-files-btn ml-2 text-indigo-500 hover:text-indigo-700" title="Time Code Dosyalarını İndir" data-id="${kayit.id}"><i class="fas fa-download"></i></button>` : '';
-            const yonetmenDurum = kayit.yonetmen ? `<td class="font-semibold text-green-600 align-middle">${kayit.yonetmen}${fileIcon}</td>` : `<td class="font-semibold text-gray-500 align-middle">Atanmadı</td>`;
-            const akademikDinleyiciDurum = kayit.akademikDinleyici ? `<td class="font-semibold text-green-600 align-middle">${kayit.akademikDinleyici}</td>` : `<td class="font-semibold text-gray-500 align-middle">Atanmadı</td>`;
+            
+            // Dosya ikonu
+            const fileIcon = (kayit.timecodeFiles && kayit.timecodeFiles.length > 0)
+                ? `<button class="download-files-btn ml-2 text-indigo-500 hover:text-indigo-700" title="Time Code Dosyalarını İndir" data-id="${kayit.id}"><i class="fas fa-download"></i></button>`
+                : '';
+
+            // Yönetmen ve Akademik Dinleyici sütunları için stil (Atanmışsa yeşil ve kalın, değilse gri ve kalın)
+            const yonetmenDurum = kayit.yonetmen 
+                ? `<td class="font-semibold text-green-600 align-middle">${kayit.yonetmen}${fileIcon}</td>`
+                : `<td class="font-semibold text-gray-500 align-middle">Atanmadı</td>`;
+            
+            const akademikDinleyiciDurum = kayit.akademikDinleyici 
+                ? `<td class="font-semibold text-green-600 align-middle">${kayit.akademikDinleyici}</td>`
+                : `<td class="font-semibold text-gray-500 align-middle">Atanmadı</td>`;
+
             const buttonTitle = kayit.yonetmen ? "Düzenle" : "Ata";
-            row.innerHTML = `<td class="align-middle">${formattedDate || ''}</td><td class="align-middle">${kayit.sinavTuru || ''}</td><td class="align-middle">${kayit.anlatimTuru || ''}</td><td class="align-middle">${kayit.videoKodu || ''}</td><td class="align-middle">${kayit.brans || ''}</td><td class="align-middle">${kayit.unite || ''}</td><td class="align-middle">${kayit.bolum || ''}</td><td class="align-middle">${kayit.testAdi || ''}</td><td class="align-middle">${kayit.soruSayisi || ''}</td><td class="align-middle">${kayit.anlaticiOgretmen || ''}</td>${yonetmenDurum}${akademikDinleyiciDurum}<td class="align-middle"><button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="${buttonTitle}"><i class="fas fa-pencil-alt"></i></button></td>`;
+
+            // SATIRIN HTML'İ OLUŞTURULUYOR - TÜM TD'LERDE "font-semibold" OLMADIĞINDAN EMİN OLUNUR
+            row.innerHTML = `
+                <td class="align-middle">${formattedDate || ''}</td>
+                <td class="align-middle">${kayit.sinavTuru || ''}</td>
+                <td class="align-middle">${kayit.anlatimTuru || ''}</td>
+                <td class="align-middle">${kayit.videoKodu || ''}</td>
+                <td class="align-middle">${kayit.brans || ''}</td>
+                <td class="align-middle">${kayit.unite || ''}</td>
+                <td class="align-middle">${kayit.bolum || ''}</td>
+                <td class="align-middle">${kayit.testAdi || ''}</td>
+                <td class="align-middle">${kayit.soruSayisi || ''}</td>
+                <td class="align-middle">${kayit.anlaticiOgretmen || ''}</td>
+                ${yonetmenDurum}
+                ${akademikDinleyiciDurum}
+                <td class="align-middle">
+                    <button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="${buttonTitle}">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                </td>
+            `;
         });
     }
 
@@ -450,4 +485,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
