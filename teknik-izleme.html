@@ -38,6 +38,23 @@
         .status-badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 9999px; font-weight: 500; }
         .status-yapildi { background-color: #dcfce7; color: #166534; }
         .status-yapilmadi { background-color: #fee2e2; color: #991b1b; }
+        /* YENİ EKLENEN KODLAR */
+        #cekim-tablosu-body tr {
+            transition: background-color 0.2s ease-out;
+            cursor: pointer;
+        }
+
+        /* Fare ile üzerine gelince satırın arkaplan rengini değiştirir */
+        #cekim-tablosu-body tr:hover {
+            background-color: #eef2ff; /* indigo-100 */
+        }
+
+        /* Tıklanan satıra kırmızı çerçeve ekler */
+        #cekim-tablosu-body tr.satir-secili {
+            outline: 2px solid #ef4444; /* red-500 */
+            outline-offset: -2px; /* Çerçevenin içeriye doğru olmasını sağlar */
+        }
+        /* YENİ EKLENEN KODLARIN SONU */
     </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
@@ -327,6 +344,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // TABLO İÇİNDEKİ TIKLAMA OLAYLARI
     tableBody.addEventListener('click', function(e) {
+       // YENİ EKLENEN KISIM BAŞLANGICI
+        const clickedRow = e.target.closest('tr');
+        if (clickedRow) {
+            // Sadece butonlara tıklanmadığında çerçeve ekle
+            if (!e.target.closest('button')) {
+                const currentlySelected = tableBody.querySelector('.satir-secili');
+                if (currentlySelected) {
+                    currentlySelected.classList.remove('satir-secili');
+                }
+                clickedRow.classList.add('satir-secili');
+            }
+        }
+        // YENİ EKLENEN KISIM SONU
         const editButton = e.target.closest('.edit-row');
         const notesBtn = e.target.closest('.download-notes-btn');
         const timecodeBtn = e.target.closest('.download-files-btn');
