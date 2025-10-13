@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kurgu Kontrol Paneli - ÜDB All Star</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -150,8 +151,15 @@
     
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. SUPABASE BAĞLANTISI
+    const SUPABASE_URL = 'https://nwxgigtsadesqjgflblr.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq_X-s_AbjJ1maioProPjPh-nNn1f4';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // --- Orijinal kodunuzdaki tüm değişkenler korundu ---
     let currentPage = 1;
     const rowsPerPage = 10;
+    let allCekimler = []; // Global kayıt listesi
     
     const cekForm = document.getElementById('cek-form');
     const tableBody = document.getElementById('cekim-tablosu-body');
@@ -162,138 +170,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const kurguOperatorleri = ["Naz Çetinkol", "Osman Doğutaş", "Büşra Pelin Demir", "Emrah Yıldırım", "Kübra Selin Demir", "Melisa Savaş", "Tuğçe Gökmen"];
     const kurguDurumlari = ["Sırada", "Kurguda", "Tamamlandı", "Revize"];
 
-    function showNotification(message, type = 'success') {
-        const container = document.getElementById('notification-container');
-        if (!container) return;
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-times-circle'}"></i><span>${message}</span>`;
-        container.appendChild(notification);
-        setTimeout(() => notification.classList.add('show'), 10);
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => { if (notification.parentNode === container) container.removeChild(notification); }, 500);
-        }, 3000);
-    }
+    // --- Orijinal kodunuzdaki tüm fonksiyonlar korundu ---
+    function showNotification(message, type = 'success') { const container = document.getElementById('notification-container'); if (!container) return; const notification = document.createElement('div'); notification.className = `notification ${type}`; notification.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-times-circle'}"></i><span>${message}</span>`; container.appendChild(notification); setTimeout(() => notification.classList.add('show'), 10); setTimeout(() => { notification.classList.remove('show'); setTimeout(() => { if (notification.parentNode === container) container.removeChild(notification); }, 500); }, 3000); }
+    const formatDate = (dateString) => { if (!dateString) return ''; const date = new Date(dateString + 'T00:00:00'); return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`; };
+    document.querySelectorAll('.collapsible-trigger').forEach(trigger => { trigger.addEventListener('click', () => { const content = trigger.nextElementSibling; const icon = trigger.querySelector('i:last-child'); if (icon) icon.classList.toggle('rotate-180'); if (content.style.maxHeight && content.style.maxHeight !== '0px') { content.style.maxHeight = null; } else { content.style.maxHeight = content.scrollHeight + "px"; } }); setTimeout(() => { const content = trigger.nextElementSibling; if(content) { content.style.maxHeight = content.scrollHeight + "px"; const icon = trigger.querySelector('i:last-child'); if (icon) icon.classList.add('rotate-180'); } }, 200); });
+    function createSearchableDropdown(selectElement) { const container = document.createElement('div'); container.className = 'searchable-select-container relative'; selectElement.parentNode.insertBefore(container, selectElement); selectElement.style.display = 'none'; container.appendChild(selectElement); const displayButton = document.createElement('button'); displayButton.type = 'button'; displayButton.className = 'form-input-base text-left flex justify-between items-center'; const displaySpan = document.createElement('span'); displaySpan.className = 'truncate'; displayButton.appendChild(displaySpan); const icon = document.createElement('i'); icon.className = 'fas fa-chevron-down text-gray-400'; displayButton.appendChild(icon); container.appendChild(displayButton); const dropdown = document.createElement('div'); dropdown.className = 'searchable-select-dropdown absolute hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg'; const searchInput = document.createElement('input'); searchInput.type = 'text'; searchInput.placeholder = 'Ara...'; searchInput.className = 'block w-full p-2 border-b border-gray-200 focus:outline-none'; dropdown.appendChild(searchInput); const optionsList = document.createElement('div'); optionsList.className = 'p-1 max-h-48 overflow-y-auto'; dropdown.appendChild(optionsList); container.appendChild(dropdown); const updateOptions = () => { optionsList.innerHTML = ''; Array.from(selectElement.options).forEach(option => { if (option.value === "" && option.textContent.includes('Seçiniz')) return; const optionDiv = document.createElement('div'); optionDiv.textContent = option.textContent; optionDiv.dataset.value = option.value; optionDiv.className = 'p-2 cursor-pointer hover:bg-indigo-100 rounded text-sm'; optionDiv.addEventListener('click', () => { selectElement.value = option.value; displaySpan.textContent = option.textContent; displaySpan.classList.remove('text-gray-400'); dropdown.classList.add('hidden'); selectElement.dispatchEvent(new Event('change')); }); optionsList.appendChild(optionDiv); }); const selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`) || selectElement.options[0]; if (selectedOption) { displaySpan.textContent = selectedOption.textContent; if(selectedOption.value === "") displaySpan.classList.add('text-gray-400'); else displaySpan.classList.remove('text-gray-400'); } }; searchInput.addEventListener('input', () => { const filter = searchInput.value.toLowerCase(); optionsList.querySelectorAll('div').forEach(optionDiv => { const text = optionDiv.textContent.toLowerCase(); optionDiv.style.display = text.includes(filter) ? '' : 'none'; }); }); displayButton.addEventListener('click', (e) => { e.stopPropagation(); if (selectElement.disabled) return; document.querySelectorAll('.searchable-select-dropdown').forEach(d => { if(d !== dropdown) d.classList.add('hidden'); }); dropdown.classList.toggle('hidden'); if(!dropdown.classList.contains('hidden')) { searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); searchInput.focus(); } }); selectElement.updateDropdown = updateOptions; updateOptions(); }
+    const updateSelectDisplay = (selectElement) => { if(selectElement && selectElement.updateDropdown) { selectElement.updateDropdown(); } }
+    function populateSelect(selectId, data) { const select = document.getElementById(selectId); data.forEach(item => { const option = document.createElement('option'); option.value = item; option.textContent = item; select.appendChild(option); }); }
     
-    function getCekimlerFromStorage() { return JSON.parse(localStorage.getItem('cekimListesi') || '[]'); }
-    function saveCekimlerToStorage(cek_kayitlari) { localStorage.setItem('cekimListesi', JSON.stringify(cek_kayitlari)); }
-    const formatDate = (dateString) => {
-        if (!dateString) return '';
-        const date = new Date(dateString + 'T00:00:00');
-        return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-    };
+    // 2. ANA LİSTELEME FONKSİYONU SUPABASE'E GÖRE GÜNCELLENDİ
+    async function loadAndDisplayCekimler() {
+        const { data, error } = await supabaseClient.from('cekimler').select('*').order('cekimTarihi', { ascending: false });
 
-    document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
-        trigger.addEventListener('click', () => {
-            const content = trigger.nextElementSibling;
-            const icon = trigger.querySelector('i:last-child');
-            if (icon) icon.classList.toggle('rotate-180');
-            if (content.style.maxHeight && content.style.maxHeight !== '0px') {
-                content.style.maxHeight = null;
-            } else {
-                content.style.maxHeight = content.scrollHeight + "px";
-            }
-        });
-        setTimeout(() => {
-            const content = trigger.nextElementSibling;
-            if(content) {
-                content.style.maxHeight = content.scrollHeight + "px";
-                const icon = trigger.querySelector('i:last-child');
-                if (icon) icon.classList.add('rotate-180');
-            }
-        }, 200);
-    });
-
-    function createSearchableDropdown(selectElement) {
-        const container = document.createElement('div');
-        container.className = 'searchable-select-container relative';
-        selectElement.parentNode.insertBefore(container, selectElement);
-        selectElement.style.display = 'none';
-        container.appendChild(selectElement);
-        const displayButton = document.createElement('button');
-        displayButton.type = 'button';
-        displayButton.className = 'form-input-base text-left flex justify-between items-center';
-        const displaySpan = document.createElement('span');
-        displaySpan.className = 'truncate';
-        displayButton.appendChild(displaySpan);
-        const icon = document.createElement('i');
-        icon.className = 'fas fa-chevron-down text-gray-400';
-        displayButton.appendChild(icon);
-        container.appendChild(displayButton);
-        const dropdown = document.createElement('div');
-        dropdown.className = 'searchable-select-dropdown absolute hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg';
-        const searchInput = document.createElement('input');
-        searchInput.type = 'text';
-        searchInput.placeholder = 'Ara...';
-        searchInput.className = 'block w-full p-2 border-b border-gray-200 focus:outline-none';
-        dropdown.appendChild(searchInput);
-        const optionsList = document.createElement('div');
-        optionsList.className = 'p-1 max-h-48 overflow-y-auto';
-        dropdown.appendChild(optionsList);
-        container.appendChild(dropdown);
-        const updateOptions = () => {
-            optionsList.innerHTML = '';
-            Array.from(selectElement.options).forEach(option => {
-                if (option.value === "" && option.textContent.includes('Seçiniz')) return;
-                const optionDiv = document.createElement('div');
-                optionDiv.textContent = option.textContent;
-                optionDiv.dataset.value = option.value;
-                optionDiv.className = 'p-2 cursor-pointer hover:bg-indigo-100 rounded text-sm';
-                optionDiv.addEventListener('click', () => {
-                    selectElement.value = option.value;
-                    displaySpan.textContent = option.textContent;
-                    displaySpan.classList.remove('text-gray-400');
-                    dropdown.classList.add('hidden');
-                    selectElement.dispatchEvent(new Event('change'));
-                });
-                optionsList.appendChild(optionDiv);
-            });
-            const selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`) || selectElement.options[0];
-            if (selectedOption) {
-                displaySpan.textContent = selectedOption.textContent;
-                if(selectedOption.value === "") displaySpan.classList.add('text-gray-400');
-                else displaySpan.classList.remove('text-gray-400');
-            }
-        };
-        searchInput.addEventListener('input', () => {
-            const filter = searchInput.value.toLowerCase();
-            optionsList.querySelectorAll('div').forEach(optionDiv => {
-                const text = optionDiv.textContent.toLowerCase();
-                optionDiv.style.display = text.includes(filter) ? '' : 'none';
-            });
-        });
-        displayButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (selectElement.disabled) return;
-            document.querySelectorAll('.searchable-select-dropdown').forEach(d => { if(d !== dropdown) d.classList.add('hidden'); });
-            dropdown.classList.toggle('hidden');
-            if(!dropdown.classList.contains('hidden')) {
-                searchInput.value = '';
-                searchInput.dispatchEvent(new Event('input'));
-                searchInput.focus();
-            }
-        });
-        selectElement.updateDropdown = updateOptions;
-        updateOptions();
-    }
-    
-    const updateSelectDisplay = (selectElement) => {
-        if(selectElement && selectElement.updateDropdown) {
-           selectElement.updateDropdown();
+        if (error) {
+            showNotification('Veri çekerken hata: ' + error.message, 'error');
+            allCekimler = [];
+        } else {
+            allCekimler = data || [];
         }
+
+        // JavaScript içinde yönetmeni olanları filtrele
+        const cekimlerWithYonetmen = allCekimler.filter(kayit => kayit.yonetmen);
+        const filterValues = Array.from(document.querySelectorAll('.filter-input')).map(input => input.value.toLowerCase());
+        
+        const filteredKayitlar = cekimlerWithYonetmen.filter(kayit => {
+            return filterValues.every((filterValue, index) => {
+                if (filterValue === '') return true;
+                const columns = [ formatDate(kayit.cekimTarihi), kayit.anlatimTuru, kayit.videoKodu, kayit.anlaticiOgretmen, kayit.yonetmen, formatDate(kayit.kurguBaslamaTarihi), formatDate(kayit.kurguBitisTarihi), kayit.kurguOperatoru, kayit.kurguDurumu, kayit.teknikIzlemeYapilabilirligi, (kayit.teknikIzlemeDurumu === 'Yapıldı' ? kayit.teknikEkipUyesi : ''), (kayit.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(kayit.teknikIzlemeTarihi) : ''), kayit.akademikIzlemeYapilabilirligi, (kayit.akademikIzlemeDurumu === 'Yapıldı' ? kayit.akademikIzlemeOgretmeni : ''), (kayit.akademikIzlemeDurumu === 'Yapıldı' ? formatDate(kayit.akademikIzlemeTarihi) : ''), kayit.yuklenmeDurumu ];
+                return (columns[index] || '').toString().toLowerCase().includes(filterValue);
+            });
+        });
+
+        recordCountEl.textContent = `Toplam ${filteredKayitlar.length} kayıt bulundu.`;
+        noDataMessage.classList.toggle('hidden', filteredKayitlar.length > 0);
+        document.getElementById('cekim-tablosu').classList.toggle('hidden', filteredKayitlar.length === 0);
+        
+        displayPage(filteredKayitlar);
+        setupPagination(filteredKayitlar);
     }
     
-    function populateSelect(selectId, data) {
-        const select = document.getElementById(selectId);
-        data.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item;
-            option.textContent = item;
-            select.appendChild(option);
-        });
-    }
-
     function displayPage(items) {
         tableBody.innerHTML = '';
         const start = (currentPage - 1) * rowsPerPage;
@@ -306,87 +221,62 @@ document.addEventListener('DOMContentLoaded', () => {
             row.className = 'hover:bg-indigo-50 transition-colors duration-200';
 
             const timecodeFileIcon = (kayit.timecodeFiles && kayit.timecodeFiles.length > 0) ? `<button class="download-files-btn ml-2 text-indigo-500 hover:text-indigo-700" title="Time Code Dosyalarını İndir" data-id="${kayit.id}"><i class="fas fa-download"></i></button>` : '';
-            
             const teknikIzlemeYapildi = kayit.teknikIzlemeDurumu === 'Yapıldı';
             const revizyonNotuIcon = teknikIzlemeYapildi && kayit.revizyonNotu && kayit.revizyonNotu.content ? `<button class="download-notes-btn ml-2 text-green-500 hover:text-green-700" title="Revizyon Notunu İndir" data-id="${kayit.id}"><i class="fas fa-file-alt"></i></button>` : '';
             const teknikEkipUyesiHtml = teknikIzlemeYapildi ? `${kayit.teknikEkipUyesi || ''}${revizyonNotuIcon}` : '';
             const teknikIzlemeTarihiHtml = teknikIzlemeYapildi ? formatDate(kayit.teknikIzlemeTarihi) : '';
-
             const akademikIzlemeYapildi = kayit.akademikIzlemeDurumu === 'Yapıldı';
             let akademikOgretmenHtml = '';
-            if (akademikIzlemeYapildi) {
-                const akademikNotuIcon = kayit.akademikIzlemeNotu && kayit.akademikIzlemeNotu.content ? `<button class="download-academic-notes-btn ml-2 text-green-500 hover:text-green-700" title="Akademik Notu İndir" data-id="${kayit.id}"><i class="fas fa-file-alt"></i></button>` : '';
-                const viewAkademikIcon = kayit.akademikIzlemeOgretmeni ? `<button class="view-akademik-btn ml-2 text-gray-500 hover:text-blue-600" title="Akademik İzleme Sayfasına Git" data-id="${kayit.id}"><i class="fas fa-eye"></i></button>` : '';
-                akademikOgretmenHtml = `${kayit.akademikIzlemeOgretmeni || ''}${akademikNotuIcon}${viewAkademikIcon}`;
-            }
+            if (akademikIzlemeYapildi) { const akademikNotuIcon = kayit.akademikIzlemeNotu && kayit.akademikIzlemeNotu.content ? `<button class="download-academic-notes-btn ml-2 text-green-500 hover:text-green-700" title="Akademik Notu İndir" data-id="${kayit.id}"><i class="fas fa-file-alt"></i></button>` : ''; const viewAkademikIcon = kayit.akademikIzlemeOgretmeni ? `<button class="view-akademik-btn ml-2 text-gray-500 hover:text-blue-600" title="Akademik İzleme Sayfasına Git" data-id="${kayit.id}"><i class="fas fa-eye"></i></button>` : ''; akademikOgretmenHtml = `${kayit.akademikIzlemeOgretmeni || ''}${akademikNotuIcon}${viewAkademikIcon}`; }
             const akademikTarihHtml = akademikIzlemeYapildi ? formatDate(kayit.akademikIzlemeTarihi) : '';
-
             let statusClass = '';
-            switch(kayit.kurguDurumu) {
-                case 'Sırada': statusClass = 'status-sirada'; break;
-                case 'Kurguda': statusClass = 'status-kurguda'; break;
-                case 'Tamamlandı': statusClass = 'status-tamamlandi'; break;
-                case 'Revize': statusClass = 'status-revize'; break;
-            }
+            switch(kayit.kurguDurumu) { case 'Sırada': statusClass = 'status-sirada'; break; case 'Kurguda': statusClass = 'status-kurguda'; break; case 'Tamamlandı': statusClass = 'status-tamamlandi'; break; case 'Revize': statusClass = 'status-revize'; break; }
 
-            row.innerHTML = `
-                <td>${formatDate(kayit.cekimTarihi)}</td>
-                <td>${kayit.anlatimTuru || ''}</td>
-                <td>${kayit.videoKodu || ''}</td>
-                <td>${kayit.anlaticiOgretmen || ''}</td>
-                <td>${kayit.yonetmen || ''}${timecodeFileIcon}</td>
-                <td>${formatDate(kayit.kurguBaslamaTarihi)}</td>
-                <td>${formatDate(kayit.kurguBitisTarihi)}</td>
-                <td>${kayit.kurguOperatoru || ''}</td>
-                <td><span class="status-badge ${statusClass}">${kayit.kurguDurumu || 'Belirtilmedi'}</span></td>
-                <td>${kayit.teknikIzlemeYapilabilirligi || ''}</td>
-                <td>${teknikEkipUyesiHtml}</td>
-                <td>${teknikIzlemeTarihiHtml}</td>
-                <td>${kayit.akademikIzlemeYapilabilirligi || ''}</td>
-                <td>${akademikOgretmenHtml}</td>
-                <td>${akademikTarihHtml}</td>
-                <td>${kayit.yuklenmeDurumu || ''}</td>
-                <td>
-                    <button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="Düzenle">
-                        <i class="fas fa-pencil-alt"></i>
-                    </button>
-                </td>
-            `;
+            row.innerHTML = `<td>${formatDate(kayit.cekimTarihi)}</td><td>${kayit.anlatimTuru || ''}</td><td>${kayit.videoKodu || ''}</td><td>${kayit.anlaticiOgretmen || ''}</td><td>${kayit.yonetmen || ''}${timecodeFileIcon}</td><td>${formatDate(kayit.kurguBaslamaTarihi)}</td><td>${formatDate(kayit.kurguBitisTarihi)}</td><td>${kayit.kurguOperatoru || ''}</td><td><span class="status-badge ${statusClass}">${kayit.kurguDurumu || 'Belirtilmedi'}</span></td><td>${kayit.teknikIzlemeYapilabilirligi || ''}</td><td>${teknikEkipUyesiHtml}</td><td>${teknikIzlemeTarihiHtml}</td><td>${kayit.akademikIzlemeYapilabilirligi || ''}</td><td>${akademikOgretmenHtml}</td><td>${akademikTarihHtml}</td><td>${kayit.yuklenmeDurumu || ''}</td><td><button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="Düzenle"><i class="fas fa-pencil-alt"></i></button></td>`;
         });
     }
 
-    function loadAndDisplayCekimler() {
-        const allCekimler = getCekimlerFromStorage();
-        const cekimlerWithYonetmen = allCekimler.filter(kayit => kayit.yonetmen);
-        const filterValues = Array.from(document.querySelectorAll('.filter-input')).map(input => input.value.toLowerCase());
-        
-        const filteredKayitlar = cekimlerWithYonetmen.filter(kayit => {
-            return filterValues.every((filterValue, index) => {
-                if (filterValue === '') return true;
-                const columns = [
-                    formatDate(kayit.cekimTarihi), kayit.anlatimTuru, kayit.videoKodu, kayit.anlaticiOgretmen, kayit.yonetmen,
-                    formatDate(kayit.kurguBaslamaTarihi), formatDate(kayit.kurguBitisTarihi), kayit.kurguOperatoru, kayit.kurguDurumu,
-                    kayit.teknikIzlemeYapilabilirligi,
-                    (kayit.teknikIzlemeDurumu === 'Yapıldı' ? kayit.teknikEkipUyesi : ''), 
-                    (kayit.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(kayit.teknikIzlemeTarihi) : ''),
-                    kayit.akademikIzlemeYapilabilirligi,
-                    (kayit.akademikIzlemeDurumu === 'Yapıldı' ? kayit.akademikIzlemeOgretmeni : ''),
-                    (kayit.akademikIzlemeDurumu === 'Yapıldı' ? formatDate(kayit.akademikIzlemeTarihi) : ''),
-                    kayit.yuklenmeDurumu
-                ];
-                return (columns[index] || '').toString().toLowerCase().includes(filterValue);
-            });
-        });
-
-        filteredKayitlar.sort((a, b) => new Date(b.cekimTarihi) - new Date(a.cekimTarihi));
-        recordCountEl.textContent = `Toplam ${filteredKayitlar.length} kayıt bulundu.`;
-        noDataMessage.classList.toggle('hidden', filteredKayitlar.length > 0);
-        document.getElementById('cekim-tablosu').classList.toggle('hidden', filteredKayitlar.length === 0);
-        
-        displayPage(filteredKayitlar);
-        setupPagination(filteredKayitlar);
+    function setupPagination(items) {
+        paginationControlsEl.innerHTML = '';
+        const pageCount = Math.ceil(items.length / rowsPerPage);
+        if (pageCount <= 1) return;
+        const prevButton = document.createElement('button'); prevButton.innerHTML = `<i class="fas fa-chevron-left"></i>`; prevButton.className = 'pagination-button'; prevButton.disabled = currentPage === 1; prevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; loadAndDisplayCekimler(); } }); paginationControlsEl.appendChild(prevButton);
+        for (let i = 1; i <= pageCount; i++) { const btn = document.createElement('button'); btn.innerText = i; btn.className = 'pagination-button'; if (i === currentPage) { btn.classList.add('active'); } btn.addEventListener('click', () => { currentPage = i; loadAndDisplayCekimler(); }); paginationControlsEl.appendChild(btn); }
+        const nextButton = document.createElement('button'); nextButton.innerHTML = `<i class="fas fa-chevron-right"></i>`; nextButton.className = 'pagination-button'; nextButton.disabled = currentPage === pageCount; nextButton.addEventListener('click', () => { if (currentPage < pageCount) { currentPage++; loadAndDisplayCekimler(); } }); paginationControlsEl.appendChild(nextButton);
     }
     
+    // 3. FORM GÖNDERME İŞLEMİ SUPABASE'E GÖRE GÜNCELLENDİ
+    cekForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const id = editingIdInput.value;
+        if (!id) {
+            showNotification("Lütfen düzenlemek için bir çekim seçin.", "error");
+            return;
+        }
+        
+        const updateData = {
+            kurguBaslamaTarihi: document.getElementById('kurgu-baslama-tarihi').value || null,
+            kurguBitisTarihi: document.getElementById('kurgu-bitis-tarihi').value || null,
+            kurguOperatoru: document.getElementById('kurgu-operatoru').value,
+            kurguDurumu: document.getElementById('kurgu-durumu').value,
+            teknikIzlemeYapilabilirligi: document.getElementById('teknik-izleme').value,
+            akademikIzlemeYapilabilirligi: document.getElementById('akademik-izleme').value
+        };
+
+        const { error } = await supabaseClient.from('cekimler').update(updateData).eq('id', id);
+
+        if (error) {
+            showNotification('Kurgu bilgileri güncellenirken hata: ' + error.message, 'error');
+        } else {
+            showNotification('Kurgu bilgileri başarıyla güncellendi!');
+            cekForm.reset();
+            editingIdInput.value = '';
+            ['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme'].forEach(id => updateSelectDisplay(document.getElementById(id)));
+            await loadAndDisplayCekimler();
+        }
+    });
+
+    // 4. TABLO İÇİNDEKİ EVENT'LER SUPABASE'E GÖRE GÜNCELLENDİ
     tableBody.addEventListener('click', function(e) {
         const editButton = e.target.closest('.edit-row');
         const notesBtn = e.target.closest('.download-notes-btn');
@@ -394,18 +284,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const timecodeBtn = e.target.closest('.download-files-btn');
         const viewAkademikBtn = e.target.closest('.view-akademik-btn');
 
-        if (viewAkademikBtn) {
-            e.preventDefault();
-            const id = viewAkademikBtn.dataset.id;
-            localStorage.setItem('selectedCekimId', id);
-            window.location.href = 'akademik-izleme.html';
-        }
+        if (viewAkademikBtn) { e.preventDefault(); const id = viewAkademikBtn.dataset.id; localStorage.setItem('selectedCekimId', id); window.location.href = 'akademik-izleme.html'; }
 
         if (editButton) {
             e.preventDefault();
-            const row = editButton.closest('tr');
-            const id = row.dataset.id;
-            const kayit = getCekimlerFromStorage().find(k => k.id == id);
+            const id = editButton.closest('tr').dataset.id;
+            const kayit = allCekimler.find(k => k.id == id); // Global listeden bul
             if (kayit) {
                 editingIdInput.value = kayit.id;
                 document.getElementById('kurgu-baslama-tarihi').value = kayit.kurguBaslamaTarihi || '';
@@ -419,126 +303,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        if (notesBtn) {
-            e.preventDefault();
-            const id = notesBtn.dataset.id;
-            const kayit = getCekimlerFromStorage().find(k => k.id === id);
-            if (kayit && kayit.revizyonNotu && kayit.revizyonNotu.content) {
-                const blob = new Blob([kayit.revizyonNotu.content], { type: 'text/plain;charset=utf-8' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = kayit.revizyonNotu.fileName || 'revizyon.txt';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        }
-        
-        if (timecodeBtn) {
-             e.preventDefault();
-            const id = timecodeBtn.dataset.id;
-            const record = getCekimlerFromStorage().find(r => r.id === id);
-            if (record && record.timecodeFiles && record.timecodeFiles.length > 0) {
-                const zip = new JSZip();
-                record.timecodeFiles.forEach(file => {
-                    const base64Data = file.data.split(',')[1];
-                    zip.file(file.name, base64Data, { base64: true });
-                });
-                zip.generateAsync({ type: "blob" }).then(function(content) {
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(content);
-                    link.download = `${record.videoKodu || 'timecodes'}.zip`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                });
-            }
-        }
-
-        if (academicNotesBtn) {
-            e.preventDefault();
-            const id = academicNotesBtn.dataset.id;
-            const kayit = getCekimlerFromStorage().find(k => k.id === id);
-            if (kayit && kayit.akademikIzlemeNotu && kayit.akademikIzlemeNotu.content) {
-                const blob = new Blob([kayit.akademikIzlemeNotu.content], { type: 'text/plain;charset=utf-8' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = kayit.akademikIzlemeNotu.fileName || 'akademik_not.txt';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        }
+        if (notesBtn) { e.preventDefault(); const id = notesBtn.dataset.id; const kayit = allCekimler.find(k => k.id === id); if (kayit && kayit.revizyonNotu && kayit.revizyonNotu.content) { const blob = new Blob([kayit.revizyonNotu.content], { type: 'text/plain;charset=utf-8' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = kayit.revizyonNotu.fileName || 'revizyon.txt'; document.body.appendChild(link); link.click(); document.body.removeChild(link); } }
+        if (timecodeBtn) { e.preventDefault(); const id = timecodeBtn.dataset.id; const record = allCekimler.find(r => r.id === id); if (record && record.timecodeFiles && record.timecodeFiles.length > 0) { const zip = new JSZip(); record.timecodeFiles.forEach(file => { const base64Data = file.data.split(',')[1]; zip.file(file.name, base64Data, { base64: true }); }); zip.generateAsync({ type: "blob" }).then(function(content) { const link = document.createElement('a'); link.href = URL.createObjectURL(content); link.download = `${record.videoKodu || 'timecodes'}.zip`; document.body.appendChild(link); link.click(); document.body.removeChild(link); }); } }
+        if (academicNotesBtn) { e.preventDefault(); const id = academicNotesBtn.dataset.id; const kayit = allCekimler.find(k => k.id === id); if (kayit && kayit.akademikIzlemeNotu && kayit.akademikIzlemeNotu.content) { const blob = new Blob([kayit.akademikIzlemeNotu.content], { type: 'text/plain;charset=utf-8' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = kayit.akademikIzlemeNotu.fileName || 'akademik_not.txt'; document.body.appendChild(link); link.click(); document.body.removeChild(link); } }
     });
     
-    function setupPagination(items) {
-        paginationControlsEl.innerHTML = '';
-        const pageCount = Math.ceil(items.length / rowsPerPage);
-        if (pageCount <= 1) return;
-        
-        const prevButton = document.createElement('button');
-        prevButton.innerHTML = `<i class="fas fa-chevron-left"></i>`;
-        prevButton.className = 'pagination-button';
-        prevButton.disabled = currentPage === 1;
-        prevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; loadAndDisplayCekimler(); } });
-        paginationControlsEl.appendChild(prevButton);
-
-        for (let i = 1; i <= pageCount; i++) {
-            const btn = document.createElement('button');
-            btn.innerText = i;
-            btn.className = 'pagination-button';
-            if (i === currentPage) { btn.classList.add('active'); }
-            btn.addEventListener('click', () => { currentPage = i; loadAndDisplayCekimler(); });
-            paginationControlsEl.appendChild(btn);
-        }
-        
-        const nextButton = document.createElement('button');
-        nextButton.innerHTML = `<i class="fas fa-chevron-right"></i>`;
-        nextButton.className = 'pagination-button';
-        nextButton.disabled = currentPage === pageCount;
-        nextButton.addEventListener('click', () => { if (currentPage < pageCount) { currentPage++; loadAndDisplayCekimler(); } });
-        paginationControlsEl.appendChild(nextButton);
-    }
-
-    cekForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const id = editingIdInput.value;
-        if (!id) {
-            showNotification("Lütfen düzenlemek için bir çekim seçin.", "error");
-            return;
-        }
-        let cek_kayitlari = getCekimlerFromStorage();
-        const kayitIndex = cek_kayitlari.findIndex(k => k.id == id);
-        if (kayitIndex > -1) {
-            cek_kayitlari[kayitIndex].kurguBaslamaTarihi = document.getElementById('kurgu-baslama-tarihi').value;
-            cek_kayitlari[kayitIndex].kurguBitisTarihi = document.getElementById('kurgu-bitis-tarihi').value;
-            cek_kayitlari[kayitIndex].kurguOperatoru = document.getElementById('kurgu-operatoru').value;
-            cek_kayitlari[kayitIndex].kurguDurumu = document.getElementById('kurgu-durumu').value;
-            cek_kayitlari[kayitIndex].teknikIzlemeYapilabilirligi = document.getElementById('teknik-izleme').value;
-            cek_kayitlari[kayitIndex].akademikIzlemeYapilabilirligi = document.getElementById('akademik-izleme').value;
-            saveCekimlerToStorage(cek_kayitlari);
-            loadAndDisplayCekimler();
-            cekForm.reset();
-            editingIdInput.value = '';
-            ['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme'].forEach(id => updateSelectDisplay(document.getElementById(id)));
-            showNotification('Kurgu bilgileri başarıyla güncellendi!');
-        }
-    });
+    document.querySelectorAll('.filter-input').forEach(input => { input.addEventListener('keyup', () => { currentPage = 1; loadAndDisplayCekimler(); }); });
+    document.addEventListener('click', () => { document.querySelectorAll('.searchable-select-dropdown').forEach(d => d.classList.add('hidden')); });
     
-    document.querySelectorAll('.filter-input').forEach(input => {
-        input.addEventListener('keyup', () => { currentPage = 1; loadAndDisplayCekimler(); });
-    });
-    
-    document.addEventListener('click', () => {
-        document.querySelectorAll('.searchable-select-dropdown').forEach(d => d.classList.add('hidden'));
-    });
-    
+    // --- Sayfa İlk Yüklendiğinde Çalışacak Kod ---
     populateSelect('kurgu-operatoru', kurguOperatorleri);
     populateSelect('kurgu-durumu', kurguDurumlari);
     ['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme'].forEach(id => createSearchableDropdown(document.getElementById(id)));
-    
     loadAndDisplayCekimler();
-    window.addEventListener('storage', loadAndDisplayCekimler);
 });
 </script>
 
