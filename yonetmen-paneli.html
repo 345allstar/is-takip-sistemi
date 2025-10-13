@@ -12,7 +12,33 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; } .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; } .searchable-select-container { position: relative; } .searchable-select-dropdown { width: 100%; max-height: 200px; overflow-y: auto; z-index: 50; } #form-container.is-active { position: relative; z-index: 60; } #cekim-tablosu { width: 100%; border-collapse: collapse; table-layout: fixed; } #table-container { max-height: 800px; overflow-y: auto; } #cekim-tablosu th, #cekim-tablosu td { text-align: center; vertical-align: middle; border-left: 1px solid #e5e7eb; padding: 0.5rem; word-break: break-word; font-size: 0.75rem; line-height: 1rem; } #cekim-tablosu th { white-space: nowrap; font-weight: 600; } #cekim-tablosu th:first-child, #cekim-tablosu td:first-child { border-left: 0; } #cekim-tablosu thead tr:last-child th { border-bottom: 2px solid #d1d5db; } .pagination-button { padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; background-color: white; color: #374151; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s; } .pagination-button:hover:not(:disabled) { background-color: #f3f4f6; } .pagination-button.active { background-color: #4f46e5; color: white; border-color: #4f46e5; } .pagination-button:disabled { cursor: not-allowed; opacity: 0.5; } .notification { position: fixed; top: 1.25rem; right: 1.25rem; padding: 1rem; border-radius: 0.5rem; color: white; display: flex; align-items: center; gap: 0.75rem; z-index: 100; opacity: 0; transform: translateX(100%); transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); } .notification.show { opacity: 1; transform: translateX(0); } .notification.success { background-color: #22c55e; } .notification.error { background-color: #ef4444; } .form-label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; } .form-input-base { margin-top: 0.25rem; width: 100%; padding: 0.5rem 0.75rem; background-color: #f9fafb; border: 1px solid #d1d5db; border-radius: 0.5rem; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); color: #111827; placeholder-color: #9ca3af; font-size: 0.875rem; } .form-input-base:focus-within, .form-input-base:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 1px #6366f1; } .form-file-input { font-size: 0.875rem; color: #4b5563; } .form-file-input::-webkit-file-upload-button { margin-right: 0.75rem; padding: 0.5rem 1rem; border-radius: 9999px; border-width: 0; font-size: 0.875rem; font-weight: 600; background-color: #eef2ff; color: #4338ca; cursor: pointer; } .form-file-input::-webkit-file-upload-button:hover { background-color: #e0e7ff; } .file-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; padding: 0.25rem 0; } .delete-file { cursor: pointer; color: #ef4444; margin-left: 8px; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .searchable-select-container { position: relative; }
+        .searchable-select-dropdown { width: 100%; max-height: 200px; overflow-y: auto; z-index: 50; }
+        #form-container.is-active { position: relative; z-index: 60; }
+        #cekim-tablosu { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        #table-container { max-height: 800px; overflow-y: auto; }
+        #cekim-tablosu th, #cekim-tablosu td { text-align: center; vertical-align: middle; border-left: 1px solid #e5e7eb; padding: 0.5rem; word-break: break-word; font-size: 0.75rem; line-height: 1rem; }
+        #cekim-tablosu th { white-space: nowrap; font-weight: 600; }
+        #cekim-tablosu th:first-child, #cekim-tablosu td:first-child { border-left: 0; }
+        #cekim-tablosu thead tr:last-child th { border-bottom: 2px solid #d1d5db; }
+        .pagination-button { padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; background-color: white; color: #374151; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s; }
+        .pagination-button:hover:not(:disabled) { background-color: #f3f4f6; }
+        .pagination-button.active { background-color: #4f46e5; color: white; border-color: #4f46e5; }
+        .pagination-button:disabled { cursor: not-allowed; opacity: 0.5; }
+        .notification { position: fixed; top: 1.25rem; right: 1.25rem; padding: 1rem; border-radius: 0.5rem; color: white; display: flex; align-items: center; gap: 0.75rem; z-index: 100; opacity: 0; transform: translateX(100%); transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+        .notification.show { opacity: 1; transform: translateX(0); }
+        .notification.success { background-color: #22c55e; }
+        .notification.error { background-color: #ef4444; }
+        .form-label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; }
+        .form-input-base { margin-top: 0.25rem; width: 100%; padding: 0.5rem 0.75rem; background-color: #f9fafb; border: 1px solid #d1d5db; border-radius: 0.5rem; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); color: #111827; placeholder-color: #9ca3af; font-size: 0.875rem; }
+        .form-input-base:focus-within, .form-input-base:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 1px #6366f1; }
+        .form-file-input { font-size: 0.875rem; color: #4b5563; }
+        .form-file-input::-webkit-file-upload-button { margin-right: 0.75rem; padding: 0.5rem 1rem; border-radius: 9999px; border-width: 0; font-size: 0.875rem; font-weight: 600; background-color: #eef2ff; color: #4338ca; cursor: pointer; }
+        .form-file-input::-webkit-file-upload-button:hover { background-color: #e0e7ff; }
+        .file-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; padding: 0.25rem 0; }
+        .delete-file { cursor: pointer; color: #ef4444; margin-left: 8px; }
     </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
@@ -128,12 +154,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- SUPABASE BAĞLANTI BİLGİLERİ ---
     const SUPABASE_URL = 'https://nwxgigtsadesqjgflblr.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq_X-s_AbjJ1maioProPjPh-nNn1f4';
+    
+    // !!! HATA BURADA DÜZELTİLDİ !!!
+    // Değişken adı 'supabase' yerine 'supabaseClient' olarak düzeltildi.
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // --- GLOBAL DEĞİŞKENLER ve SABİT VERİLER ---
     let currentPage = 1;
     const rowsPerPage = 10;
-    let allCekimler = []; // Filtreleme ve düzenleme için TÜM verileri bellekte tut
+    let allCekimler = []; // Filtreleme için TÜM verileri bellekte tutacak
 
     const cekForm = document.getElementById('cek-form');
     const tableBody = document.getElementById('cekim-tablosu-body');
@@ -176,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- ARAYÜZ FONKSİYONLARI (Değişiklik yok) ---
+    // --- ARAYÜZ FONKSİYONLARI ---
     document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
         trigger.addEventListener('click', () => {
             const content = trigger.nextElementSibling;
@@ -201,8 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- SUPABASE & TABLO İŞLEMLERİ ---
 
     async function loadCekimlerFromSupabase() {
-        // !!! DEĞİŞİKLİK BURADA !!!
-        // Artık filtrelemeden TÜM verileri çekiyoruz.
+        // Filtresiz olarak TÜM verileri çekiyoruz.
         const { data, error } = await supabaseClient
             .from('cekimler')
             .select('*') 
@@ -218,8 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderFilteredData() {
-        // !!! DEĞİŞİKLİK BURADA !!!
-        // Verileri Supabase'den aldıktan sonra JavaScript içinde filtreliyoruz.
+        // Verileri JavaScript içinde "Yönetmeni Olmayanlar" olarak filtreliyoruz.
         const atamaBekleyenler = allCekimler.filter(kayit => !kayit.yonetmen);
 
         const filterValues = Array.from(document.querySelectorAll('.filter-input')).map(input => input.value.toLowerCase());
@@ -287,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
             editingIdInput.value = '';
             updateSelectDisplay(document.getElementById('yonetmen'));
             updateSelectDisplay(document.getElementById('akademik-dinleyici'));
-            await loadAndDisplayCekimler(); // Listeyi yenile
+            await loadAndDisplayCekimler();
         }
     });
 
@@ -367,8 +394,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     showNotification('Dosya başarıyla silindi.');
                     await loadAndDisplayCekimler();
-                    const editBtn = tableBody.querySelector(`tr[data-id="${id}"] .edit-row`);
-                    if(editBtn) editBtn.click();
+                    const editBtnInTable = tableBody.querySelector(`tr[data-id="${id}"] .edit-row`);
+                    if(editBtnInTable) {
+                       editBtnInTable.click();
+                    } else { // Eğer atama sonrası listeden kaybolduysa formu temizle
+                        cekForm.reset();
+                        document.getElementById('current-files-list').innerHTML = '';
+                        editingIdInput.value = '';
+                    }
                 }
             }
         }
@@ -414,5 +447,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initializePage();
 });
 </script>
+
 </body>
 </html>
