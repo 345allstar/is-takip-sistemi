@@ -16,6 +16,23 @@
         .multi-select-tag button { margin-left: 0.4rem; color: #4f46e5; background: none; border: none; cursor: pointer; font-size: 0.9rem; }
         .multi-select-tags-container { display: flex; flex-wrap: wrap; gap: 0.25rem; padding: 0.25rem; min-height: 42px; border: 1px solid #d1d5db; border-radius: 0.5rem; background-color: #f9fafb; margin-top: 0.25rem;}
         .multi-select-tags-container:focus-within { border-color: #6366f1; box-shadow: 0 0 0 1px #6366f1;}
+        /* YENİ EKLENEN KODLAR */
+        #cekim-tablosu-body tr {
+            transition: background-color 0.2s ease-out;
+            cursor: pointer;
+        }
+
+        /* Fare ile üzerine gelince satırın arkaplan rengini değiştirir */
+        #cekim-tablosu-body tr:hover {
+            background-color: #eef2ff; /* indigo-100 */
+        }
+
+        /* Tıklanan satıra kırmızı çerçeve ekler */
+        #cekim-tablosu-body tr.satir-secili {
+            outline: 2px solid #ef4444; /* red-500 */
+            outline-offset: -2px; /* Çerçevenin içeriye doğru olmasını sağlar */
+        }
+        /* YENİ EKLENEN KODLARIN SONU */
     </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
@@ -335,6 +352,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     
     tableBody.addEventListener('click', function(e) {
+        // YENİ EKLENEN KISIM BAŞLANGICI
+        const clickedRow = e.target.closest('tr');
+        if (clickedRow) {
+            // Sadece butonlara tıklanmadığında çerçeve ekle
+            if (!e.target.closest('button')) {
+                const currentlySelected = tableBody.querySelector('.satir-secili');
+                if (currentlySelected) {
+                    currentlySelected.classList.remove('satir-secili');
+                }
+                clickedRow.classList.add('satir-secili');
+            }
+        }
+        // YENİ EKLENEN KISIM SONU
         const editButton = e.target.closest('.edit-row');
         const downloadNoteButton = e.target.closest('.download-note-btn');
         const viewAkademikBtn = e.target.closest('.view-akademik-btn');
