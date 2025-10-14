@@ -103,7 +103,7 @@
                                 <tr>
                                     <th>ÇEKİM TARİHİ</th>
                                     <th>ANLATIM TÜRÜ</th>
-                                    <th>VİDEO KODU</th>
+                                    <th style="width: 160px;">VİDEO KODU</th>
                                     <th>ANLATICI ÖĞRETMEN</th>
                                     <th>YÖNETMEN</th>
                                     <th>KURGU BAŞLAMA</th>
@@ -157,13 +157,12 @@
     
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. SUPABASE BAĞLANTISI
     const SUPABASE_URL = 'https://nwxgigtsadesqjgflblr.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentPage = 1;
-    const rowsPerPage = 20; // DÜZELTME: Sayfa başına grup sayısı 20'ye çıkarıldı.
+    const rowsPerPage = 20;
     let allCekimler = []; 
     
     const cekForm = document.getElementById('cek-form');
@@ -203,7 +202,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateSelectDisplay = (selectElement) => { if(selectElement && selectElement.updateDropdown) { selectElement.updateDropdown(); } }
     function populateSelect(selectId, data) { const select = document.getElementById(selectId); data.forEach(item => { const option = document.createElement('option'); option.value = item; option.textContent = item; select.appendChild(option); }); }
     
-    // 2. ANA LİSTELEME FONKSİYONU
     async function loadAndDisplayCekimler() {
         const { data, error } = await supabaseClient.from('cekimler').select('*').order('cekimTarihi', { ascending: false });
 
@@ -239,7 +237,12 @@ document.addEventListener('DOMContentLoaded', () => {
         displayPage(groupedData);
         setupPagination(groupedData);
 
-        updateCollapsibleHeight(document.querySelector('#cekim-tablosu').closest('.collapsible-content'));
+        // DÜZELTME: Bu fonksiyon çağrıldığında panellerin yüksekliğini güncelle
+        document.querySelectorAll('.collapsible-content').forEach(content => {
+            if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                updateCollapsibleHeight(content);
+            }
+        });
     }
     
     function displayPage(groups) {
@@ -276,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 switch(kayit.kurguDurumu) { case 'Sırada': statusClass = 'status-sirada'; break; case 'Kurguda': statusClass = 'status-kurguda'; break; case 'Tamamlandı': statusClass = 'status-tamamlandi'; break; case 'Revize': statusClass = 'status-revize'; break; }
 
                 const videoKoduHtml = isMaster && isGrouped 
-                    ? `<div class="flex items-center justify-center">
+                    ? `<div class="flex items-center justify-center" style="white-space: nowrap;">
                          <i class="fas fa-chevron-down group-toggle-icon" data-group="${kayit.videoKodu}"></i>
                          <span class="ml-2">${kayit.videoKodu || ''}</span>
                          <span class="group-count-badge">${groupItems.length}</span>
@@ -382,8 +385,17 @@ document.addEventListener('DOMContentLoaded', () => {
     populateSelect('kurgu-durumu', kurguDurumlari);
     ['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme'].forEach(id => createSearchableDropdown(document.getElementById(id)));
     
-    // DÜZELTME: İlk yükleme fonksiyon çağrısını timeout'suz yapıyoruz, çünkü düzeltme artık loadAndDisplayCekimler içinde.
-    loadAndDisplayCekimler();
+    // DÜZELTME: loadAndDisplayCekimler'ı bekleyip ardından panelleri açıyoruz
+    loadAndDisplayCekimler().then(() => {
+        document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
+            const content = trigger.nextElementSibling;
+            const icon = trigger.querySelector('i:last-child');
+            if (content && icon) {
+                content.style.maxHeight = content.scrollHeight + "px";
+                icon.classList.add('rotate-180');
+            }
+        });
+    });
 });
 </script>
 
