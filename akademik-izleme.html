@@ -16,23 +16,12 @@
         .multi-select-tag button { margin-left: 0.4rem; color: #4f46e5; background: none; border: none; cursor: pointer; font-size: 0.9rem; }
         .multi-select-tags-container { display: flex; flex-wrap: wrap; gap: 0.25rem; padding: 0.25rem; min-height: 42px; border: 1px solid #d1d5db; border-radius: 0.5rem; background-color: #f9fafb; margin-top: 0.25rem;}
         .multi-select-tags-container:focus-within { border-color: #6366f1; box-shadow: 0 0 0 1px #6366f1;}
-        /* YENİ EKLENEN KODLAR */
-        #cekim-tablosu-body tr {
-            transition: background-color 0.2s ease-out;
-            cursor: pointer;
-        }
-
-        /* Fare ile üzerine gelince satırın arkaplan rengini değiştirir */
-        #cekim-tablosu-body tr:hover {
-            background-color: #eef2ff; /* indigo-100 */
-        }
-
-        /* Tıklanan satıra kırmızı çerçeve ekler */
-        #cekim-tablosu-body tr.satir-secili {
-            outline: 2px solid #ef4444; /* red-500 */
-            outline-offset: -2px; /* Çerçevenin içeriye doğru olmasını sağlar */
-        }
-        /* YENİ EKLENEN KODLARIN SONU */
+        #cekim-tablosu-body tr.satir-secili { outline: 2px solid #ef4444; outline-offset: -2px; }
+        .group-child { display: none; }
+        .group-master td { background-color: #f9fafb; }
+        .group-toggle-icon { cursor: pointer; transition: transform 0.2s ease-in-out; display: inline-block; }
+        .group-toggle-icon.expanded { transform: rotate(180deg); }
+        .group-count-badge { background-color: #e0e7ff; color: #4338ca; padding: 2px 6px; border-radius: 8px; font-size: 0.7rem; font-weight: 500; margin-left: 8px; }
     </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
@@ -155,7 +144,7 @@
                         <table id="cekim-tablosu">
                             <thead class="bg-gray-100">
                                 <tr>
-                                    <th>ÇEKİM TARİHİ</th> <th>ANLATIM TÜRÜ</th> <th>VİDEO KODU</th> <th>BRANŞ</th> <th>ÜNİTE</th> <th>BÖLÜM</th> <th>DERS</th> <th>TEST ADI</th> <th>SORU SAYISI</th> <th>AKADEMİK İZL. ÖĞRETMENİ</th> <th>AKADEMİK İZL. TARİHİ</th> <th>DURUM</th> <th>İŞLEMLER</th>
+                                    <th>ÇEKİM TARİHİ</th> <th>ANLATIM TÜRÜ</th> <th style="width: 160px;">VİDEO KODU</th> <th>BRANŞ</th> <th>ÜNİTE</th> <th>BÖLÜM</th> <th>DERS</th> <th>TEST ADI</th> <th>SORU SAYISI</th> <th>AKADEMİK İZL. ÖĞRETMENİ</th> <th>AKADEMİK İZL. TARİHİ</th> <th>DURUM</th> <th>İŞLEMLER</th>
                                 </tr>
                                 <tr>
                                     <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
@@ -191,20 +180,17 @@
     
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. SUPABASE BAĞLANTISI
     const SUPABASE_URL = 'https://nwxgigtsadesqjgflblr.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // --- Orijinal kodunuzdaki tüm değişkenler ve veri dizileri korundu ---
     let currentPage = 1;
-    const rowsPerPage = 10;
-    let allCekimler = []; // Global kayıt listesi
+    const rowsPerPage = 20;
+    let allCekimler = [];
 
     const akademikIzlemeOgretmenleri = ["Ali Yıldırım", "İsmail Tolga Aktaş", "Rahim Ural", "Burak Onay", "Betül Çiçek", "Sinem Şentürk", "Ahmet Ölmez", "Barış Özcan", "Cem Oğuz Büke", "Cihat Çiçek", "Didem Özbay Sarıaydın", "Eda Güney", "Edip İçli", "Elif Bozkurt", "Emine Bolat Kırbıyık", "Esra Dindar", "Esra Şahin", "Esra Yurttaş", "Firdevs Bozkurt", "Fuat Ses", "Hülya Güçkan Taşkın", "İbrahim Atakuru", "İbrahim Halil Kesici", "Koray Dindar", "Mehmet Bademli", "Mehmet Kırbıyık", "Muharrem Akbaş", "Özcan Kulaksız", "Raziye İnal", "Sabri Bingöl", "Semih Sunucuoğlu", "Serkan Yıldız", "Serpil Tunç İçli", "Suat Emre", "Tuğba Bostancı", "Yasin Baş", "Yavuz Selim Yıldız"];
-    const kazanimKodlari = ["25100 - Çarpanlar Ve Katlar", "25110 - Asal Çarpanlara Ayırma", "25120 - Aralarında Asal", "25130 - Ebob", "25140 - Ekok", "25150 - Ebob-Ekok Problemleri", "25200 - Üslü İfadeler", /* ... listenin geri kalanı ... */ "86070 - Kişisel Görüşleri İfade Etme"];
+    const kazanimKodlari = ["25100 - Çarpanlar Ve Katlar", "25110 - Asal Çarpanlara Ayırma", "25120 - Aralarında Asal", "25130 - Ebob", "25140 - Ekok", "25150 - Ebob-Ekok Problemleri", "25200 - Üslü İfadeler", "86070 - Kişisel Görüşleri İfade Etme"];
 
-    // UI Elements
     const cekForm = document.getElementById('cek-form');
     const tableBody = document.getElementById('cekim-tablosu-body');
     const editingIdInput = document.getElementById('editing-row-id');
@@ -213,17 +199,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     const paginationControlsEl = document.getElementById('pagination-controls');
     const kaydetNotuBtn = document.getElementById('kaydet-notu-btn');
 
-    // --- Orijinal kodunuzdaki tüm yardımcı fonksiyonlar EKSİKSİZ olarak geri eklendi ---
     function showNotification(message, type = 'success') { const container = document.getElementById('notification-container'); if (!container) return; const notification = document.createElement('div'); notification.className = `notification ${type}`; notification.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-times-circle'}"></i><span>${message}</span>`; container.appendChild(notification); setTimeout(() => notification.classList.add('show'), 10); setTimeout(() => { notification.classList.remove('show'); setTimeout(() => { if (notification.parentNode === container) container.removeChild(notification); }, 500); }, 3000); }
     const formatDate = (dateString) => { if (!dateString) return ''; const date = new Date(dateString + 'T00:00:00'); return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`; };
+    
+    function updateCollapsibleHeight(contentElement) {
+        if (contentElement && contentElement.style.maxHeight && contentElement.style.maxHeight !== '0px') {
+            requestAnimationFrame(() => {
+                contentElement.style.maxHeight = contentElement.scrollHeight + 'px';
+            });
+        }
+    }
+
     document.querySelectorAll('.collapsible-trigger').forEach(trigger => { trigger.addEventListener('click', () => { const content = trigger.nextElementSibling; const icon = trigger.querySelector('i:last-child'); if (icon) icon.classList.toggle('rotate-180'); if (content.style.maxHeight && content.style.maxHeight !== '0px') { content.style.maxHeight = null; } else { content.style.maxHeight = content.scrollHeight + "px"; } }); });
     function createSearchableDropdown(selectElement) { const container = document.createElement('div'); container.className = 'custom-select-container relative'; selectElement.parentNode.insertBefore(container, selectElement); selectElement.style.display = 'none'; container.appendChild(selectElement); const displayButton = document.createElement('button'); displayButton.type = 'button'; displayButton.className = 'form-input-base text-left flex justify-between items-center'; const displaySpan = document.createElement('span'); displaySpan.className = 'truncate'; displayButton.appendChild(displaySpan); const icon = document.createElement('i'); icon.className = 'fas fa-chevron-down text-gray-400'; displayButton.appendChild(icon); container.appendChild(displayButton); const dropdown = document.createElement('div'); dropdown.className = 'custom-select-dropdown absolute hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg w-full'; const searchInput = document.createElement('input'); searchInput.type = 'text'; searchInput.placeholder = 'Ara...'; searchInput.className = 'block w-full p-2 border-b border-gray-200 focus:outline-none'; dropdown.appendChild(searchInput); const optionsList = document.createElement('div'); optionsList.className = 'p-1 max-h-48 overflow-y-auto'; dropdown.appendChild(optionsList); container.appendChild(dropdown); const updateOptions = () => { optionsList.innerHTML = ''; Array.from(selectElement.options).forEach(option => { if (option.value === "" && option.textContent.includes('Seçiniz')) return; const optionDiv = document.createElement('div'); optionDiv.textContent = option.textContent; optionDiv.dataset.value = option.value; optionDiv.className = 'p-2 cursor-pointer hover:bg-indigo-100 rounded text-sm'; optionDiv.addEventListener('click', () => { selectElement.value = option.value; displaySpan.textContent = option.textContent; displaySpan.classList.remove('text-gray-400'); dropdown.classList.add('hidden'); selectElement.dispatchEvent(new Event('change')); }); optionsList.appendChild(optionDiv); }); const selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`) || selectElement.options[0]; if (selectedOption) { displaySpan.textContent = selectedOption.textContent; if(selectedOption.value === "") displaySpan.classList.add('text-gray-400'); else displaySpan.classList.remove('text-gray-400'); } }; searchInput.addEventListener('input', () => { const filter = searchInput.value.toLowerCase(); optionsList.querySelectorAll('div').forEach(optionDiv => { const text = optionDiv.textContent.toLowerCase(); optionDiv.style.display = text.includes(filter) ? '' : 'none'; }); }); displayButton.addEventListener('click', (e) => { e.stopPropagation(); if (selectElement.disabled) return; document.querySelectorAll('.custom-select-dropdown').forEach(d => { if(d !== dropdown) d.classList.add('hidden'); }); dropdown.classList.toggle('hidden'); if(!dropdown.classList.contains('hidden')) { searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); searchInput.focus(); } }); selectElement.updateDropdown = updateOptions; updateOptions(); }
     function createMultiSelectDropdown(selectElement) { const container = document.createElement('div'); container.className = 'custom-select-container relative'; selectElement.parentNode.insertBefore(container, selectElement); selectElement.style.display = 'none'; const tagsContainer = document.createElement('div'); tagsContainer.className = 'multi-select-tags-container'; container.appendChild(tagsContainer); const dropdown = document.createElement('div'); dropdown.className = 'custom-select-dropdown absolute hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg w-full'; const searchInput = document.createElement('input'); searchInput.type = 'text'; searchInput.placeholder = 'Kazanım ara...'; searchInput.className = 'block w-full p-2 border-b border-gray-200 focus:outline-none'; dropdown.appendChild(searchInput); const optionsList = document.createElement('div'); optionsList.className = 'p-1 max-h-48 overflow-y-auto'; dropdown.appendChild(optionsList); container.appendChild(dropdown); const updateTags = () => { tagsContainer.innerHTML = ''; Array.from(selectElement.selectedOptions).forEach(option => { const tag = document.createElement('div'); tag.className = 'multi-select-tag'; tag.textContent = option.textContent; const removeBtn = document.createElement('button'); removeBtn.innerHTML = '&times;'; removeBtn.addEventListener('click', (e) => { e.stopPropagation(); option.selected = false; updateTags(); updateOptions(); }); tag.appendChild(removeBtn); tagsContainer.appendChild(tag); }); }; const updateOptions = () => { optionsList.innerHTML = ''; Array.from(selectElement.options).forEach(option => { if (!option.value) return; const optionDiv = document.createElement('div'); optionDiv.className = 'p-2 cursor-pointer hover:bg-indigo-100 rounded text-sm flex items-center justify-between'; optionDiv.textContent = option.textContent; optionDiv.dataset.value = option.value; if (option.selected) { optionDiv.classList.add('bg-indigo-50', 'font-semibold'); } optionDiv.addEventListener('click', () => { option.selected = !option.selected; updateTags(); updateOptions(); selectElement.dispatchEvent(new Event('change')); }); optionsList.appendChild(optionDiv); }); }; searchInput.addEventListener('input', () => { const filter = searchInput.value.toLowerCase(); optionsList.querySelectorAll('div').forEach(optionDiv => { optionDiv.style.display = optionDiv.textContent.toLowerCase().includes(filter) ? '' : 'flex'; }); }); tagsContainer.addEventListener('click', (e) => { e.stopPropagation(); document.querySelectorAll('.custom-select-dropdown').forEach(d => { if(d !== dropdown) d.classList.add('hidden'); }); dropdown.classList.toggle('hidden'); if (!dropdown.classList.contains('hidden')) { searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); searchInput.focus(); } }); selectElement.updateDropdown = () => { updateTags(); updateOptions(); }; updateOptions(); updateTags(); }
     const updateSelectDisplay = (selectElement, values) => { if (!selectElement) return; if (selectElement.multiple) { Array.from(selectElement.options).forEach(opt => { opt.selected = (values && values.includes(opt.value)); }); } else { selectElement.value = values || ''; } if(selectElement.updateDropdown) { selectElement.updateDropdown(); } }
     function populateSelect(selectId, data) { const select = document.getElementById(selectId); if(!select) return; data.forEach(item => { const option = document.createElement('option'); option.value = item; option.textContent = item; select.appendChild(option); }); }
     
-    // --- VERİ İŞLEME FONKSİYONLARI ---
-
     async function loadAndDisplayCekimler() {
         const { data, error } = await supabaseClient.from('cekimler').select('*').order('cekimTarihi', { ascending: false });
         if (error) { showNotification('Veri yüklenirken hata oluştu: ' + error.message, 'error'); allCekimler = []; } 
@@ -239,41 +231,68 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         });
 
+        const groupedData = Object.values(filteredKayitlar.reduce((acc, item) => {
+            const key = item.videoKodu || `no-code-${item.id}`;
+            if (!acc[key]) acc[key] = [];
+            acc[key].push(item);
+            return acc;
+        }, {}));
+
         recordCountEl.textContent = `Toplam ${filteredKayitlar.length} kayıt bulundu.`;
         noDataMessage.classList.toggle('hidden', filteredKayitlar.length > 0);
         document.getElementById('cekim-tablosu').classList.toggle('hidden', filteredKayitlar.length === 0);
-        displayPage(filteredKayitlar);
-        setupPagination(filteredKayitlar);
+        
+        displayPage(groupedData);
+        setupPagination(groupedData);
 
-        // Görsel hata düzeltmesi: Alanları veriler geldikten sonra aç
-        document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
-            const content = trigger.nextElementSibling;
-            if (content && (!content.style.maxHeight || content.style.maxHeight === '0px')) {
-                const icon = trigger.querySelector('i:last-child');
-                content.style.maxHeight = content.scrollHeight + "px";
-                if (icon) icon.classList.add('rotate-180');
+        document.querySelectorAll('.collapsible-content').forEach(content => {
+            if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                updateCollapsibleHeight(content);
             }
         });
     }
     
-    function displayPage(items) {
+    function displayPage(groups) {
         tableBody.innerHTML = '';
         const start = (currentPage - 1) * rowsPerPage;
         const end = start + rowsPerPage;
-        const paginatedItems = items.slice(start, end);
-        paginatedItems.forEach(kayit => {
-            const row = tableBody.insertRow();
-            row.dataset.id = kayit.id;
-            let durumClass = kayit.akademikIzlemeDurumu === 'Yapıldı' ? 'status-yapildi' : 'status-yapilmadi';
-            const noteIcon = (kayit.akademikIzlemeNotu && kayit.akademikIzlemeNotu.content) ? `<button class="download-note-btn ml-2 text-green-500 hover:text-green-700" title="Akademik Notu İndir" data-id="${kayit.id}"><i class="fas fa-file-alt"></i></button>` : '';
-            const viewIcon = `<button class="view-akademik-btn ml-2 text-gray-500 hover:text-blue-600" title="Bu Kaydı Formda Görüntüle" data-id="${kayit.id}"><i class="fas fa-eye"></i></button>`;
-            row.innerHTML = `<td>${formatDate(kayit.cekimTarihi)}</td><td>${kayit.anlatimTuru || ''}</td><td>${kayit.videoKodu || ''}</td><td>${kayit.brans || ''}</td><td>${kayit.unite || ''}</td><td>${kayit.bolum || ''}</td><td>${kayit.ders || ''}</td><td>${kayit.testAdi || ''}</td><td>${kayit.soruSayisi || ''}</td><td>${kayit.akademikIzlemeOgretmeni || ''}${noteIcon}${viewIcon}</td><td>${formatDate(kayit.akademikIzlemeTarihi)}</td><td><span class="status-badge ${durumClass}">${kayit.akademikIzlemeDurumu || 'Belirtilmedi'}</span></td><td><button class="edit-row text-blue-500 hover:text-blue-700" title="Düzenle"><i class="fas fa-pencil-alt"></i></button></td>`;
+        const paginatedGroups = groups.slice(start, end);
+
+        paginatedGroups.forEach(groupItems => {
+            groupItems.forEach((kayit, index) => {
+                const row = tableBody.insertRow();
+                const isMaster = index === 0;
+                const isGrouped = groupItems.length > 1;
+
+                row.dataset.id = kayit.id;
+                
+                if (isMaster) {
+                    row.classList.add('group-master');
+                } else {
+                    row.classList.add('group-child');
+                    row.dataset.group = kayit.videoKodu || `no-code-${kayit.id}`;
+                }
+
+                let durumClass = kayit.akademikIzlemeDurumu === 'Yapıldı' ? 'status-yapildi' : 'status-yapilmadi';
+                const noteIcon = (kayit.akademikIzlemeNotu && kayit.akademikIzlemeNotu.content) ? `<button class="download-note-btn ml-2 text-green-500 hover:text-green-700" title="Akademik Notu İndir" data-id="${kayit.id}"><i class="fas fa-file-alt"></i></button>` : '';
+                const viewIcon = `<button class="view-akademik-btn ml-2 text-gray-500 hover:text-blue-600" title="Bu Kaydı Formda Görüntüle" data-id="${kayit.id}"><i class="fas fa-eye"></i></button>`;
+                
+                const videoKoduHtml = isMaster && isGrouped 
+                    ? `<div class="flex items-center justify-center" style="white-space: nowrap;">
+                         <i class="fas fa-chevron-down group-toggle-icon" data-group="${kayit.videoKodu}"></i>
+                         <span class="ml-2">${kayit.videoKodu || ''}</span>
+                         <span class="group-count-badge">${groupItems.length}</span>
+                       </div>`
+                    : (kayit.videoKodu || '');
+
+                row.innerHTML = `<td>${formatDate(kayit.cekimTarihi)}</td><td>${kayit.anlatimTuru || ''}</td><td>${videoKoduHtml}</td><td>${kayit.brans || ''}</td><td>${kayit.unite || ''}</td><td>${kayit.bolum || ''}</td><td>${kayit.ders || ''}</td><td>${kayit.testAdi || ''}</td><td>${kayit.soruSayisi || ''}</td><td>${kayit.akademikIzlemeOgretmeni || ''}${noteIcon}${viewIcon}</td><td>${formatDate(kayit.akademikIzlemeTarihi)}</td><td><span class="status-badge ${durumClass}">${kayit.akademikIzlemeDurumu || 'Belirtilmedi'}</span></td><td><button class="edit-row text-blue-500 hover:text-blue-700" title="Düzenle"><i class="fas fa-pencil-alt"></i></button></td>`;
+            });
         });
     }
 
-    function setupPagination(items) {
+    function setupPagination(groups) {
         paginationControlsEl.innerHTML = '';
-        const pageCount = Math.ceil(items.length / rowsPerPage);
+        const pageCount = Math.ceil(groups.length / rowsPerPage);
         if (pageCount <= 1) return;
         const prevButton = document.createElement('button'); prevButton.innerHTML = `<i class="fas fa-chevron-left"></i>`; prevButton.className = 'pagination-button'; prevButton.disabled = currentPage === 1; prevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; loadAndDisplayCekimler(); } }); paginationControlsEl.appendChild(prevButton);
         for (let i = 1; i <= pageCount; i++) { const btn = document.createElement('button'); btn.innerText = i; btn.className = 'pagination-button'; if (i === currentPage) btn.classList.add('active'); btn.addEventListener('click', () => { currentPage = i; loadAndDisplayCekimler(); }); paginationControlsEl.appendChild(btn); }
@@ -307,19 +326,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!data[key]) data[key] = [];
                 data[key].push(value);
             } else {
-                data[key] = value || null; // Boş alanları null yap
+                data[key] = value || null;
             }
         }
         if (!data.kazanimKodu) data.kazanimKodu = [];
 
         const { error } = await supabaseClient.from('cekimler').update(data).eq('id', id);
-
-        if (error) {
-            showNotification('Akademik bilgiler güncellenirken hata: ' + error.message, 'error');
-        } else {
-            showNotification('Tüm akademik bilgiler güncellendi!');
-            await loadAndDisplayCekimler();
-        }
+        if (error) { showNotification('Akademik bilgiler güncellenirken hata: ' + error.message, 'error'); } 
+        else { showNotification('Tüm akademik bilgiler güncellendi!'); await loadAndDisplayCekimler(); }
     });
 
     kaydetNotuBtn.addEventListener('click', async () => {
@@ -335,10 +349,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const akademikIzlemeNotuObjesi = { fileName: dosyaAdi, content: notIcerigi };
         
         const { error } = await supabaseClient.from('cekimler').update({ akademikIzlemeNotu: akademikIzlemeNotuObjesi }).eq('id', id);
-        
-        if (error) {
-            showNotification("Not kaydedilirken hata: " + error.message, "error");
-        } else {
+        if (error) { showNotification("Not kaydedilirken hata: " + error.message, "error"); } 
+        else {
             const blob = new Blob([notIcerigi], { type: 'text/plain;charset=utf-8' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -352,19 +364,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     
     tableBody.addEventListener('click', function(e) {
-        // YENİ EKLENEN KISIM BAŞLANGICI
-        const clickedRow = e.target.closest('tr');
-        if (clickedRow) {
-            // Sadece butonlara tıklanmadığında çerçeve ekle
-            if (!e.target.closest('button')) {
-                const currentlySelected = tableBody.querySelector('.satir-secili');
-                if (currentlySelected) {
-                    currentlySelected.classList.remove('satir-secili');
-                }
-                clickedRow.classList.add('satir-secili');
-            }
+        const toggleIcon = e.target.closest('.group-toggle-icon');
+        if (toggleIcon) {
+            e.stopPropagation();
+            const group = toggleIcon.dataset.group;
+            const children = tableBody.querySelectorAll(`.group-child[data-group="${group}"]`);
+            children.forEach(child => {
+                child.style.display = child.style.display === 'table-row' ? 'none' : 'table-row';
+            });
+            toggleIcon.classList.toggle('expanded');
+            updateCollapsibleHeight(document.querySelector('#cekim-tablosu').closest('.collapsible-content'));
+            return;
         }
-        // YENİ EKLENEN KISIM SONU
+
+        const clickedRow = e.target.closest('tr');
+        if (clickedRow && !e.target.closest('button')) {
+            const currentlySelected = tableBody.querySelector('.satir-secili');
+            if (currentlySelected) { currentlySelected.classList.remove('satir-secili'); }
+            clickedRow.classList.add('satir-secili');
+        }
+
         const editButton = e.target.closest('.edit-row');
         const downloadNoteButton = e.target.closest('.download-note-btn');
         const viewAkademikBtn = e.target.closest('.view-akademik-btn');
@@ -379,7 +398,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     document.addEventListener('click', () => { document.querySelectorAll('.custom-select-dropdown').forEach(d => d.classList.add('hidden')); });
 
-    // SİLİNEN KOD GERİ GETİRİLDİ: initializePage fonksiyonu
     async function initializePage() {
         populateSelect('akademik-izleme-ogretmeni', akademikIzlemeOgretmenleri);
         populateSelect('kazanim-kodu', kazanimKodlari);
@@ -396,22 +414,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const selectedId = localStorage.getItem('selectedCekimId');
         if (selectedId) {
-            const formContent = document.querySelector('.collapsible-content');
-            const icon = formContent.previousElementSibling.querySelector('i:last-child');
-            
-            // Gecikme eklendi ki yükseklik doğru hesaplansın
             setTimeout(async () => {
-                 if (!formContent.style.maxHeight || formContent.style.maxHeight === '0px') {
-                    formContent.style.maxHeight = formContent.scrollHeight + "px";
-                    if(icon) icon.classList.add('rotate-180');
-                 }
                 await populateFormById(selectedId);
                 localStorage.removeItem('selectedCekimId');
             }, 300); 
         }
+
+        // DÜZELTME: Panelleri her durumda açık başlat
+        setTimeout(() => {
+            document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
+                const content = trigger.nextElementSibling;
+                const icon = trigger.querySelector('i:last-child');
+                if (content && icon) {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    icon.classList.add('rotate-180');
+                }
+            });
+        }, 200);
     }
 
-    // Sayfa yüklendiğinde bu fonksiyon çalıştırılıyor
     initializePage();
 });
 </script>
