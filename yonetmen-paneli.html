@@ -40,13 +40,11 @@
         .file-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; padding: 0.25rem 0; }
         .delete-file { cursor: pointer; color: #ef4444; margin-left: 8px; }
         #cekim-tablosu-body tr.satir-secili { outline: 2px solid #ef4444; outline-offset: -2px; }
-        /* GRUPLAMA İÇİN YENİ EKLENEN CSS KODLARI */
         .group-child { display: none; }
         .group-master td { background-color: #f9fafb; }
         .group-toggle-icon { cursor: pointer; transition: transform 0.2s ease-in-out; display: inline-block; }
         .group-toggle-icon.expanded { transform: rotate(180deg); }
         .group-count-badge { background-color: #e0e7ff; color: #4338ca; padding: 2px 6px; border-radius: 8px; font-size: 0.7rem; font-weight: 500; margin-left: 8px; }
-        /* YENİ CSS KODLARI SONU */
     </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
@@ -165,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
     let currentPage = 1;
-    const rowsPerPage = 10; // Sayfa başına 10 grup
+    const rowsPerPage = 20; // DÜZELTME: Sayfa başına grup sayısı 20'ye çıkarıldı.
     let allCekimler = []; 
 
     function showNotification(message, type = 'success') { const container = document.getElementById('notification-container'); if (!container) return; const notification = document.createElement('div'); notification.className = `notification ${type}`; const iconClass = type === 'success' ? 'fa-check-circle' : 'fa-times-circle'; notification.innerHTML = `<i class="fas ${iconClass}"></i><span>${message}</span>`; container.appendChild(notification); setTimeout(() => notification.classList.add('show'), 10); setTimeout(() => { notification.classList.remove('show'); setTimeout(() => { if (notification.parentNode === container) container.removeChild(notification); }, 500); }, 3000); }
@@ -255,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const buttonTitle = kayit.yonetmen ? "Düzenle" : "Ata";
 
                 const videoKoduHtml = isMaster && isGrouped 
-                    ? `<div class="flex items-center justify-start">
+                    ? `<div class="flex items-center justify-center">
                          <i class="fas fa-chevron-down group-toggle-icon" data-group="${kayit.videoKodu}"></i>
                          <span class="ml-2">${kayit.videoKodu || ''}</span>
                          <span class="group-count-badge">${groupItems.length}</span>
@@ -346,6 +344,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         displayPage(groupedData);
         setupPagination(groupedData);
+
+        // DÜZELTME: Veri yüklendikten sonra liste yüksekliğini güncelle
+        updateCollapsibleHeight(document.querySelector('#cekim-tablosu').closest('.collapsible-content'));
     }
 
     cekForm.addEventListener('submit', async function(e) {
@@ -395,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 child.style.display = child.style.display === 'table-row' ? 'none' : 'table-row';
             });
             toggleIcon.classList.toggle('expanded');
-            updateCollapsibleHeight(document.querySelector('#liste-tablo-alani.collapsible-content'));
+            updateCollapsibleHeight(document.querySelector('#cekim-tablosu').closest('.collapsible-content'));
             return;
         }
 
