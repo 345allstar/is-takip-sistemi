@@ -142,6 +142,7 @@
                                             <th class="p-2 border">Teknik İzleme Tarihi</th>
                                             <th class="p-2 border">Akademik İzl. Öğretmeni</th>
                                             <th class="p-2 border">Akademik İzl. Tarihi</th>
+                                            <th class="p-2 border">Yüklenme Durumu</th>
                                             <th class="p-2 border">Yazılım Yükleme Üyesi</th>
                                             <th class="p-2 border">Yazılıma Yükleme Tarihi</th>
                                             <th class="p-2 border">İşlemler</th>
@@ -402,6 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     (row.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(row.teknikIzlemeTarihi) : ''),
                     (row.akademikIzlemeDurumu === 'Yapıldı' ? row.akademikIzlemeOgretmeni : ''),
                     (row.akademikIzlemeDurumu === 'Yapıldı' ? formatDate(row.akademikIzlemeTarihi) : ''),
+                    row.yuklenmeDurumu,
                     row.yazilimYuklemeUyesi,
                     formatDate(row.yazilimaYuklemeTarihi)
                 ];
@@ -545,6 +547,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="p-2 align-middle border">${teknikIzlemeTarihiHtml}</td>
                     <td class="p-2 align-middle border">${akademikOgretmenHtml}</td>
                     <td class="p-2 align-middle border">${akademikTarihHtml}</td>
+                    <td class="p-2 align-middle border">${data.yuklenmeDurumu || ''}</td>
                     <td class="p-2 align-middle border">${data.yazilimYuklemeUyesi || ''}</td>
                     <td class="p-2 align-middle border">${formatDate(data.yazilimaYuklemeTarihi)}</td>
                     <td class="p-2 align-middle border">
@@ -763,4 +766,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
