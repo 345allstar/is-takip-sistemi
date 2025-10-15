@@ -259,13 +259,59 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setupPagination(groups) {
-        paginationControlsEl.innerHTML = '';
-        const pageCount = Math.ceil(groups.length / rowsPerPage);
-        if (pageCount <= 1) return;
-        const prevButton = document.createElement('button'); prevButton.innerHTML = `<i class="fas fa-chevron-left"></i>`; prevButton.className = 'pagination-button'; prevButton.disabled = currentPage === 1; prevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; loadAndDisplayCekimler(); } }); paginationControlsEl.appendChild(prevButton);
-        for (let i = 1; i <= pageCount; i++) { const btn = document.createElement('button'); btn.innerText = i; btn.className = 'pagination-button'; if (i === currentPage) btn.classList.add('active'); btn.addEventListener('click', () => { currentPage = i; loadAndDisplayCekimler(); }); paginationControlsEl.appendChild(btn); }
-        const nextButton = document.createElement('button'); nextButton.innerHTML = `<i class="fas fa-chevron-right"></i>`; nextButton.className = 'pagination-button'; nextButton.disabled = currentPage === pageCount; nextButton.addEventListener('click', () => { if (currentPage < pageCount) { currentPage++; loadAndDisplayCekimler(); } }); paginationControlsEl.appendChild(nextButton);
-    }
+    paginationControlsEl.innerHTML = '';
+    const pageCount = Math.ceil(groups.length / rowsPerPage);
+    if (pageCount <= 1) return;
+
+    // Önceki Butonu
+    const prevButton = document.createElement('button');
+    prevButton.innerHTML = `<i class="fas fa-chevron-left"></i>`;
+    prevButton.className = 'pagination-button';
+    prevButton.disabled = currentPage === 1;
+    prevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderFilteredData(); } });
+    paginationControlsEl.appendChild(prevButton);
+
+    // Sayfa Numaralarını Oluşturma Mantığı
+    const pageNumbers = new Set();
+    pageNumbers.add(1); // Her zaman ilk sayfayı göster
+    if (pageCount > 1) pageNumbers.add(pageCount); // Her zaman son sayfayı göster
+
+    // Mevcut sayfanın etrafındaki sayfaları ekle
+    if (currentPage > 1) pageNumbers.add(currentPage - 1);
+    pageNumbers.add(currentPage);
+    if (currentPage < pageCount) pageNumbers.add(currentPage + 1);
+
+    const sortedPages = Array.from(pageNumbers).sort((a, b) => a - b);
+    let lastPage = 0;
+
+    sortedPages.forEach(page => {
+        // Sayfalar arasında boşluk varsa '...' ekle
+        if (page > lastPage + 1) {
+            const ellipsis = document.createElement('span');
+            ellipsis.className = 'px-3 py-2 text-gray-500';
+            ellipsis.textContent = '...';
+            paginationControlsEl.appendChild(ellipsis);
+        }
+
+        // Sayfa numarasını ekle
+        const btn = document.createElement('button');
+        btn.innerText = page;
+        btn.className = 'pagination-button';
+        if (page === currentPage) btn.classList.add('active');
+        btn.addEventListener('click', () => { currentPage = page; renderFilteredData(); });
+        paginationControlsEl.appendChild(btn);
+        
+        lastPage = page;
+    });
+
+    // Sonraki Butonu
+    const nextButton = document.createElement('button');
+    nextButton.innerHTML = `<i class="fas fa-chevron-right"></i>`;
+    nextButton.className = 'pagination-button';
+    nextButton.disabled = currentPage === pageCount;
+    nextButton.addEventListener('click', () => { if (currentPage < pageCount) { currentPage++; renderFilteredData(); } });
+    paginationControlsEl.appendChild(nextButton);
+}
 
     cekForm.addEventListener('submit', async function(e) {
         e.preventDefault();
