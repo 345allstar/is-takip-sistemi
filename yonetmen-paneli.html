@@ -307,9 +307,13 @@ document.addEventListener('DOMContentLoaded', () => {
         paginationControlsEl.appendChild(nextButton);
     }
     
-    async function loadAndDisplayCekimler() {
-        const { data: cek_kayitlari, error } = await supabaseClient.from('cekimler').select('*').order('cekimTarihi', { ascending: false });
-
+   async function loadAndDisplayCekimler() {
+    const { data: cek_kayitlari, error } = await supabaseClient
+        .from('cekimler')
+        .select('*')
+        .order('cekimTarihi', { ascending: false })
+        .range(0, 100000); // <-- BU SATIRI EKLEYİN
+       
         if (error) {
             showNotification('Veri yüklenirken bir hata oluştu: ' + error.message, 'error');
             allCekimler = [];
@@ -480,3 +484,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
