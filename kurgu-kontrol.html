@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .from('cekimler')
         .select('*')
         .order('cekimTarihi', { ascending: false })
-        .range(0, 9999); // <-- BU SATIRI EKLEYİN
+        .range(0, 4999); // <-- BU SATIRI EKLEYİN
         
         if (error) {
             showNotification('Veri çekerken hata: ' + error.message, 'error');
