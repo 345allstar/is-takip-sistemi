@@ -379,10 +379,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- SUPABASE & TABLO İŞLEMLERİ ---
 
     async function loadCekimlerFromSupabase() {
-        const { data, error } = await supabaseClient
-            .from('cekimler')
-            .select('*')
-            .order('cekimTarihi', { ascending: false });
+    const { data, error } = await supabaseClient
+        .from('cekimler')
+        .select('*')
+        .order('cekimTarihi', { ascending: false })
+        .range(0, 100000); // <-- BU SATIRI EKLEYİN
 
         if (error) {
             console.error('Veri çekerken hata:', error);
@@ -770,6 +771,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
 
 
