@@ -45,23 +45,31 @@
                 <div class="collapsible-content mt-6 pb-40">
                     <form id="cek-form" class="space-y-6">
                         <input type="hidden" id="editing-row-id">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div>
-                                <label class="form-label">Yazılım Yükleme Üyesi</label>
-                                <select id="yazilim-yukleme-uyesi" name="yazilimYuklemeUyesi" class="searchable-select">
-                                    <option value="">Seçiniz...</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="form-label">Yazılıma Yükleme Tarihi</label>
-                                <input type="date" id="yazilima-yukleme-tarihi" name="yazilimaYuklemeTarihi" class="form-input-base">
-                            </div>
-                            <div class="flex items-end">
-                                <button type="submit" id="submit-button" class="w-full bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700">
-                                    <i class="fas fa-check mr-2"></i>Yüklemeyi Tamamla
-                                </button>
-                            </div>
-                        </div>
+                       <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div>
+        <label class="form-label">Yazılım Yükleme Üyesi</label>
+        <select id="yazilim-yukleme-uyesi" name="yazilimYuklemeUyesi" class="searchable-select">
+            <option value="">Seçiniz...</option>
+        </select>
+    </div>
+    <div>
+        <label class="form-label">Yazılıma Yükleme Tarihi</label>
+        <input type="date" id="yazilima-yukleme-tarihi" name="yazilimaYuklemeTarihi" class="form-input-base">
+    </div>
+    <div>
+        <label class="form-label">Yükleme Durumu</label>
+        <select id="yukleme-durumu" name="yuklemeDurumu" class="searchable-select">
+            <option value="">Seçiniz...</option>
+            <option value="Yüklendi">Yüklendi</option>
+            <option value="Yüklenmedi">Yüklenmedi</option>
+        </select>
+    </div>
+    <div class="flex items-end">
+        <button type="submit" id="submit-button" class="w-full bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700">
+            <i class="fas fa-check mr-2"></i>Yüklemeyi Tamamla
+        </button>
+    </div>
+</div>
                     </form>
                 </div>
             </div>
@@ -88,9 +96,11 @@
                                     <th class="p-2 border">Akademik İzl. Öğretmeni</th>
                                     <th class="p-2 border">Yazılıma Yükleme Tarihi</th>
                                     <th class="p-2 border">Yazılım Yükleme Üyesi</th>
+                                    <th class="p-2 border">Yükleme Durumu</th>
                                     <th class="p-2 border">İşlem</th>
                                 </tr>
                                 <tr>
+                                    <th class="p-2 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
                                     <th class="p-2 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
                                     <th class="p-2 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
                                     <th class="p-2 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
@@ -182,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const filteredKayitlar = yuklenecekCekimler.filter(kayit => {
             return filterValues.every((filterValue, index) => {
                 if (filterValue === '') return true;
-                const columns = [ formatDate(kayit.cekimTarihi), kayit.anlatimTuru, kayit.videoKodu, kayit.brans, kayit.unite, kayit.bolum, kayit.ders, kayit.testAdi, kayit.soruSayisi, kayit.akademikIzlemeOgretmeni, formatDate(kayit.yazilimaYuklemeTarihi), kayit.yazilimYuklemeUyesi ];
+                const columns = [ formatDate(kayit.cekimTarihi), kayit.anlatimTuru, kayit.videoKodu, kayit.brans, kayit.unite, kayit.bolum, kayit.ders, kayit.testAdi, kayit.soruSayisi, kayit.akademikIzlemeOgretmeni, formatDate(kayit.yazilimaYuklemeTarihi), kayit.yazilimYuklemeUyesi, kayit.yuklemeDurumu ];
                 return (columns[index] || '').toString().toLowerCase().includes(filterValue);
             });
         });
@@ -239,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
                        </div>`
                     : (kayit.videoKodu || '');
 
-                row.innerHTML = `<td class="p-2 border">${formatDate(kayit.cekimTarihi)}</td><td class="p-2 border">${kayit.anlatimTuru || ''}</td><td class="p-2 border">${videoKoduHtml}</td><td class="p-2 border">${kayit.brans || ''}</td><td class="p-2 border">${kayit.unite || ''}</td><td class="p-2 border">${kayit.bolum || ''}</td><td class="p-2 border">${kayit.ders || ''}</td><td class="p-2 border">${kayit.testAdi || ''}</td><td class="p-2 border">${kayit.soruSayisi || ''}</td><td class="p-2 border">${(kayit.akademikIzlemeOgretmeni || '') + viewAkademikIcon}</td><td class="p-2 border">${formatDate(kayit.yazilimaYuklemeTarihi)}</td><td class="p-2 border">${kayit.yazilimYuklemeUyesi || ''}</td><td class="p-2 border"><button class="edit-row text-blue-500 hover:text-blue-700 p-2" title="İşlem Yap"><i class="fas fa-pencil-alt"></i></button></td>`;
+                row.innerHTML = `<td class="p-2 border">${formatDate(kayit.cekimTarihi)}</td><td class="p-2 border">${kayit.anlatimTuru || ''}</td><td class="p-2 border">${videoKoduHtml}</td><td class="p-2 border">${kayit.brans || ''}</td><td class="p-2 border">${kayit.unite || ''}</td><td class="p-2 border">${kayit.bolum || ''}</td><td class="p-2 border">${kayit.ders || ''}</td><td class="p-2 border">${kayit.testAdi || ''}</td><td class="p-2 border">${kayit.soruSayisi || ''}</td><td class="p-2 border">${(kayit.akademikIzlemeOgretmeni || '') + viewAkademikIcon}</td><td class="p-2 border">${formatDate(kayit.yazilimaYuklemeTarihi)}</td><td class="p-2 border">${kayit.yazilimYuklemeUyesi || ''}</td><td class="p-2 border">${kayit.yuklemeDurumu || ''}</td><td class="p-2 border"><button class="edit-row text-blue-500 hover:text-blue-700 p-2" title="İşlem Yap"><i class="fas fa-pencil-alt"></i></button></td>`;
             });
         });
     }
@@ -259,9 +269,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!id) { showNotification("Lütfen işlem yapmak için bir kayıt seçin.", "error"); return; }
         
         const updateData = {
-            yazilimYuklemeUyesi: document.getElementById('yazilim-yukleme-uyesi').value,
-            yazilimaYuklemeTarihi: document.getElementById('yazilima-yukleme-tarihi').value || null
-        };
+    yazilimYuklemeUyesi: document.getElementById('yazilim-yukleme-uyesi').value,
+    yazilimaYuklemeTarihi: document.getElementById('yazilima-yukleme-tarihi').value || null,
+    yuklemeDurumu: document.getElementById('yukleme-durumu').value
+};
         
         const { error } = await supabaseClient.from('cekimler').update(updateData).eq('id', id);
 
@@ -308,6 +319,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('yazilim-yukleme-uyesi').value = kayit.yazilimYuklemeUyesi || '';
                 document.getElementById('yazilima-yukleme-tarihi').value = kayit.yazilimaYuklemeTarihi || '';
                 updateSelectDisplay(document.getElementById('yazilim-yukleme-uyesi'));
+                document.getElementById('yukleme-durumu').value = kayit.yuklemeDurumu || '';
+                updateSelectDisplay(document.getElementById('yukleme-durumu'));
                 document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
             }
         }
@@ -330,6 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function initializePage() {
         populateSelect('yazilim-yukleme-uyesi', yazilimYuklemeUyeleri);
         createSearchableDropdown(document.getElementById('yazilim-yukleme-uyesi'));
+        createSearchableDropdown(document.getElementById('yukleme-durumu'));
         
         loadAndDisplayCekimler().then(() => {
             document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
