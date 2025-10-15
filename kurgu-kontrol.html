@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
     prevButton.innerHTML = `<i class="fas fa-chevron-left"></i>`;
     prevButton.className = 'pagination-button';
     prevButton.disabled = currentPage === 1;
-    prevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderFilteredData(); } });
+    prevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; loadAndDisplayCekimler(); } });
     paginationControlsEl.appendChild(prevButton);
 
     // Sayfa Numaralarını Oluşturma Mantığı
@@ -335,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.innerText = page;
         btn.className = 'pagination-button';
         if (page === currentPage) btn.classList.add('active');
-        btn.addEventListener('click', () => { currentPage = page; renderFilteredData(); });
+        btn.addEventListener('click', () => { currentPage = page; loadAndDisplayCekimler(); });
         paginationControlsEl.appendChild(btn);
         
         lastPage = page;
@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
     nextButton.innerHTML = `<i class="fas fa-chevron-right"></i>`;
     nextButton.className = 'pagination-button';
     nextButton.disabled = currentPage === pageCount;
-    nextButton.addEventListener('click', () => { if (currentPage < pageCount) { currentPage++; renderFilteredData(); } });
+    nextButton.addEventListener('click', () => { if (currentPage < pageCount) { currentPage++; loadAndDisplayCekimler(); } });
     paginationControlsEl.appendChild(nextButton);
 }
     
