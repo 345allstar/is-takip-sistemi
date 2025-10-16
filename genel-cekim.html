@@ -19,14 +19,6 @@
         .group-toggle-icon.expanded { transform: rotate(180deg); }
         .group-count-badge { background-color: #e0e7ff; color: #4338ca; padding: 2px 6px; border-radius: 8px; font-size: 0.7rem; font-weight: 500; margin-left: 8px; }
         #cekim-tablosu-body tr.satir-secili { outline: 2px solid #ef4444; outline-offset: -2px; }
-        .status-yuklendi { background-color: #dcfce7 !important; color: #166534 !important; }
-        .status-yuklenmedi { background-color: #fee2e2 !important; color: #991b1b !important; }
-        .status-yuklenmeye-hazir { background-color: #dbeafe !important; color: #1d4ed8 !important; }
-        .status-kontrol-ediliyor { background-color: #fef3c7 !important; color: #92400e !important; }
-        .status-kontrol-bekliyor { background-color: #f3f4f6 !important; color: #4b5563 !important; }
-        .status-teknik-duzeltmede { background-color: #e5e0ff !important; color: #5b21b6 !important; }
-        .status-akademik-izlemede { background-color: #cffafe !important; color: #0e7490 !important; }
-        .status-belirtilmedi { background-color: #f3f4f6 !important; color: #4b5563 !important; }
     </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
@@ -209,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- GLOBAL DEĞİŞKENLER ve SABİT VERİLER ---
     let currentPage = 1;
-    const rowsPerPage = 20;
+    const rowsPerPage = 20; // YENİ: Sayfa başına gösterilecek grup sayısı 20'ye çıkarıldı.
     let allCekimler = []; 
 
     const anlaticiOgretmenler = ['Ali Saçan', 'Altuğ Güneş', 'Anıl Gül', 'Bayram Meral', 'Betül Büyükkalaycı', 'Buğra Arslan', 'Burak Onay', 'Büşra Altınok', 'Cebrail Karaoğlan', 'Celal Gündüz', 'Deniz Bozkurt', 'Didar Baskın', 'Emrah Karcı', 'Enes Avcı', 'Erdal Aydemir', 'Erkan Ayrancı', 'Erkan Özaslan', 'Erkan Tunçer', 'Ersen Örenler', 'Eyüp Boncuk', 'Fatih Demirkaya', 'Fatih Sefi', 'Görkem Şahin', 'Gülhan Şen', 'Hale Karataş', 'İbrahim Taş', 'İbrahim Ulaş Baldemir', 'İlayda Gültekin', 'İlhan Aslan', 'İlyas Güneş', 'İsmail Kocabaş', 'İsmail Tolga Aktaş', 'Kader Altınel', 'Kadir Gümüş', 'Kadir Sefi', 'Kemal Coşkun', 'Kenan Kara', 'Mahsum Öztürk', 'Mehmet Celal Özyıldız', 'Mehmet Dural', 'Mehmet Durmuş', 'Mehmet Özalp', 'Melih Akgündüz', 'Mesut Uğurdoğan', 'Murat Namlı', 'Mustafa Öztürk', 'Mustafa Yağcı', 'Nagihan Damargüç', 'Nurtaç Kozak', 'Nurten Aydın', 'Onur Soğuk', 'Önay Çepe', 'Özcan Aykın', 'Özer Akgümüş', 'Öznur Saat Yıldırım', 'Rahim Ural', 'Recep Üstünel', 'Rıdvan Çelebi', 'Rümeysa Enise Özdemir', 'Rüştü Bayındır', 'Salih Yıldırır', 'Selim Yüksel', 'Semih Akpınar', 'Sercan Dural', 'Serkan Yeşilkan', 'Sinan Aydın', 'Şenol Aydın', 'Sinem Şentürk', 'Şükrü Akkoyun', 'Tuncay Ateş', 'Umut Öncül', 'Uzay Arslantürk', 'Veysel Boynueğri', 'Yaşar Aslan', 'Yavuz Tuna', 'Yunus Turan'];
@@ -245,24 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isNaN(date.getTime())) return '';
         return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
     };
-    
-// YENİ FONKSİYON: Yükleme Durumu seçimine göre rengi günceller
-function updateYuklenmeDurumuColor() {
-    const yuklenmeDurumuSelect = document.querySelector('select[name="yuklenmeDurumu"]');
-    if (!yuklenmeDurumuSelect) return;
-    const displayButton = yuklenmeDurumuSelect.previousElementSibling;
-    if (!displayButton) return;
-    const statusClasses = ['status-yuklendi', 'status-yuklenmedi', 'status-yuklenmeye-hazir', 'status-kontrol-ediliyor', 'status-kontrol-bekliyor', 'status-teknik-duzeltmede', 'status-akademik-izlemede'];
-    displayButton.classList.remove(...statusClasses);
-    const selectedValue = yuklenmeDurumuSelect.value;
-    if (selectedValue) {
-        const newClass = (selectedValue || '').toLowerCase()
-            .replace(/ /g, '-').replace(/ı/g, 'i').replace(/ğ/g, 'g').replace(/ü/g, 'u')
-            .replace(/ş/g, 's').replace(/ö/g, 'o').replace(/ç/g, 'c');
-        displayButton.classList.add(`status-${newClass}`);
-    }
-}
-    
+
     // --- ARAYÜZ FONKSİYONLARI ---
     function createSearchableDropdown(selectElement) {
         const container = document.createElement('div');
@@ -410,6 +385,8 @@ function updateYuklenmeDurumuColor() {
         .order('cekimTarihi', { ascending: false })
         .range(0, 4999);
 
+    console.log("Supabase'den gelen kayıt sayısı:", data ? data.length : 0); // <-- BU SATIRI EKLEYİN
+
         if (error) {
             console.error('Veri çekerken hata:', error);
             showNotification('Veriler yüklenirken bir hata oluştu.', 'error');
@@ -418,7 +395,7 @@ function updateYuklenmeDurumuColor() {
             allCekimler = data || [];
         }
     }
-    
+
     function renderFilteredData() {
         const filters = Array.from(filterInputs).map(i => i.value.toLowerCase());
         const filteredCekimler = allCekimler.filter(row => {
@@ -432,10 +409,9 @@ function updateYuklenmeDurumuColor() {
     (row.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(row.teknikIzlemeTarihi) : ''),
     (row.akademikIzlemeDurumu === 'Yapıldı' ? row.akademikIzlemeOgretmeni : ''),
     (row.akademikIzlemeDurumu === 'Yapıldı' ? formatDate(row.akademikIzlemeTarihi) : ''),
-    row.yuklenmeDurumu,
     row.yazilimYuklemeUyesi,
     formatDate(row.yazilimaYuklemeTarihi),
-    row.yuklemeDurumu
+    row.yuklemeDurumu // YENİ EKLENEN FİLTRE ALANI
 ];
                 return (columns[index] || '').toString().toLowerCase().includes(filter);
             });
@@ -506,6 +482,7 @@ function updateYuklenmeDurumuColor() {
         resetForm();
     });
 
+    // --- GRUPLAMA VE SAYFALAMA MANTIĞI İLE GÜNCELLENEN displayPage FONKSİYONU ---
     function displayPage(groups) {
         tableBody.innerHTML = '';
         const start = (currentPage - 1) * rowsPerPage;
@@ -576,22 +553,12 @@ function updateYuklenmeDurumuColor() {
                     <td class="p-2 align-middle border">${teknikIzlemeTarihiHtml}</td>
                     <td class="p-2 align-middle border">${akademikOgretmenHtml}</td>
                     <td class="p-2 align-middle border">${akademikTarihHtml}</td>
-                    <td class="p-2 align-middle border">
-                        ${ data.yuklenmeDurumu ? 
-                            `<span class="status-badge ${ 
-                                (data.yuklenmeDurumu || 'belirtilmedi').toLowerCase()
-                                    .replace(/ /g, '-')
-                                    .replace(/ı/g, 'i').replace(/ğ/g, 'g').replace(/ü/g, 'u')
-                                    .replace(/ş/g, 's').replace(/ö/g, 'o').replace(/ç/g, 'c') 
-                            }">${data.yuklenmeDurumu}</span>` 
-                            : '' 
-                        }
-                    </td>
+                    <td class="p-2 align-middle border">${data.yuklenmeDurumu || ''}</td>
                     <td class="p-2 align-middle border">${data.yazilimYuklemeUyesi || ''}</td>
                     <td class="p-2 align-middle border">${formatDate(data.yazilimaYuklemeTarihi)}</td>
                     <td class="p-2 align-middle border">${data.yuklemeDurumu || ''}</td>
                     <td class="p-2 align-middle border">
-                        <div class="flex items-center justify-center space-x-2">
+    <div class="flex items-center justify-center space-x-2">
                             <button title="Düzenle" class="text-indigo-600 hover:text-indigo-900 p-2 rounded-full hover:bg-indigo-100 edit-row" data-id="${data.id}"><i class="fas fa-edit"></i></button>
                             <button title="Sil" class="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-100 delete-row" data-id="${data.id}"><i class="fas fa-trash"></i></button>
                         </div>
@@ -601,11 +568,13 @@ function updateYuklenmeDurumuColor() {
         });
     }
 
+    // YENİ: PAGINATION ARTIK GRUPLAR ÜZERİNDEN YAPILIYOR
     function setupPagination(groups) {
     paginationControlsEl.innerHTML = '';
     const pageCount = Math.ceil(groups.length / rowsPerPage);
     if (pageCount <= 1) return;
 
+    // Önceki Butonu
     const prevButton = document.createElement('button');
     prevButton.innerHTML = `<i class="fas fa-chevron-left"></i>`;
     prevButton.className = 'pagination-button';
@@ -613,10 +582,12 @@ function updateYuklenmeDurumuColor() {
     prevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderFilteredData(); } });
     paginationControlsEl.appendChild(prevButton);
 
+    // Sayfa Numaralarını Oluşturma Mantığı
     const pageNumbers = new Set();
-    pageNumbers.add(1); 
-    if (pageCount > 1) pageNumbers.add(pageCount); 
+    pageNumbers.add(1); // Her zaman ilk sayfayı göster
+    if (pageCount > 1) pageNumbers.add(pageCount); // Her zaman son sayfayı göster
 
+    // Mevcut sayfanın etrafındaki sayfaları ekle
     if (currentPage > 1) pageNumbers.add(currentPage - 1);
     pageNumbers.add(currentPage);
     if (currentPage < pageCount) pageNumbers.add(currentPage + 1);
@@ -625,6 +596,7 @@ function updateYuklenmeDurumuColor() {
     let lastPage = 0;
 
     sortedPages.forEach(page => {
+        // Sayfalar arasında boşluk varsa '...' ekle
         if (page > lastPage + 1) {
             const ellipsis = document.createElement('span');
             ellipsis.className = 'px-3 py-2 text-gray-500';
@@ -632,6 +604,7 @@ function updateYuklenmeDurumuColor() {
             paginationControlsEl.appendChild(ellipsis);
         }
 
+        // Sayfa numarasını ekle
         const btn = document.createElement('button');
         btn.innerText = page;
         btn.className = 'pagination-button';
@@ -642,6 +615,7 @@ function updateYuklenmeDurumuColor() {
         lastPage = page;
     });
 
+    // Sonraki Butonu
     const nextButton = document.createElement('button');
     nextButton.innerHTML = `<i class="fas fa-chevron-right"></i>`;
     nextButton.className = 'pagination-button';
@@ -666,7 +640,6 @@ function updateYuklenmeDurumuColor() {
         uniteSelect.innerHTML = '<option value="">Önce branş seçiniz...</option>';
         updateSelectDisplay(bransSelect);
         updateSelectDisplay(uniteSelect);
-        updateYuklenmeDurumuColor();
     }
 
     tableBody.addEventListener('click', async function(e) {
@@ -679,6 +652,8 @@ function updateYuklenmeDurumuColor() {
                 child.style.display = child.style.display === 'table-row' ? 'none' : 'table-row';
             });
             toggleIcon.classList.toggle('expanded');
+            
+            // YENİ: Konteynerin yüksekliğini güncelle
             updateCollapsibleHeight(document.getElementById('liste-tablo-alani'));
             return;
         }
@@ -754,7 +729,6 @@ function updateYuklenmeDurumuColor() {
                 formContent.parentElement.querySelector('.collapsible-trigger').click();
             }
             document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
-            updateYuklenmeDurumuColor();
         }
 
         if (downloadFilesBtn) { /* ... JSZip indirme kodu ... */ }
@@ -784,8 +758,7 @@ function updateYuklenmeDurumuColor() {
         }
     });
 
-    document.querySelector('select[name="yuklenmeDurumu"]').addEventListener('change', updateYuklenmeDurumuColor);
-    
+    // --- SAYFA YÜKLENDİĞİNDE ÇALIŞACAK KODLAR ---
     function initializePage() {
         document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
             const content = document.getElementById(trigger.dataset.target);
@@ -815,7 +788,6 @@ function updateYuklenmeDurumuColor() {
         });
         
         renderTable(); 
-        document.querySelector('select[name="yuklenmeDurumu"]').addEventListener('change', updateYuklenmeDurumuColor);
     }
     
     initializePage();
