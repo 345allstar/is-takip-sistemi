@@ -404,11 +404,11 @@ function updateYuklenmeDurumuColor() {
     // --- SUPABASE & TABLO İŞLEMLERİ ---
 
     async function loadCekimlerFromSupabase() {
-        const { data, error } = await supabaseClient
-            .from('cekimler')
-            .select('*')
-            .order('cekimTarihi', { ascending: false })
-            .range(0, 4999);
+    const { data, error } = await supabaseClient
+        .from('cekimler')
+        .select('*')
+        .order('cekimTarihi', { ascending: false })
+        .range(0, 4999);
 
         if (error) {
             console.error('Veri çekerken hata:', error);
@@ -425,32 +425,33 @@ function updateYuklenmeDurumuColor() {
             return filters.every((filter, index) => {
                 if (!filter) return true;
                const columns = [
-                    formatDate(row.cekimTarihi), row.sinavTuru, row.anlatimTuru, row.videoKodu, row.brans, row.unite, row.bolum, row.ders, row.testAdi,
-                    row.soruSayisi, row.not, row.anlaticiOgretmen, row.yonetmen, row.akademikDinleyici, formatDate(row.kurguBaslamaTarihi),
-                    formatDate(row.kurguBitisTarihi), row.kurguOperatoru, row.kurguDurumu,
-                    (row.teknikIzlemeDurumu === 'Yapıldı' ? row.teknikEkipUyesi : ''), 
-                    (row.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(row.teknikIzlemeTarihi) : ''),
-                    (row.akademikIzlemeDurumu === 'Yapıldı' ? row.akademikIzlemeOgretmeni : ''),
-                    (row.akademikIzlemeDurumu === 'Yapıldı' ? formatDate(row.akademikIzlemeTarihi) : ''),
-                    row.yuklenmeDurumu,
-                    row.yazilimYuklemeUyesi,
-                    formatDate(row.yazilimaYuklemeTarihi),
-                    row.yuklemeDurumu
-                ];
+    formatDate(row.cekimTarihi), row.sinavTuru, row.anlatimTuru, row.videoKodu, row.brans, row.unite, row.bolum, row.ders, row.testAdi,
+    row.soruSayisi, row.not, row.anlaticiOgretmen, row.yonetmen, row.akademikDinleyici, formatDate(row.kurguBaslamaTarihi),
+    formatDate(row.kurguBitisTarihi), row.kurguOperatoru, row.kurguDurumu,
+    (row.teknikIzlemeDurumu === 'Yapıldı' ? row.teknikEkipUyesi : ''), 
+    (row.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(row.teknikIzlemeTarihi) : ''),
+    (row.akademikIzlemeDurumu === 'Yapıldı' ? row.akademikIzlemeOgretmeni : ''),
+    (row.akademikIzlemeDurumu === 'Yapıldı' ? formatDate(row.akademikIzlemeTarihi) : ''),
+    row.yuklenmeDurumu,
+    row.yazilimYuklemeUyesi,
+    formatDate(row.yazilimaYuklemeTarihi),
+    row.yuklemeDurumu
+];
                 return (columns[index] || '').toString().toLowerCase().includes(filter);
             });
         });
         
+        // YENİ: Veriyi video koduna göre grupla
         const groupedData = Object.values(filteredCekimler.reduce((acc, item) => {
-            const key = item.videoKodu || `no-code-${item.id}`;
+            const key = item.videoKodu || `no-code-${item.id}`; // Kodu olmayanlar için benzersiz anahtar
             if (!acc[key]) acc[key] = [];
             acc[key].push(item);
             return acc;
         }, {}));
 
         recordCountEl.textContent = `Toplam ${filteredCekimler.length} kayıt bulundu.`;
-        displayPage(groupedData);
-        setupPagination(groupedData);
+        displayPage(groupedData); // YENİ: Gruplanmış veriyi gönder
+        setupPagination(groupedData); // YENİ: Gruplanmış veriyi gönder
         updateCollapsibleHeight(document.getElementById('liste-tablo-alani'));
     }
 
