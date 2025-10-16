@@ -326,15 +326,16 @@ if (!selectedOption) selectedOption = selectElement.options[0];
 
 if (selectedOption) {
   // "Yüklenme Durumu" ise rozet, değilse düz metin
-if ((selectElement.getAttribute('name') || selectElement.id || '').toLowerCase() === 'yuklenmedurumu' && selectedOption.value !== "") {
-  displaySpan.innerHTML = renderBadge(selectedOption.textContent);
-  displaySpan.classList.remove('text-gray-400');
-} else {
-  displaySpan.textContent = selectedOption.textContent;
-  if (selectedOption.value === "" || selectElement.disabled) displaySpan.classList.add('text-gray-400');
-  else displaySpan.classList.remove('text-gray-400');
+  if ((selectElement.getAttribute('name') || selectElement.id || '').toLowerCase() === 'yuklenmedurumu' && selectedOption.value !== "") {
+    displaySpan.innerHTML = renderBadge(selectedOption.textContent);
+    displaySpan.classList.remove('text-gray-400');
+  } else {
+    displaySpan.textContent = selectedOption.textContent;
+    if (selectedOption.value === "" || selectElement.disabled) displaySpan.classList.add('text-gray-400');
+    else displaySpan.classList.remove('text-gray-400');
+  }
 }
-        };
+};
         searchInput.addEventListener('input', () => {
             const filter = searchInput.value.toLowerCase();
             optionsList.querySelectorAll('div').forEach(optionDiv => {
@@ -381,17 +382,11 @@ function setSelectByValueOrText(selectEl, rawVal) {
   let match = opts.find(o => _normalize(o.value) === target);
   if (!match) match = opts.find(o => _normalize(o.textContent) === target);
 
-  if (match) {
-    selectEl.value = match.value || match.textContent;
-  } else {
-    // eşleşme yoksa temizle
-    selectEl.value = '';
-  }
+  selectEl.value = match ? (match.value || match.textContent) : '';
 
-  // custom dropdown’u güncelle
   if (typeof selectEl.updateDropdown === 'function') selectEl.updateDropdown();
-  }
 }
+
     
     sinavTuruSelect.addEventListener('change', () => {
         const secilenSinavTuru = sinavTuruSelect.value;
@@ -876,6 +871,7 @@ cekForm.querySelectorAll('.searchable-select').forEach(updateSelectDisplay);
 
 </body>
 </html>
+
 
 
 
