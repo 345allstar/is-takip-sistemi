@@ -700,30 +700,50 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = editButton.dataset.id;
             const cekim = allCekimler.find(c => c.id == id);
             if (!cekim) return;
-            
-            Object.keys(cekim).forEach(key => {
-                const element = cekForm.elements[key];
-                if (element) {
-                    element.value = cekim[key] || '';
+
+            // 1. Formu sıfırla ve temel bilgileri doldur
+            cekForm.reset();
+            document.getElementById('editing-row-id').value = id;
+            cekForm.elements['cekimTarihi'].value = cekim.cekimTarihi || '';
+            cekForm.elements['videoKodu'].value = cekim.videoKodu || '';
+            cekForm.elements['testAdi'].value = cekim.testAdi || '';
+            cekForm.elements['soruSayisi'].value = cekim.soruSayisi || '';
+            cekForm.elements['not'].value = cekim.not || '';
+
+            // 2. Bağımsız seçim kutularını doldur ve görünümlerini güncelle
+            ['anlatimTuru', 'bolum', 'ders', 'anlaticiOgretmen', 'yuklenmeDurumu'].forEach(name => {
+                const selectElement = cekForm.elements[name];
+                if (selectElement) {
+                    selectElement.value = cekim[name] || '';
+                    updateSelectDisplay(selectElement);
                 }
             });
 
-            cekForm.querySelectorAll('.searchable-select').forEach(updateSelectDisplay);
+            // 3. Birbirine bağlı seçim kutularını sıralı ve garantili bir şekilde doldur
+            const sinavTuruSelect = document.getElementById('sinav-turu-select');
+            sinavTuruSelect.value = cekim.sinavTuru || '';
+            updateSelectDisplay(sinavTuruSelect);
             sinavTuruSelect.dispatchEvent(new Event('change'));
+
             setTimeout(() => {
+                const bransSelect = document.getElementById('brans-select');
                 bransSelect.value = cekim.brans || '';
                 updateSelectDisplay(bransSelect);
                 bransSelect.dispatchEvent(new Event('change'));
+
                 setTimeout(() => {
+                    const uniteSelect = document.getElementById('unite-select');
                     uniteSelect.value = cekim.unite || '';
                     updateSelectDisplay(uniteSelect);
-                }, 100);
-            }, 100);
+                }, 150); // İç içe zamanlayıcı için biraz daha süre
+            }, 150); // Branş listesinin dolması için bekleme süresi
 
-            document.getElementById('editing-row-id').value = id;
+            // 4. Form başlığını ve buton metnini güncelle
             document.getElementById('form-title').innerHTML = '<i class="fas fa-edit mr-3 text-indigo-500"></i>Kaydı Düzenle';
             document.getElementById('submit-text').textContent = 'Güncelle';
             document.getElementById('submit-icon').className = 'fas fa-sync-alt mr-2';
+
+            // 5. Formu görünür hale getir ve kaydır
             const formContent = document.getElementById('cekim-ekle-form');
             if (!formContent.style.maxHeight || formContent.style.maxHeight === '0px') {
                 formContent.parentElement.querySelector('.collapsible-trigger').click();
@@ -796,3 +816,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
