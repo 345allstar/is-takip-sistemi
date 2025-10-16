@@ -19,6 +19,14 @@
         .group-toggle-icon.expanded { transform: rotate(180deg); }
         .group-count-badge { background-color: #e0e7ff; color: #4338ca; padding: 2px 6px; border-radius: 8px; font-size: 0.7rem; font-weight: 500; margin-left: 8px; }
         #cekim-tablosu-body tr.satir-secili { outline: 2px solid #ef4444; outline-offset: -2px; }
+        .status-yuklendi { background-color: #dcfce7; color: #166534; } /* Green */
+.status-yuklenmedi { background-color: #fee2e2; color: #991b1b; } /* Red */
+.status-yuklenmeye-hazir { background-color: #dbeafe; color: #1d4ed8; } /* Blue */
+.status-kontrol-ediliyor { background-color: #fef3c7; color: #92400e; } /* Amber */
+.status-kontrol-bekliyor { background-color: #f3f4f6; color: #4b5563; } /* Gray */
+.status-teknik-duzeltmede { background-color: #e5e0ff; color: #5b21b6; } /* Violet */
+.status-akademik-izlemede { background-color: #cffafe; color: #0e7490; } /* Cyan */
+.status-belirtilmedi { background-color: #f3f4f6; color: #4b5563; } /* Gray */
     </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
@@ -237,7 +245,29 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isNaN(date.getTime())) return '';
         return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
     };
+    
+// YENİ FONKSİYON: Yükleme Durumu seçimine göre rengi günceller
+function updateYuklenmeDurumuColor() {
+    const yuklenmeDurumuSelect = document.querySelector('select[name="yuklenmeDurumu"]');
+    if (!yuklenmeDurumuSelect) return;
 
+    const displayButton = yuklenmeDurumuSelect.previousElementSibling; // Bu, görünürdeki butondur
+    if (!displayButton) return;
+
+    // Önceki tüm renk sınıflarını temizle
+    const statusClasses = ['status-yuklendi', 'status-yuklenmedi', 'status-yuklenmeye-hazir', 'status-kontrol-ediliyor', 'status-kontrol-bekliyor', 'status-teknik-duzeltmede', 'status-akademik-izlemede'];
+    displayButton.classList.remove(...statusClasses);
+
+    const selectedValue = yuklenmeDurumuSelect.value;
+    if (selectedValue) {
+        const newClass = (selectedValue || '').toLowerCase()
+            .replace(/ /g, '-')
+            .replace(/ı/g, 'i').replace(/ğ/g, 'g').replace(/ü/g, 'u')
+            .replace(/ş/g, 's').replace(/ö/g, 'o').replace(/ç/g, 'c');
+        displayButton.classList.add(`status-${newClass}`);
+    }
+}
+    
     // --- ARAYÜZ FONKSİYONLARI ---
     function createSearchableDropdown(selectElement) {
         const container = document.createElement('div');
@@ -640,7 +670,8 @@ document.addEventListener('DOMContentLoaded', () => {
         uniteSelect.innerHTML = '<option value="">Önce branş seçiniz...</option>';
         updateSelectDisplay(bransSelect);
         updateSelectDisplay(uniteSelect);
-    }
+    updateYuklenmeDurumuColor(); // BU SATIRI EKLEYİN
+}
 
     tableBody.addEventListener('click', async function(e) {
         const toggleIcon = e.target.closest('.group-toggle-icon');
@@ -729,7 +760,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 formContent.parentElement.querySelector('.collapsible-trigger').click();
             }
             document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
-        }
+    updateYuklenmeDurumuColor(); // BU SATIRI EKLEYİN
+}
 
         if (downloadFilesBtn) { /* ... JSZip indirme kodu ... */ }
         if (downloadNotesBtn) {
@@ -758,6 +790,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // YENİ OLAY DİNLEYİCİ: Yüklenme Durumu değiştiğinde rengi güncelle
+document.querySelector('select[name="yuklenmeDurumu"]').addEventListener('change', updateYuklenmeDurumuColor);
+    
     // --- SAYFA YÜKLENDİĞİNDE ÇALIŞACAK KODLAR ---
     function initializePage() {
         document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
@@ -796,6 +831,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
 
 
