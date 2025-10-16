@@ -415,7 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const filteredCekimler = allCekimler.filter(row => {
             return filters.every((filter, index) => {
                 if (!filter) return true;
-                const columns = [
+               const columns = [
                     formatDate(row.cekimTarihi), row.sinavTuru, row.anlatimTuru, row.videoKodu, row.brans, row.unite, row.bolum, row.ders, row.testAdi,
                     row.soruSayisi, row.not, row.anlaticiOgretmen, row.yonetmen, row.akademikDinleyici, formatDate(row.kurguBaslamaTarihi),
                     formatDate(row.kurguBitisTarihi), row.kurguOperatoru, row.kurguDurumu,
@@ -673,7 +673,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const clickedRow = e.target.closest('tr');
-        if (clickedRow && !e.target.closest('button')) { // Butonlara tıklandığında seçimi engelle
+        if (clickedRow) {
             const currentlySelected = tableBody.querySelector('.satir-secili');
             if (currentlySelected) {
                 currentlySelected.classList.remove('satir-secili');
@@ -715,7 +715,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const cekim = allCekimler.find(c => c.id == id);
             if (!cekim) return;
             
-            // 1. Formu sıfırla ve basit alanları (text, date, number) doldur
+            // 1. Formu sıfırla ve basit alanları doldur
             cekForm.reset();
             document.getElementById('editing-row-id').value = id;
             Object.keys(cekForm.elements).forEach(key => {
@@ -727,7 +727,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // 2. Bağımsız (zincirleme olmayan) select kutularını doldur
+            // 2. Bağımsız (non-chained) select kutularını doldur
             ['anlatimTuru', 'bolum', 'ders', 'anlaticiOgretmen', 'yuklenmeDurumu'].forEach(name => {
                 const selectElement = cekForm.elements[name];
                 if (selectElement) {
@@ -737,22 +737,23 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             // 3. Birbirine bağlı select kutularını sıralı ve garantili bir şekilde doldur
+            const sinavTuruSelect = document.getElementById('sinav-turu-select');
             sinavTuruSelect.value = cekim.sinavTuru || '';
             updateSelectDisplay(sinavTuruSelect);
             sinavTuruSelect.dispatchEvent(new Event('change'));
 
-            // `requestAnimationFrame` veya kısa bir `setTimeout` ile tarayıcının DOM'u güncellemesine izin ver.
-            // Bu, 'change' event'inin Branş seçeneklerini doldurmasını bekler.
             setTimeout(() => {
+                const bransSelect = document.getElementById('brans-select');
                 bransSelect.value = cekim.brans || '';
                 updateSelectDisplay(bransSelect);
                 bransSelect.dispatchEvent(new Event('change'));
 
                 setTimeout(() => {
+                    const uniteSelect = document.getElementById('unite-select');
                     uniteSelect.value = cekim.unite || '';
                     updateSelectDisplay(uniteSelect);
-                }, 50); // Ünite'nin dolması için çok kısa bir bekleme daha
-            }, 50); 
+                }, 150); 
+            }, 150); 
 
             // 4. Formu görünür yap ve diğer ayarları yap
             document.getElementById('form-title').innerHTML = '<i class="fas fa-edit mr-3 text-indigo-500"></i>Kaydı Düzenle';
@@ -769,8 +770,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (downloadFilesBtn) { /* ... JSZip indirme kodu ... */ }
-        if (downloadNotesBtn) { /* ... */ }
-        if (downloadAkademikNotesBtn) { /* ... */ }
+        if (downloadNotesBtn) {
+            e.preventDefault();
+            const id = downloadNotesBtn.dataset.id;
+            const kayit = allCekimler.find(k => k.id == id);
+            if (kayit && kayit.revizyonNotu && kayit.revizyonNotu.content) {
+                const blob = new Blob([kayit.revizyonNotu.content], { type: 'text/plain;charset=utf-8' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = kayit.revizyonNotu.fileName || `revizyon_${kayit.videoKodu}.txt`;
+                link.click();
+            }
+        }
+        if (downloadAkademikNotesBtn) {
+            e.preventDefault();
+            const id = downloadAkademikNotesBtn.dataset.id;
+            const kayit = allCekimler.find(k => k.id == id);
+            if (kayit && kayit.akademikIzlemeNotu && kayit.akademikIzlemeNotu.content) {
+                const blob = new Blob([kayit.akademikIzlemeNotu.content], { type: 'text/plain;charset=utf-8' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = kayit.akademikIzlemeNotu.fileName || `akademik_not_${kayit.videoKodu}.txt`;
+                link.click();
+            }
+        }
     });
     
     function initializePage() {
@@ -808,3 +831,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initializePage();
 });
 </script>
+</body>
+</html>
