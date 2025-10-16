@@ -51,7 +51,11 @@
                                 <div><label class="form-label">Çekim Tarihi</label><input name="cekimTarihi" type="date" class="form-input-base"></div>
                                 <div><label class="form-label">Sınav Türü</label>
                                     <select name="sinavTuru" id="sinav-turu-select" class="searchable-select">
-                                        <option value="">Seçiniz...</option><option>TYT</option><option>AYT</option><option>LGS</option>
+                                        <option value="">Seçiniz...</option>
+<option value="TYT">TYT</option>
+<option value="AYT">AYT</option>
+<option value="LGS">LGS</option>
+
                                     </select>
                                 </div>
                                 <div><label class="form-label">Anlatım Türü</label>
@@ -283,12 +287,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 optionsList.appendChild(optionDiv);
             });
-            const selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`) || selectElement.options[0];
-            if (selectedOption) {
-                displaySpan.textContent = selectedOption.textContent;
-                if(selectedOption.value === "" || selectElement.disabled) displaySpan.classList.add('text-gray-400');
-                else displaySpan.classList.remove('text-gray-400');
-            }
+            // daha toleranslı seçim (value yoksa görünen metne bak)
+const _n = s => (s ?? '').toString().replace(/\s+/g,' ').trim().toLowerCase();
+
+let selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`);
+if (!selectedOption) {
+  selectedOption = Array.from(selectElement.options)
+    .find(o => _n(o.textContent) === _n(selectElement.value));
+}
+if (!selectedOption) selectedOption = selectElement.options[0];
+
+if (selectedOption) {
+  displaySpan.textContent = selectedOption.textContent;
+  if (selectedOption.value === "" || selectElement.disabled) displaySpan.classList.add('text-gray-400');
+  else displaySpan.classList.remove('text-gray-400');
+}
         };
         searchInput.addEventListener('input', () => {
             const filter = searchInput.value.toLowerCase();
@@ -322,7 +335,33 @@ document.addEventListener('DOMContentLoaded', () => {
            selectElement.updateDropdown();
         }
     }
+// --- Seçim Eşleştirme Yardımcıları (toleranslı) ---
+const _normalize = s => (s ?? '').toString().replace(/\s+/g,' ').trim().toLowerCase();
 
+/**
+ * selectEl içinde rawVal değerini önce value ile, yoksa görünen metinle eşleştirip seçer.
+ * Boşluk/küçük-büyük harf farklarını tolere eder. Custom dropdown görüntüsünü de tazeler.
+ */
+function setSelectByValueOrText(selectEl, rawVal) {
+  if (!selectEl) return;
+  const target = _normalize(rawVal);
+  const opts = Array.from(selectEl.options || []);
+  let match = opts.find(o => _normalize(o.value) === target);
+  if (!match) match = opts.find(o => _normalize(o.textContent) === target);
+
+  if (match) {
+    selectEl.value = match.value || match.textContent;
+  } else {
+    // eşleşme yoksa temizle
+    selectEl.value = '';
+  }
+
+  // custom dropdown’u güncelle
+  if (typeof selectEl.updateDropdown === 'function') {
+    selectEl.updateDropdown();
+  }
+}
+    
     sinavTuruSelect.addEventListener('change', () => {
         const secilenSinavTuru = sinavTuruSelect.value;
         const branslar = bransListeleri[secilenSinavTuru] || [];
@@ -701,24 +740,34 @@ document.addEventListener('DOMContentLoaded', () => {
             const cekim = allCekimler.find(c => c.id == id);
             if (!cekim) return;
             
-            Object.keys(cekim).forEach(key => {
-                const element = cekForm.elements[key];
-                if (element) {
-                    element.value = cekim[key] || '';
-                }
-            });
+            // SELECT olmayan alanları doğrudan yaz
+Object.keys(cekim).forEach(key => {
+  const el = cekForm.elements[key];
+  if (el && el.tagName !== 'SELECT') el.value = cekim[key] ?? '';
+});
 
-            cekForm.querySelectorAll('.searchable-select').forEach(updateSelectDisplay);
-            sinavTuruSelect.dispatchEvent(new Event('change'));
-            setTimeout(() => {
-                bransSelect.value = cekim.brans || '';
-                updateSelectDisplay(bransSelect);
-                bransSelect.dispatchEvent(new Event('change'));
-                setTimeout(() => {
-                    uniteSelect.value = cekim.unite || '';
-                    updateSelectDisplay(uniteSelect);
-                }, 100);
-            }, 100);
+// toleranslı seçim yardımcısını kullan (3. adımdaki fonksiyon)
+setSelectByValueOrText(sinavTuruSelect, cekim.sinavTuru);
+sinavTuruSelect.dispatchEvent(new Event('change'));
+
+setTimeout(() => {
+  setSelectByValueOrText(bransSelect, cekim.brans);
+  bransSelect.dispatchEvent(new Event('change'));
+
+  setTimeout(() => {
+    setSelectByValueOrText(uniteSelect, cekim.unite);
+  }, 120);
+}, 120);
+
+// diğer selectler
+['anlatimTuru','bolum','ders','anlaticiOgretmen','yuklenmeDurumu'].forEach(name => {
+  const el = cekForm.elements[name];
+  if (el) setSelectByValueOrText(el, cekim[name]);
+});
+
+// custom dropdown görüntülerini tazele
+cekForm.querySelectorAll('.searchable-select').forEach(updateSelectDisplay);
+
 
             document.getElementById('editing-row-id').value = id;
             document.getElementById('form-title').innerHTML = '<i class="fas fa-edit mr-3 text-indigo-500"></i>Kaydı Düzenle';
@@ -796,3 +845,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
