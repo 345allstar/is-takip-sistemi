@@ -737,16 +737,19 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             // 3. Birbirine bağlı select kutularını sıralı ve garantili bir şekilde doldur
+            const sinavTuruSelect = document.getElementById('sinav-turu-select');
             sinavTuruSelect.value = cekim.sinavTuru || '';
             updateSelectDisplay(sinavTuruSelect);
             sinavTuruSelect.dispatchEvent(new Event('change'));
 
             setTimeout(() => {
+                const bransSelect = document.getElementById('brans-select');
                 bransSelect.value = cekim.brans || '';
                 updateSelectDisplay(bransSelect);
                 bransSelect.dispatchEvent(new Event('change'));
 
                 setTimeout(() => {
+                    const uniteSelect = document.getElementById('unite-select');
                     uniteSelect.value = cekim.unite || '';
                     updateSelectDisplay(uniteSelect);
                 }, 150); 
@@ -830,7 +833,3 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
-
-
-
-
