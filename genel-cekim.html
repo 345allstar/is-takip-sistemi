@@ -1,798 +1,519 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Genel Çekim Takip - ÜçDörtBeş All Star</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; } .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; } .searchable-select-container { position: relative; } #table-container { max-height: 800px; overflow-y: auto; } .searchable-select-dropdown { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; max-height: 200px; overflow-y: auto; } .pagination-button { padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; background-color: white; color: #374151; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s; } .pagination-button:hover:not(:disabled) { background-color: #f3f4f6; } .pagination-button.active { background-color: #4f46e5; color: white; border-color: #4f46e5; } .pagination-button:disabled { cursor: not-allowed; opacity: 0.5; } .notification { position: fixed; top: 1.25rem; right: 1.25rem; padding: 1rem; border-radius: 0.5rem; color: white; display: flex; align-items: center; gap: 0.75rem; z-index: 1000; opacity: 0; transform: translateX(100%); transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); } .notification.show { opacity: 1; transform: translateX(0); } .notification.success { background-color: #22c55e; } .notification.error { background-color: #ef4444; } .form-label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; } .form-input-base { margin-top: 0.25rem; width: 100%; padding: 0.5rem 0.75rem; background-color: #f9fafb; border: 1px solid #d1d5db; border-radius: 0.5rem; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); color: #111827; } .form-input-base:focus-within, .form-input-base:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 1px #6366f1; } .status-badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 9999px; font-weight: 500; font-size: 0.7rem; } .status-sirada { background-color: #f3f4f6; color: #4b5563; } .status-kurguda { background-color: #dbeafe; color: #1d4ed8; } .status-tamamlandi { background-color: #dcfce7; color: #166534; } .status-revize { background-color: #fee2e2; color: #991b1b; }
-        .group-child { display: none; }
-        .group-master td { background-color: #f9fafb; }
-        .group-toggle-icon { cursor: pointer; transition: transform 0.2s ease-in-out; display: inline-block; }
-        .group-toggle-icon.expanded { transform: rotate(180deg); }
-        .group-count-badge { background-color: #e0e7ff; color: #4338ca; padding: 2px 6px; border-radius: 8px; font-size: 0.7rem; font-weight: 500; margin-left: 8px; }
-        #cekim-tablosu-body tr.satir-secili { outline: 2px solid #ef4444; outline-offset: -2px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Genel Çekim Takip - ÜçDörtBeş All Star</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; }
+    .searchable-select-container { position: relative; }
+    #table-container { max-height: 800px; overflow-y: auto; }
+    .searchable-select-dropdown { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; max-height: 200px; overflow-y: auto; }
+    .pagination-button { padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; background-color: white; color: #374151; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s; }
+    .pagination-button:hover:not(:disabled) { background-color: #f3f4f6; }
+    .pagination-button.active { background-color: #4f46e5; color: white; border-color: #4f46e5; }
+    .pagination-button:disabled { cursor: not-allowed; opacity: 0.5; }
+    .notification { position: fixed; top: 1.25rem; right: 1.25rem; padding: 1rem; border-radius: 0.5rem; color: white; display: flex; align-items: center; gap: 0.75rem; z-index: 1000; opacity: 0; transform: translateX(100%); transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+    .notification.show { opacity: 1; transform: translateX(0); }
+    .notification.success { background-color: #22c55e; }
+    .notification.error { background-color: #ef4444; }
+    .form-label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; }
+    .form-input-base { margin-top: 0.25rem; width: 100%; padding: 0.5rem 0.75rem; background-color: #f9fafb; border: 1px solid #d1d5db; border-radius: 0.5rem; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); color: #111827; }
+    .form-input-base:focus-within, .form-input-base:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 1px #6366f1; }
+    .status-badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 9999px; font-weight: 500; font-size: 0.7rem; }
+    .status-sirada { background-color: #f3f4f6; color: #4b5563; }
+    .status-kurguda { background-color: #dbeafe; color: #1d4ed8; }
+    .status-tamamlandi { background-color: #dcfce7; color: #166534; }
+    .status-revize { background-color: #fee2e2; color: #991b1b; }
+    .group-child { display: none; }
+    .group-master td { background-color: #f9fafb; }
+    .group-toggle-icon { cursor: pointer; transition: transform 0.2s ease-in-out; display: inline-block; }
+    .group-toggle-icon.expanded { transform: rotate(180deg); }
+    .group-count-badge { background-color: #e0e7ff; color: #4338ca; padding: 2px 6px; border-radius: 8px; font-size: 0.7rem; font-weight: 500; margin-left: 8px; }
+    #cekim-tablosu-body tr.satir-secili { outline: 2px solid #ef4444; outline-offset: -2px; }
+  </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
 
-    <div id="notification-container"></div>
+  <div id="notification-container"></div>
 
-    <div class="min-h-screen flex flex-col">
-      <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-40">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <a href="index.html" class="flex items-center space-x-2">
-                     <span class="text-xl font-bold bg-indigo-600 text-white px-2 py-1 rounded-lg">ÜDB</span>
-                    <span class="text-lg font-semibold text-gray-700">All Star İş Takip Programı</span>
-                </a>
-            </div>
+  <div class="min-h-screen flex flex-col">
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-40">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <a href="index.html" class="flex items-center space-x-2">
+            <span class="text-xl font-bold bg-indigo-600 text-white px-2 py-1 rounded-lg">ÜDB</span>
+            <span class="text-lg font-semibold text-gray-700">All Star İş Takip Programı</span>
+          </a>
         </div>
+      </div>
     </header>
 
-        <main class="flex-grow p-4 md:p-6">
-            <div class="space-y-8">
-                <div id="form-container" class="bg-white rounded-xl shadow-lg border border-gray-200/80">
-                    <button class="collapsible-trigger w-full p-5 text-left font-bold text-lg text-indigo-700 flex justify-between items-center hover:bg-gray-50 rounded-t-xl" data-target="cekim-ekle-form">
-                        <span id="form-title" class="flex items-center"><i class="fas fa-plus-circle mr-3 text-indigo-500"></i>Çekim Ekle</span>
-                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
-                    </button>
-                    <div id="cekim-ekle-form" class="collapsible-content">
-                        <div class="p-6 border-t border-gray-200">
-                             <form id="cek-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-6">
-                                <input type="hidden" id="editing-row-id" name="id">
-                                <div><label class="form-label">Çekim Tarihi</label><input name="cekimTarihi" type="date" class="form-input-base"></div>
-                                <div><label class="form-label">Sınav Türü</label>
-                                    <select name="sinavTuru" id="sinav-turu-select" class="searchable-select">
-                                        <option value="">Seçiniz...</option><option>TYT</option><option>AYT</option><option>LGS</option>
-                                    </select>
-                                </div>
-                                <div><label class="form-label">Anlatım Türü</label>
-                                    <select name="anlatimTuru" class="searchable-select">
-                                        <option value="">Seçiniz...</option><option>GGÇK</option><option>SORU PRATİĞİ</option><option>TABLET ANLATIM</option><option>AKILLI TAHTA ANLATIM</option><option>ÖZET ANLATIM</option><option>DERECE ANLATIM</option><option>EĞLENCELİ ANLATIM</option><option>İSPATLI ANLATIM</option><option>SÜREÇ İZLEME SINAVI</option><option>ENDENEME</option><option>TÜRKİYE GENELİ DENEME</option><option>TIPKI PROVA</option>
-                                    </select>
-                                </div>
-                                <div><label class="form-label">Video Kodu</label><input name="videoKodu" type="text" placeholder="Video kodunu girin..." class="form-input-base"></div>
-                                <div><label class="form-label">Branş</label>
-                                    <select name="brans" id="brans-select" class="searchable-select" disabled><option value="">Önce sınav türü seçiniz...</option></select>
-                                </div>
-                                <div><label class="form-label">Ünite</label>
-                                    <select name="unite" id="unite-select" class="searchable-select" disabled><option value="">Önce branş seçiniz...</option></select>
-                                </div>
-                                <div><label class="form-label">Bölüm</label>
-                                    <select name="bolum" class="searchable-select">
-                                        <option value="">Seçiniz...</option><option>1.BÖLÜM</option><option>2. BÖLÜM</option><option>3. BÖLÜM</option><option>4. BÖLÜM</option><option>5. BÖLÜM</option><option>6. BÖLÜM</option><option>7. BÖLÜM</option><option>8. BÖLÜM</option><option>9. BÖLÜM</option><option>10. BÖLÜM</option>
-                                    </select>
-                                </div>
-                                 <div><label class="form-label">Ders</label>
-                                    <select name="ders" class="searchable-select">
-                                        <option value="">Seçiniz...</option><option>1. DERS</option><option>2. DERS</option><option>3. DERS</option><option>4. DERS</option><option>5. DERS</option><option>6. DERS</option><option>7. DERS</option><option>8. DERS</option><option>9. DERS</option><option>10. DERS</option>
-                                    </select>
-                                </div>
-                                <div><label class="form-label">Test Adı</label>
-                                    <input name="testAdi" type="text" list="test-adi-list" placeholder="Test adını yazın..." class="form-input-base">
-                                    <datalist id="test-adi-list"></datalist>
-                                </div>
-                                <div><label class="form-label">Soru Sayısı</label>
-                                    <input name="soruSayisi" type="number" min="1" max="50" placeholder="Örn: 8" class="form-input-base">
-                                </div>
-                                <div><label class="form-label">Anlatıcı Öğretmen</label>
-                                    <select name="anlaticiOgretmen" class="searchable-select">
-                                        <option value="">Seçiniz...</option>
-                                    </select>
-                                </div>
-                                 <div><label class="form-label">Yüklenme Durumu</label>
-                                    <select name="yuklenmeDurumu" class="searchable-select">
-                                        <option value="">Seçiniz...</option>
-                                        <option value="Yüklenmeye Hazır">Yüklenmeye Hazır</option>
-                                        <option value="Kontrol Ediliyor">Kontrol Ediliyor</option>
-                                        <option value="Kontrol Bekliyor">Kontrol Bekliyor</option>
-                                        <option value="Teknik Düzeltmede">Teknik Düzeltmede</option>
-                                        <option value="Akademik İzlemede">Akademik İzlemede</option>
-                                    </select>
-                                </div>
-                                <div class="lg:col-span-3"><label class="form-label">Not</label><textarea name="not" rows="2" class="form-input-base" placeholder="Eklemek istediğiniz notlar..."></textarea></div>
-                                <div class="md:col-span-2 lg:col-span-3 text-right pt-4">
-                                    <button id="submit-button" type="submit" class="inline-flex items-center justify-center py-2 px-6 border border-transparent shadow-lg text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700">
-                                        <i id="submit-icon" class="fas fa-check mr-2"></i><span id="submit-text">Kaydet</span>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+    <main class="flex-grow p-4 md:p-6">
+      <div class="space-y-8">
+        <div id="form-container" class="bg-white rounded-xl shadow-lg border border-gray-200/80">
+          <button class="collapsible-trigger w-full p-5 text-left font-bold text-lg text-indigo-700 flex justify-between items-center hover:bg-gray-50 rounded-t-xl" data-target="cekim-ekle-form">
+            <span id="form-title" class="flex items-center"><i class="fas fa-plus-circle mr-3 text-indigo-500"></i>Çekim Ekle</span>
+            <i class="fas fa-chevron-down transition-transform duration-300"></i>
+          </button>
+          <div id="cekim-ekle-form" class="collapsible-content">
+            <div class="p-6 border-t border-gray-200">
+              <form id="cek-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-6">
+                <input type="hidden" id="editing-row-id" name="id">
+                <div><label class="form-label">Çekim Tarihi</label><input name="cekimTarihi" type="date" class="form-input-base"></div>
+                <div>
+                  <label class="form-label">Sınav Türü</label>
+                  <select name="sinavTuru" id="sinav-turu-select" class="searchable-select">
+                    <option value="">Seçiniz...</option>
+                    <option value="TYT">TYT</option>
+                    <option value="AYT">AYT</option>
+                    <option value="LGS">LGS</option>
+                  </select>
                 </div>
-
-                <div class="bg-white rounded-xl shadow-lg border border-gray-200/80">
-                    <button class="collapsible-trigger w-full p-5 text-left font-bold text-lg text-indigo-700 flex justify-between items-center hover:bg-gray-50 rounded-t-xl" data-target="liste-tablo-alani">
-                         <span class="flex items-center"><i class="fas fa-list-ul mr-3 text-indigo-500"></i>Çekim Listesi</span>
-                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
-                    </button>
-                    <div id="liste-tablo-alani" class="collapsible-content">
-                         <div class="p-2 sm:p-4 border-t border-gray-200">
-                           <div id="table-container" class="overflow-x-auto">
-                                <table id="cekim-tablosu" class="min-w-full border-collapse">
-                                    <thead class="bg-gray-100" style="font-size: 0.7rem;">
-                                        <tr>
-                                            <th class="p-2 border">Çekim Tarihi</th>
-                                            <th class="p-2 border">Sınav Türü</th>
-                                            <th class="p-2 border">Anlatım Türü</th>
-                                            <th class="p-2 border">Video Kodu</th>
-                                            <th class="p-2 border">Branş</th>
-                                            <th class="p-2 border">Ünite</th>
-                                            <th class="p-2 border">Bölüm</th>
-                                            <th class="p-2 border">Ders</th>
-                                            <th class="p-2 border">Test Adı</th>
-                                            <th class="p-2 border">Soru Sayısı</th>
-                                            <th class="p-2 border">Not</th>
-                                            <th class="p-2 border">Anlatıcı Öğretmen</th>
-                                            <th class="p-2 border">Yönetmen</th>
-                                            <th class="p-2 border">Akademik Dinleyici</th>
-                                            <th class="p-2 border">Kurgu Başlama</th>
-                                            <th class="p-2 border">Kurgu Bitiş</th>
-                                            <th class="p-2 border">Kurgu Operatörü</th>
-                                            <th class="p-2 border">Kurgu Durumu</th>
-                                            <th class="p-2 border">Teknik Ekip Üyesi</th>
-                                            <th class="p-2 border">Teknik İzleme Tarihi</th>
-                                            <th class="p-2 border">Akademik İzl. Öğretmeni</th>
-                                            <th class="p-2 border">Akademik İzl. Tarihi</th>
-                                            <th class="p-2 border">Yüklenme Durumu</th>
-                                            <th class="p-2 border">Yazılım Yükleme Üyesi</th>
-                                            <th class="p-2 border">Yazılıma Yükleme Tarihi</th>
-                                            <th class="p-2 border">Yükleme Durumu</th>
-                                            <th class="p-2 border">İşlemler</th>
-                                        </tr>
-                                        <tr>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
-                                            <td class="p-1 border"></td>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="cekim-tablosu-body" class="bg-white divide-y divide-gray-200"></tbody>
-                                </table>
-                            </div>
-                            <div class="flex items-center justify-between mt-4 p-2 border-t">
-                                <span id="record-count" class="text-sm text-gray-600"></span>
-                                <div id="pagination-controls" class="flex items-center space-x-1"></div>
-                            </div>
-                        </div>
-                    </div>
+                <div>
+                  <label class="form-label">Anlatım Türü</label>
+                  <select name="anlatimTuru" class="searchable-select" id="anlatim-turu-select">
+                    <option value="">Seçiniz...</option>
+                    <option>GGÇK</option><option>SORU PRATİĞİ</option><option>TABLET ANLATIM</option><option>AKILLI TAHTA ANLATIM</option><option>ÖZET ANLATIM</option><option>DERECE ANLATIM</option><option>EĞLENCELİ ANLATIM</option><option>İSPATLI ANLATIM</option><option>SÜREÇ İZLEME SINAVI</option><option>ENDENEME</option><option>TÜRKİYE GENELİ DENEME</option><option>TIPKI PROVA</option>
+                  </select>
                 </div>
+                <div><label class="form-label">Video Kodu</label><input name="videoKodu" type="text" placeholder="Video kodunu girin..." class="form-input-base"></div>
+                <div>
+                  <label class="form-label">Branş</label>
+                  <select name="brans" id="brans-select" class="searchable-select" disabled><option value="">Önce sınav türü seçiniz...</option></select>
+                </div>
+                <div>
+                  <label class="form-label">Ünite</label>
+                  <select name="unite" id="unite-select" class="searchable-select" disabled><option value="">Önce branş seçiniz...</option></select>
+                </div>
+                <div>
+                  <label class="form-label">Bölüm</label>
+                  <select name="bolum" class="searchable-select">
+                    <option value="">Seçiniz...</option>
+                    <option>1.BÖLÜM</option><option>2. BÖLÜM</option><option>3. BÖLÜM</option><option>4. BÖLÜM</option><option>5. BÖLÜM</option>
+                    <option>6. BÖLÜM</option><option>7. BÖLÜM</option><option>8. BÖLÜM</option><option>9. BÖLÜM</option><option>10. BÖLÜM</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label">Ders</label>
+                  <select name="ders" class="searchable-select">
+                    <option value="">Seçiniz...</option>
+                    <option>1. DERS</option><option>2. DERS</option><option>3. DERS</option><option>4. DERS</option><option>5. DERS</option>
+                    <option>6. DERS</option><option>7. DERS</option><option>8. DERS</option><option>9. DERS</option><option>10. DERS</option>
+                  </select>
+                </div>
+                <div><label class="form-label">Test Adı</label>
+                  <input name="testAdi" type="text" list="test-adi-list" placeholder="Test adını yazın..." class="form-input-base">
+                  <datalist id="test-adi-list"></datalist>
+                </div>
+                <div><label class="form-label">Soru Sayısı</label>
+                  <input name="soruSayisi" type="number" min="1" max="50" placeholder="Örn: 8" class="form-input-base">
+                </div>
+                <div><label class="form-label">Anlatıcı Öğretmen</label>
+                  <select name="anlaticiOgretmen" class="searchable-select">
+                    <option value="">Seçiniz...</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label">Yüklenme Durumu</label>
+                  <select name="yuklenmeDurumu" class="searchable-select">
+                    <option value="">Seçiniz...</option>
+                    <option value="Yüklenmeye Hazır">Yüklenmeye Hazır</option>
+                    <option value="Kontrol Ediliyor">Kontrol Ediliyor</option>
+                    <option value="Kontrol Bekliyor">Kontrol Bekliyor</option>
+                    <option value="Teknik Düzeltmede">Teknik Düzeltmede</option>
+                    <option value="Akademik İzlemede">Akademik İzlemede</option>
+                  </select>
+                </div>
+                <div class="lg:col-span-3"><label class="form-label">Not</label><textarea name="not" rows="2" class="form-input-base" placeholder="Eklemek istediğiniz notlar..."></textarea></div>
+                <div class="md:col-span-2 lg:col-span-3 text-right pt-4">
+                  <button id="submit-button" type="submit" class="inline-flex items-center justify-center py-2 px-6 border border-transparent shadow-lg text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700">
+                    <i id="submit-icon" class="fas fa-check mr-2"></i><span id="submit-text">Kaydet</span>
+                  </button>
+                </div>
+              </form>
             </div>
-        </main>
-    </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200/80">
+          <button class="collapsible-trigger w-full p-5 text-left font-bold text-lg text-indigo-700 flex justify-between items-center hover:bg-gray-50 rounded-t-xl" data-target="liste-tablo-alani">
+            <span class="flex items-center"><i class="fas fa-list-ul mr-3 text-indigo-500"></i>Çekim Listesi</span>
+            <i class="fas fa-chevron-down transition-transform duration-300"></i>
+          </button>
+          <div id="liste-tablo-alani" class="collapsible-content">
+            <div class="p-2 sm:p-4 border-t border-gray-200">
+              <div id="table-container" class="overflow-x-auto">
+                <table id="cekim-tablosu" class="min-w-full border-collapse">
+                  <thead class="bg-gray-100" style="font-size: 0.7rem;">
+                    <tr>
+                      <th class="p-2 border">Çekim Tarihi</th>
+                      <th class="p-2 border">Sınav Türü</th>
+                      <th class="p-2 border">Anlatım Türü</th>
+                      <th class="p-2 border">Video Kodu</th>
+                      <th class="p-2 border">Branş</th>
+                      <th class="p-2 border">Ünite</th>
+                      <th class="p-2 border">Bölüm</th>
+                      <th class="p-2 border">Ders</th>
+                      <th class="p-2 border">Test Adı</th>
+                      <th class="p-2 border">Soru Sayısı</th>
+                      <th class="p-2 border">Not</th>
+                      <th class="p-2 border">Anlatıcı Öğretmen</th>
+                      <th class="p-2 border">Yönetmen</th>
+                      <th class="p-2 border">Akademik Dinleyici</th>
+                      <th class="p-2 border">Kurgu Başlama</th>
+                      <th class="p-2 border">Kurgu Bitiş</th>
+                      <th class="p-2 border">Kurgu Operatörü</th>
+                      <th class="p-2 border">Kurgu Durumu</th>
+                      <th class="p-2 border">Teknik Ekip Üyesi</th>
+                      <th class="p-2 border">Teknik İzleme Tarihi</th>
+                      <th class="p-2 border">Akademik İzl. Öğretmeni</th>
+                      <th class="p-2 border">Akademik İzl. Tarihi</th>
+                      <th class="p-2 border">Yüklenme Durumu</th>
+                      <th class="p-2 border">Yazılım Yükleme Üyesi</th>
+                      <th class="p-2 border">Yazılıma Yükleme Tarihi</th>
+                      <th class="p-2 border">Yükleme Durumu</th>
+                      <th class="p-2 border">İşlemler</th>
+                    </tr>
+                    <tr>
+                      <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+<td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+                    </tr>
+                  </thead>
+                  <tbody id="cekim-tablosu-body" class="bg-white divide-y divide-gray-200"></tbody>
+                </table>
+              </div>
+              <div class="flex items-center justify-between mt-4 p-2 border-t">
+                <span id="record-count" class="text-sm text-gray-600"></span>
+                <div id="pagination-controls" class="flex items-center space-x-1"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // --- SUPABASE BAĞLANTI BİLGİLERİ ---
-    const SUPABASE_URL = 'https://nwxgigtsadesqjgflblr.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4';
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const SUPABASE_URL = 'https://nwxgigtsadesqjgflblr.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4';
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // --- GLOBAL DEĞİŞKENLER ve SABİT VERİLER ---
-    let currentPage = 1;
-    const rowsPerPage = 20; // YENİ: Sayfa başına gösterilecek grup sayısı 20'ye çıkarıldı.
-    let allCekimler = []; 
+  let currentPage = 1;
+  const rowsPerPage = 20;
+  let allCekimler = [];
 
-    const anlaticiOgretmenler = ['Ali Saçan', 'Altuğ Güneş', 'Anıl Gül', 'Bayram Meral', 'Betül Büyükkalaycı', 'Buğra Arslan', 'Burak Onay', 'Büşra Altınok', 'Cebrail Karaoğlan', 'Celal Gündüz', 'Deniz Bozkurt', 'Didar Baskın', 'Emrah Karcı', 'Enes Avcı', 'Erdal Aydemir', 'Erkan Ayrancı', 'Erkan Özaslan', 'Erkan Tunçer', 'Ersen Örenler', 'Eyüp Boncuk', 'Fatih Demirkaya', 'Fatih Sefi', 'Görkem Şahin', 'Gülhan Şen', 'Hale Karataş', 'İbrahim Taş', 'İbrahim Ulaş Baldemir', 'İlayda Gültekin', 'İlhan Aslan', 'İlyas Güneş', 'İsmail Kocabaş', 'İsmail Tolga Aktaş', 'Kader Altınel', 'Kadir Gümüş', 'Kadir Sefi', 'Kemal Coşkun', 'Kenan Kara', 'Mahsum Öztürk', 'Mehmet Celal Özyıldız', 'Mehmet Dural', 'Mehmet Durmuş', 'Mehmet Özalp', 'Melih Akgündüz', 'Mesut Uğurdoğan', 'Murat Namlı', 'Mustafa Öztürk', 'Mustafa Yağcı', 'Nagihan Damargüç', 'Nurtaç Kozak', 'Nurten Aydın', 'Onur Soğuk', 'Önay Çepe', 'Özcan Aykın', 'Özer Akgümüş', 'Öznur Saat Yıldırım', 'Rahim Ural', 'Recep Üstünel', 'Rıdvan Çelebi', 'Rümeysa Enise Özdemir', 'Rüştü Bayındır', 'Salih Yıldırır', 'Selim Yüksel', 'Semih Akpınar', 'Sercan Dural', 'Serkan Yeşilkan', 'Sinan Aydın', 'Şenol Aydın', 'Sinem Şentürk', 'Şükrü Akkoyun', 'Tuncay Ateş', 'Umut Öncül', 'Uzay Arslantürk', 'Veysel Boynueğri', 'Yaşar Aslan', 'Yavuz Tuna', 'Yunus Turan'];
-    const testAdlari = ['LGS TADINDA 1', 'LGS TADINDA 2', 'LGS TADINDA 3', 'LGS TADINDA 4', 'LGS TADINDA 5', 'LGS TADINDA 6', 'LGS TADINDA 7', 'LGS TADINDA 8', 'LGS TADINDA 9', 'LGS TADINDA 10', 'LGS TADINDA 1-A', 'LGS TADINDA 1-B', 'LGS TADINDA 1-C', 'LGS TADINDA 1-D', 'LGS TADINDA 2-A', 'LGS TADINDA 2-B', 'LGS TADINDA 2-C', 'LGS TADINDA 2-D', 'LGS TADINDA 3-A', 'LGS TADINDA 3-B', 'LGS TADINDA 3-C', 'LGS TADINDA 3-D', 'LGS TADINDA 4-A', 'LGS TADINDA 4-B', 'LGS TADINDA 4-C', 'LGS TADINDA 4-D', 'LGS TADINDA 5-A', 'LGS TADINDA 5-B', 'LGS TADINDA 5-C', 'LGS TADINDA 5-D', 'LGS TADINDA 6-A', 'LGS TADINDA 6-B', 'LGS TADINDA 6-C', 'LGS TADINDA 6-D', 'LGS TADINDA 7-A', 'LGS TADINDA 7-B', 'LGS TADINDA 7-C', 'LGS TADINDA 7-D', 'LGS TADINDA 8-A', 'LGS TADINDA 8-B', 'LGS TADINDA 8-C', 'LGS TADINDA 8-D', 'SINAV TADINDA 1', 'SINAV TADINDA 1-A', 'SINAV TADINDA 1-B', 'SINAV TADINDA 2', 'SINAV TADINDA 2-A', 'SINAV TADINDA 2-B', 'SINAV TADINDA 3', 'SINAV TADINDA 3-A', 'SINAV TADINDA 3-B', 'SINAV TADINDA 3-C', 'SINAV TADINDA 4', 'SINAV TADINDA 4-A', 'SINAV TADINDA 4-B', 'SINAV TADINDA 5', 'SINAV TADINDA 5-A', 'SINAV TADINDA 5-B', 'SINAV TADINDA 5-C', 'SINAV TADINDA 6', 'SINAV TADINDA 6-A', 'SINAV TADINDA 6-B', 'SINAV TADINDA 7', 'SINAV TADINDA 7-A', 'SINAV TADINDA 7-B', 'SINAV TADINDA 8', 'SINAV TADINDA 8-A', 'SINAV TADINDA 8-B', 'SINAV TADINDA 9', 'SINAV TADINDA 9-A', 'SINAV TADINDA 9-B', 'SINAV TADINDA 10', 'SINAV TADINDA 10-A', 'SINAV TADINDA 10-B', 'YENİ NESİL ISINDIRMA 1', 'YENİ NESİL ISINDIRMA 1-A', 'YENİ NESİL ISINDIRMA 1-B', 'YENİ NESİL ISINDIRMA 1-C', 'YENİ NESİL ISINDIRMA 1-D', 'YENİ NESİL ISINDIRMA 1-E', 'YENİ NESİL ISINDIRMA 2', 'YENİ NESİL ISINDIRMA 2-A', 'YENİ NESİL ISINDIRMA 2-B', 'YENİ NESİL ISINDIRMA 2-C', 'YENİ NESİL ISINDIRMA 2-D', 'YENİ NESİL ISINDIRMA 2-E', 'YENİ NESİL ISINDIRMA 3', 'YENİ NESİL ISINDIRMA 3-A', 'YENİ NESİL ISINDIRMA 3-B', 'YENİ NESİL ISINDIRMA 3-C', 'YENİ NESİL ISINDIRMA 3-D', 'YENİ NESİL ISINDIRMA 3-E', 'YENİ NESİL ISINDIRMA 4', 'YENİ NESİL ISINDIRMA 4-A', 'YENİ NESİL ISINDIRMA 4-B', 'YENİ NESİL ISINDIRMA 4-C', 'YENİ NESİL ISINDIRMA 4-D', 'YENİ NESİL ISINDIRMA 4-E', 'YENİ NESİL ISINDIRMA 5', 'YENİ NESİL ISINDIRMA 5-A', 'YENİ NESİL ISINDIRMA 5-B', 'YENİ NESİL ISINDIRMA 5-C', 'YENİ NESİL ISINDIRMA 5-D', 'YENİ NESİL ISINDIRMA 5-E', 'YENİ NESİL ISINDIRMA 6', 'YENİ NESİL ISINDIRMA 6-A', 'YENİ NESİL ISINDIRMA 6-B', 'YENİ NESİL ISINDIRMA 6-C', 'YENİ NESİL ISINDIRMA 7', 'YENİ NESİL ISINDIRMA 7-A', 'YENİ NESİL ISINDIRMA 7-B', 'YENİ NESİL ISINDIRMA 8', 'YENİ NESİL ISINDIRMA 8-A', 'YENİ NESİL ISINDIRMA 8-B', 'YENİ NESİL ISINDIRMA 9', 'YENİ NESİL ISINDIRMA 9-A', 'YENİ NESİL ISINDIRMA 9-B', 'YENİ NESİL ISINDIRMA 10', 'YENİ NESİL ISINDIRMA 10-A', 'YENİ NESİL ISINDIRMA 10-B', 'YENİ NESLE GEÇİŞ 1', 'YENİ NESLE GEÇİŞ 1-A', 'YENİ NESLE GEÇİŞ 1-B', 'YENİ NESLE GEÇİŞ 1-C', 'YENİ NESLE GEÇİŞ 1-D', 'YENİ NESLE GEÇİŞ 1-E', 'YENİ NESLE GEÇİŞ 2', 'YENİ NESLE GEÇİŞ 2-A', 'YENİ NESLE GEÇİŞ 2-B', 'YENİ NESLE GEÇİŞ 2-C', 'YENİ NESLE GEÇİŞ 2-D', 'YENİ NESLE GEÇİŞ 2-E', 'YENİ NESLE GEÇİŞ 3', 'YENİ NESLE GEÇİŞ 3-A', 'YENİ NESLE GEÇİŞ 3-B', 'YENİ NESLE GEÇİŞ 3-C', 'YENİ NESLE GEÇİŞ 3-D', 'YENİ NESLE GEÇİŞ 3-E', 'YENİ NESLE GEÇİŞ 4', 'YENİ NESLE GEÇİŞ 4-A', 'YENİ NESLE GEÇİŞ 4-B', 'YENİ NESLE GEÇİŞ 4-C', 'YENİ NESLE GEÇİŞ 4-D', 'YENİ NESLE GEÇİŞ 4-E', 'YENİ NESLE GEÇİŞ 5', 'YENİ NESLE GEÇİŞ 5-A', 'YENİ NESLE GEÇİŞ 5-B', 'YENİ NESLE GEÇİŞ 5-C', 'YENİ NESLE GEÇİŞ 5-D', 'YENİ NESLE GEÇİŞ 5-E', 'YENİ NESLE GEÇİŞ 6', 'YENİ NESLE GEÇİŞ 6-A', 'YENİ NESLE GEÇİŞ 6-B', 'YENİ NESLE GEÇİŞ 6-C', 'YENİ NESLE GEÇİŞ 7', 'YENİ NESLE GEÇİŞ 7-A', 'YENİ NESLE GEÇİŞ 7-B', 'YENİ NESLE GEÇİŞ 8', 'YENİ NESLE GEÇİŞ 8-A', 'YENİ NESLE GEÇİŞ 8-B', 'YENİ NESLE GEÇİŞ 9', 'YENİ NESLE GEÇİŞ 9-A', 'YENİ NESLE GEÇİŞ 9-B', 'YENİ NESLE GEÇİŞ 10', 'YENİ NESLE GEÇİŞ 10-A', 'YENİ NESLE GEÇİŞ 10-B', 'MODULE A', 'MODULE B', 'MODULAR CHECK 1', 'MODULE C', 'MODULE D', 'MODULAR CHECK 2', 'MODULE E', 'MODULE F', 'MODULAR CHECK 3', 'MODULE G', 'MODULE H', 'LGS EXPLORER', 'LGS EXPLORER 1', 'LGS EXPLORER 2', 'EXIT TEST 1', 'EXIT TEST 2', 'EXIT TEST 3', 'LGS MASTER', 'MODULE TEST 1', 'MODULE TEST 2', 'MODULE TEST 3', 'MODULE TEST 4', 'MODULE TEST 5', 'MODULE TEST 6', 'MODULE TEST 7', 'MODULE TEST 8', 'MODULE TEST 9', 'MODULE TEST 10', 'FINAL TEST', 'KONU TESTİ 1', 'KONU TESTİ 1-A', 'KONU TESTİ 1-B', 'KONU TESTİ 2', 'KONU TESTİ 2-A', 'KONU TESTİ 2-B', 'KONU TESTİ 3', 'KONU TESTİ 3-A', 'KONU TESTİ 3-B', 'KONU TESTİ 4', 'KONU TESTİ 4-A', 'KONU TESTİ 4-B', 'KONU TESTİ 5', 'KONU TESTİ 5-A', 'KONU TESTİ 5-B', 'KONU TESTİ 6', 'KONU TESTİ 6-A', 'KONU TESTİ 6-B', 'KONU TESTİ 7', 'KONU TESTİ 8', 'KONU TESTİ 9', 'KONU TESTİ 10', 'KONU TESTİ 11', 'KONU TESTİ 12', 'KONU TESTİ 13', 'KONU TESTİ 14', 'KONU TESTİ 15', 'KONU TESTİ 16', 'KONU TOPARLAMA', 'SEÇİCİ 1', 'SEÇİCİ 2', 'SEÇİCİ 3', 'SEÇİCİ 4', 'SEÇİCİ 5', 'SEÇİCİ 6', 'SEÇİCİ 7', 'SEÇİCİ 8', 'SEÇİCİ 9', 'SEÇİCİ 10', 'ÖDEV 1', 'ÖDEV 2', 'ÖDEV 3', 'ÖDEV 4', 'ÖDEV 5', 'ÖDEV 6', 'ÖDEV 7', 'ÖDEV 8', 'ÖDEV 9', 'ÖDEV 10', 'ÖDEV 1-A', 'ÖDEV 1-B', 'ÖDEV 1-C', 'ÖDEV 1-D', 'ÖDEV 2-A', 'ÖDEV 2-B', 'ÖDEV 2-C', 'ÖDEV 2-D', 'ÖDEV 3-A', 'ÖDEV 3-B', 'ÖDEV 3-C', 'ÖDEV 3-D', 'ÖDEV 4-A', 'ÖDEV 4-B', 'ÖDEV 4-C', 'ÖDEV 4-D', 'ÖDEV 5-A', 'ÖDEV 5-B', 'ÖDEV 5-C', 'ÖDEV 5-D', 'ÖDEV 6-A', 'ÖDEV 6-B', 'ÖDEV 6-C', 'ÖDEV 6-D', 'ÖDEV 7-A', 'ÖDEV 7-B', 'ÖDEV 7-C', 'ÖDEV 7-D', 'ÖDEV 8-A', 'ÖDEV 8-B', 'ÖDEV 8-C', 'ÖDEV 8-D', 'ÖDEV 9-A', 'ÖDEV 9-B', 'ÖDEV 9-C', 'ÖDEV 9-D', 'ÖDEV 10-A', 'ÖDEV 10-B', 'ÖDEV 10-C', 'ÖDEV 10-D'];
-    const bransListeleri = { 'TYT': ['TYT TÜRKÇE', 'TYT MATEMATİK', 'TYT FİZİK', 'TYT KİMYA', 'TYT BİYOLOJİ', 'TYT COĞRAFYA', 'TYT DİN KÜLTÜRÜ', 'TYT-AYT GEOMETRİ', 'TYT-AYT TARİH', 'TYT-AYT FELSEFE'], 'AYT': ['AYT EDEBİYAT', 'AYT MATEMATİK', 'AYT FİZİK', 'AYT KİMYA', 'AYT BİYOLOJİ', 'AYT COĞRAFYA', 'AYT SOSYOLOJİ-PSİKOLOJİ-MANTIK', 'TYT-AYT GEOMETRİ', 'TYT-AYT TARİH', 'TYT-AYT FELSEFE'], 'LGS': ['LGS TÜRKÇE', 'LGS MATEMATİK', 'LGS FEN BİLİMLERİ', 'LGS İNKILAP TARİHİ', 'LGS İNGİLİZCE', 'LGS DİN KÜLTÜRÜ'] };
-    const uniteListeleri = { 'TYT TÜRKÇE': ['SÖZCÜKTE VE SÖZ ÖBEĞİNDE ANLAM', 'CÜMLEDE ANLAM', 'PARAGRAFTA ANLAM', 'SES-YAZIM-NOKTALAMA', 'SÖZCÜK YAPISI', 'İSİM SOYLU SÖZCÜKLER', 'FİİLLER', 'SÖZCÜK GRUPLARI VE CÜMLE BİLGİSİ', 'ANLATIM BOZUKLUKLARI'], 'TYT MATEMATİK': ['TEMEL KAVRAMLAR', 'BÖLME BÖLÜNEBİLME', 'RASYONEL SAYILAR', 'I VE II BİLİNMEYENLİ DENKLEMLER', 'I VE II BİLİNMEYENLİ EŞİTSİZLİKLER', 'MUTLAK DEĞER', 'ÜSLÜ SAYILAR', 'KÖKLÜ SAYILAR', 'ORAN-ORANTI', 'ÇARPANLARA AYIRMA', 'SAYI PROBLEMLERİ', 'KESİR PROBLEMLERİ', 'YAŞ PROBLEMLERİ', 'YÜZDE PROBLEMLERİ', 'KARIŞIM PROBLEMLERİ', 'HIZ PROBLEMLERİ', 'EMEK PROBLEMLERİ', 'GRAFİK PROBLEMLERİ', 'TANIM VE FORMÜL KULLANABİLME', 'ÖRÜNTÜLÜ SAYI GRUPLARI', 'MANTIK', 'KÜMELER', 'SAYMA OLASILIK', 'GÖRSEL ZEKA'], 'TYT FİZİK': ['FİZİK BİLİMİNE GİRİŞ', 'MADDE VE ÖZEİKLERİ', 'HAREKET', 'KUVVET', 'İŞ, GÜÇ VE ENERJİ', 'ISI VE SICAKLIK', 'ELEKTROSTATİK', 'ELEKTRİK', 'MANYETİZMA', 'BASINÇ', 'KALDIRMA KUVVETİ', 'DALGA HAREKETİ VE YAY DALGASI', 'SU DALGALARI', 'SES VE DEPREM DALGALARI', 'AYDINLANMA VE GÖLGE', 'IŞIĞIN YANSIMASI VE DÜZLEM AYNALAR', 'IŞIĞIN YANSIMASI VE KÜRESEL AYNALAR', 'IŞIĞIN KIRILMASI', 'MERCEKLER, PRİZMALAR VE RENK'], 'TYT KİMYA': ['KİMYA BİLİMİ', 'ATOM VE PERİYODİK SİSTEM', 'KİMYASAL TÜRLER ARASI ETKİLEŞİMLER', 'MADDENİN HALLERİ', 'DOĞA VE KİMYA', 'KİMYANIN TEMEL KANUNLARI VE KİMYASAL HESAPLAMALAR', 'KARIŞIMLAR', 'ASİTLER, BAZLAR VE TUZLAR', 'KİMYA HER YERDE'], 'TYT BİYOLOJİ': ['YAŞAM BİLİMİ BİYOLOJİ', 'CANLI YAPISINDAKİ BİLEŞİKLER', 'HÜCRE', 'CANLILARIN SINIFLANDIRILMASI', 'CANLI ALEMLERİ', 'HÜCRE BÖLÜNMELERİ VE ÜREME', 'KALITIM', 'EKOSİSTEM EKOLOJİSİ VE GÜNCEL ÇEVRE SORUNLARI'], 'TYT COĞRAFYA': ["DOĞA, İNSAN VE COĞRAFYA", "DÜNYA'NIN ŞEKLİ HAREKETLERİ", 'COĞRAFİ KONUM', 'HARİTA BİLGİSİ', 'İKLİM BİLGİSİ', 'İÇ VE DIŞ KUVVETLER', 'SU-TOPRAK-BİTKİ', "DÜNYA'DA VE TÜRKİYE'DE NÜFUS", 'EKONOMİK FAALİYETLER', 'BÖLGE KAVRAMI', 'BÖLGELER VE ÜLKELER', 'ÇEVRE VE TOPLUM'], 'TYT DİN KÜLTÜRÜ': ['BİLGİ VE İNANÇ', 'DİN VE İSLAM', 'İSLAM VE İBADET', 'GENÇLİK VE DEĞERLER', 'GÖNÜL COĞRAFYA', 'ALLAH VE İNSAN İLİŞKİSİ', 'HZ.MUHAMMED (S.A.V)', 'DİN VE HAYAT', 'AHLAKİ TUTUM VE DAVRANİşLAR', 'İSLAM DÜŞÜNCESİNDE İTİKADİ, SİYASİ VE FIKHİ YORUMLAR', 'DÜNYA VE AHİRET', "KUR'AN'A GÖRE HZ.MUHAMMED (S.A.V)", "KUR'AN'DA BAZI KAVRAMLAR", 'İNANÇLA İLGİLİ MESELELER', 'YAHUDİLİK VE HRİSTİYANLIK', 'İSLAM VE BİLİM', "ANADOLU'DA İSLAM", 'İSLAM DÜŞÜNCESİNDE TASAVVUFİ YORUMLAR', 'GÜNCEL DİNİ MESELELER', 'HİNT VE ÇİN DİNLERİ'], 'TYT-AYT GEOMETRİ': ['AÇILAR', 'ÖZEL ÜÇGENLER', 'ALAN', 'AÇIORTAY', 'KENARORTAY', 'BENZERLİK', 'AÇI-KENAR BAĞINTILARI', 'ÇOKGENLER', 'GENEL DÖRTGENLER VE DELTOİD', 'PARALELKENAR', 'EŞKENAR DÖRTGEN', 'DİKDÖRTGEN', 'KARE', 'YAMUK', 'ÇEMBERDE AÇI', 'ÇEMBERDE UZUNLUK', 'DAİREDE ALAN', 'NOKTA ANALİTİĞİ', 'DOĞRU ANALİTİĞİ', 'DÖNÜŞÜMLER', 'ÇEMBER ANALİTİĞİ', 'KATI CİSİMLER'], 'TYT-AYT TARİH': ['TARİH VE ZAMAN', 'İNSANLIĞIN İLK DÖNEMLERİ', "ORTA ÇAĞ'DA DÜNYA", 'İLK VE ORTA ÇAĞLARDA TÜRK DÜNYASI', 'İSLAM MEDENİYETİNİN DOĞUŞU', 'TÜRKLERİN İSLAMİYETİ KABULÜ', 'YERLEŞME VE DEVLETLEŞME SÜRECİNDE SELÇUKLU', 'BEYLİKTEN DEVLETE OSMANLI SİYASETİ', 'DEVLETLEŞME SÜRECİNDE SAVAŞÇILAR VE ASKERLER', 'BEYLİKTEN DEVLETE OSMANLI MEDENİYETİ', 'DÜNYA GÜCÜ OSMANLI', 'SULTAN VE OSMANLI MERKEZ TEŞKİLATI', "KLASİK ÇAĞ'DA OSMANLI TOPLUM DÜZENİ", 'DEĞİŞEN DÜNYA DENGELERİ KARŞISINDA OSMANLI', 'DEĞİŞİM ÇAĞINDA AVRUPA VE OSMANLI', 'DEVRİMLER ÇAĞINDA DEĞİŞEN DEVLET-TOPLUM İLİŞKİLERİ', 'ULUSLARARASI İLİŞKİLERDE DENGE STRATEJİSİ', 'XIX. VE XX.YÜZYILDA DEĞİŞEN SOSYO-EKONOMİK HAYAT', 'XX.YÜZYIL BAŞLARINDA OSMANLI DEVLETİ VE DÜNYA', 'MİLLİ MÜCADELE', 'ATATÜRKÇÜLÜK VE TÜRK İNKILABI', 'İKİ SAVAŞ ARASINDAKİ DÖNEMDE TÜRKİYE VE DÜNYA', 'II.DÜNYA SAVAŞI SÜRECİNDE TÜRKİYE VE DÜNYA', 'II.DÜNYA SAVAŞI SONRASINDA TÜRKİYE VE DÜNYA', 'TOPLUMSAL DEVRİM ÇAĞINDA DÜNYA VE TÜRKİYE', '21.YÜZYIL EŞİĞİNDE TÜRKİYE VE DÜNYA'], 'TYT-AYT FELSEFE': ['FELSEFEYİ TANIMA', 'FELSEFE İLE DÜŞÜNME', 'FELSEFENİN TEMEL KONULARI VE PROBLEMLERİ', 'FELSEFİ OKUMA VE YAZMA', 'MÖ 6.YÜZYIL-MS 2.YÜZYIL FELSEFESİ', 'MS. 2.YÜZYIL-15.YÜZYIL FELSEFESİ', '15.YÜZYIL-17.YÜZYIL FELSEFESİ', '18.YÜZYIL-19.YÜZYIL FELSEFESİ', '20.YÜZYIL FELSEFESİ'], 'AYT EDEBİYAT': ['TÜRK DİLİ VE EDEBİYATINA GİRİŞ', 'COŞKU VE HEYECANI DİLE GETİREN METİNLER', 'İSLAMİYET ÖNCESİ VE İSLAMİ DÖNEM TÜRK ŞİİRİ', 'TANZİMATTA MİLLİ EDEBİYATA TÜRK ŞİİRİ', 'CUMHURİYET DÖNEMİ TÜRK ŞİİRİ', 'TANZİMATTAN CUMHURİYETE HİKAYE', 'TANZİMATTAN CUMHURİYETE ROMAN', 'TANZİMATTAN CUMHURİYETE TİYATRO', 'BATI EDEBİYATI VE EDEBİ AKIMLAR'], 'AYT MATEMATİK': ['FONKSİYONLAR', 'POLİNOMLAR', 'II.DERECEDEN DENKLEMLER', 'PARABOL', 'EŞİTSİZLİKLER', 'LOGARİTMA', 'DİZİLER', 'TRİGONOMETRİ', 'LİMİT', 'TÜREV', 'İNTEGRAL'], 'AYT FİZİK': ['VEKTÖRLER', 'BAĞIL HAREKET', "NEWTON'IN HAREKET YASALARI", 'BİR BOYUTTA SABİT İVMELİ HAREKET', 'BİR VE İKİ BOYUTTA HAREKET', 'ENERJİ', 'İTME VE ÇİZGİSEL MOMENTUM', 'DENGE VE DENGE ŞARTLARI', 'BASİT MAKİNELER', 'ELEKTRİK', 'MANYETİZMA', 'ALTERNATİF AKIM', 'ÇEMBERSEL HAREKET', 'BASİT HARMONİK HAREKET', 'DALGA MEKANİĞİ', 'ATOM FİZİĞİNE GİRİŞ', 'MODERN FİZİK', 'MODERN FİZİĞİN TEKNOLOJİDEKİ UYGULAMALARI'], 'AYT KİMYA': ['KARBON KİMYASINA GİRİŞ', 'ENERJİ KAYNAKLARI', 'MODERN ATOM TEORİSİ', 'GAZLAR', 'SIVI ÇÖZELTİLER', 'KİMYASAL TEPKİMELERDE HIZ', 'KİMYASAL TEPKİMELERDE ENERJİ', 'KİMYASAL TEPKİMELERDE DENGE', 'KİMYA VE ELEKTRİK'], 'AYT BİYOLOJİ': ['İNSAN FİZYOLOJİSİ', 'KOMÜNİTE VE POPÜLASYON EKOLOJİSİ', 'GENDEN PROTEİNE', 'CANLILARDA ENERJİ DÖNÜŞÜMLERİ', 'BİTKİ BİYOLOJİSİ'], 'AYT COĞRAFYA': ['BİYOÇEŞİTLİLİK', 'EKSTREM DOĞA OLAYLARI', 'NÜFUS POLİTİKALARI', 'DOĞAL KAYNAKLAR', "TÜRKİYE'DE EKONOMİ, TARIM, HAYVANCILIK VE ORMANCILIK", "TÜRKİYE'DE MADENLER VE ENERJİ KAYNAKLARI", "TÜRKİYE'DE ULAŞIM, TİCARET VE TURİZM", "TÜRKİYE'NİN İŞLEVSEL BÖLGELERİ VE BÖLGESEL KALKINMA PROJELERİ", 'İLK KÜLTÜR MERKEZLERİ', 'DOĞAL KAYNAKLARIN ETKİLERİ, ÜLKELER ARASI ETKİLEŞİM', 'ULUSLARARASI ÖRGÜTLER', 'ÇEVRE VE TOPLUM'], 'AYT SOSYOLOJİ-PSİKOLOJİ-MANTIK': ['SOSYOLOJİYE GİRİŞ', 'BİREY VE TOPLUM', 'TOPLUMSAL YAPI', 'TOPLUMSAL DEĞİŞME VE GELİŞME', 'TOPLUM VE KÜLTÜR', 'TOPLUMSAL KURUMLAR', 'PSİKOLOJİ BİLİMİNİ TANIYALIM', 'PSKİLOJİNİN TEMEL SÜREÇLERİ', 'ÖĞRENME-BELLEK-DÜŞÜNME', 'RUH SAĞLIĞININ TEMELLERİ', 'MANTIĞA GİRİŞ', 'KLASİK MANTIK', 'MANTIK VE DİL', 'SEMBOLİK MANTIK'], 'LGS TÜRKÇE': ['SÖZCÜKTE ANLAM', 'CÜMLEDE ANLAM', 'METİNDE ANLAM', 'SÖZEL MANTIK', 'FİİLİMSİLER', 'CÜMLENİN ÖGELERİ', 'FİİİLDE ÇATI', 'CÜMLE TÜRLERİ', 'ANLATIM BOZUKLUKLARI', 'YAZIM KURALLARI', 'NOKTALAMA İŞARETLERİ'], 'LGS MATEMATİK': ['ÇARPANLAR VE KATLAR', 'ÜSLÜ İFADELER', 'KAREKÖKLÜ İFADELER', 'VERİ ANALİZİ', 'OLASILIK', 'CEBİRSEL İFADELER', 'DENKLEMLER', 'EŞİTSİZLİKLER', 'ÜÇGENLER', 'BENZERLİK', 'DÖNÜŞÜM GEOMETRİSİ', 'GEOMETRİK CİSİMLER'], 'LGS İNKILAP TARİHİ': ['BİR KAHRAMAN DOĞUYOR', 'MİLLİ UYANIŞ', 'MİLLİ BİR DESTAN', 'ATATÜRKÇÜLÜK VE ÇAĞDAŞLAŞAN TÜRKİYE', 'DEMOKRATİKLEŞME ÇABALARI', 'ATATÜRK DÖNEMİ DIŞ POLİTİKA', "ATATÜRK'ÜN ÖLÜMÜ VE SONRASI"], 'LGS FEN BİLİMLERİ': ['MEVSİMLER VE İKLİM', 'DNA VE GENETİK KOD', 'BASINÇ', 'MADDE VE ENDÜSTRİ', 'BASİT MAKİNELER', 'ENERJİ DÖNÜŞÜMLERİ', 'ELEKTRİK YÜKLERİ'], 'LGS DİN KÜLTÜRÜ': ['KAZA VE KADER İNANCI', 'ZEKAT VE SADAKA', 'DİN VE HAYAT', "HZ.MUHAMMED'İN ÖRNEKLİĞİ", 'KUR\'AN-I KERİM VE ÖZELLİKLERİ'], 'LGS İNGİLİZCE': ['FRIENDSHIP', 'TEEN LIFE', 'IN THE KITCHEN', 'ON THE PHONE', 'THE INTERNET', 'ADVENTURES', 'TOURISM', 'CHORES', 'SCIENCE', 'NATURAL FORCES'], };
-    const sinavTuruSelect = document.getElementById('sinav-turu-select');
-    const bransSelect = document.getElementById('brans-select');
-    const uniteSelect = document.getElementById('unite-select');
-    const cekForm = document.getElementById('cek-form');
-    const tableBody = document.getElementById('cekim-tablosu-body');
-    const recordCountEl = document.getElementById('record-count');
-    const paginationControlsEl = document.getElementById('pagination-controls');
-    const filterInputs = document.querySelectorAll('.filter-input');
+  const anlaticiOgretmenler = ['Ali Saçan','Altuğ Güneş','Anıl Gül','Bayram Meral','Betül Büyükkalaycı','Buğra Arslan','Burak Onay','Büşra Altınok','Cebrail Karaoğlan','Celal Gündüz'];
+  const testAdlari = ['LGS TADINDA 1','LGS TADINDA 2','SINAV TADINDA 1','YENİ NESLE GEÇİŞ 1','MODULE TEST 1','FINAL TEST'];
 
-    // --- YARDIMCI FONKSİYONLAR ---
-    function showNotification(message, type = 'success') {
-        const container = document.getElementById('notification-container'); if (!container) return;
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-times-circle'}"></i><span>${message}</span>`;
-        container.appendChild(notification);
-        setTimeout(() => notification.classList.add('show'), 10);
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => { if (notification.parentNode === container) container.removeChild(notification); }, 500);
-        }, 3000);
-    }
+  const bransListeleri = {
+    'TYT': ['TYT TÜRKÇE','TYT MATEMATİK','TYT FİZİK','TYT KİMYA','TYT BİYOLOJİ','TYT COĞRAFYA','TYT DİN KÜLTÜRÜ','TYT-AYT GEOMETRİ','TYT-AYT TARİH','TYT-AYT FELSEFE'],
+    'AYT': ['AYT EDEBİYAT','AYT MATEMATİK','AYT FİZİK','AYT KİMYA','AYT BİYOLOJİ','AYT COĞRAFYA','AYT SOSYOLOJİ-PSİKOLOJİ-MANTIK','TYT-AYT GEOMETRİ','TYT-AYT TARİH','TYT-AYT FELSEFE'],
+    'LGS': ['LGS TÜRKÇE','LGS MATEMATİK','LGS FEN BİLİMLERİ','LGS İNKILAP TARİHİ','LGS İNGİLİZCE','LGS DİN KÜLTÜRÜ']
+  };
 
-    const formatDate = (dateString) => {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) return '';
-        return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+  const uniteListeleri = {
+    'TYT MATEMATİK': ['TEMEL KAVRAMLAR','BÖLME BÖLÜNEBİLME','RASYONEL SAYILAR'],
+    'AYT MATEMATİK': ['FONKSİYONLAR','POLİNOMLAR','TÜREV'],
+    'LGS MATEMATİK': ['ÇARPANLAR VE KATLAR','ÜSLÜ İFADELER']
+  };
+
+  const sinavTuruSelect = document.getElementById('sinav-turu-select');
+  const bransSelect = document.getElementById('brans-select');
+  const uniteSelect = document.getElementById('unite-select');
+  const cekForm = document.getElementById('cek-form');
+  const tableBody = document.getElementById('cekim-tablosu-body');
+  const recordCountEl = document.getElementById('record-count');
+  const paginationControlsEl = document.getElementById('pagination-controls');
+
+  function showNotification(message, type='success') {
+    const container = document.getElementById('notification-container'); if (!container) return;
+    const el = document.createElement('div');
+    el.className = `notification ${type}`;
+    el.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle':'fa-times-circle'}"></i><span>${message}</span>`;
+    container.appendChild(el); requestAnimationFrame(()=>el.classList.add('show'));
+    setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(),500); },3000);
+  }
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
+    return `${String(date.getDate()).padStart(2,'0')}/${String(date.getMonth()+1).padStart(2,'0')}/${date.getFullYear()}`;
+  };
+
+  const normalize = s => (s||'').toString().trim().replace(/\s+/g,' ').toLowerCase();
+  function setSelectByValueOrText(selectEl, value) {
+    const target = normalize(value);
+    const option = Array.from(selectEl.options).find(opt => normalize(opt.value||opt.textContent)===target);
+    if (option) { selectEl.value = option.value || option.textContent; }
+    (selectEl.updateDropdown ? selectEl.updateDropdown() : 0);
+    selectEl.dispatchEvent(new Event('change'));
+  }
+
+  function createSearchableDropdown(selectElement) {
+    const container = document.createElement('div');
+    container.className = 'searchable-select-container relative';
+    selectElement.parentNode.insertBefore(container, selectElement);
+    selectElement.style.display = 'none';
+    container.appendChild(selectElement);
+
+    const displayButton = document.createElement('button');
+    displayButton.type = 'button';
+    displayButton.className = 'form-input-base text-left flex justify-between items-center';
+    const displaySpan = document.createElement('span');
+    displaySpan.className = 'truncate';
+    displayButton.appendChild(displaySpan);
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-chevron-down text-gray-400';
+    displayButton.appendChild(icon);
+    container.appendChild(displayButton);
+
+    const dropdown = document.createElement('div');
+    dropdown.className = 'searchable-select-dropdown hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg';
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text'; searchInput.placeholder = 'Ara...';
+    searchInput.className = 'block w-full p-2 border-b border-gray-200 focus:outline-none';
+    dropdown.appendChild(searchInput);
+    const optionsList = document.createElement('div');
+    optionsList.className = 'p-1';
+    dropdown.appendChild(optionsList);
+    container.appendChild(dropdown);
+
+    const updateOptions = () => {
+      optionsList.innerHTML = '';
+      Array.from(selectElement.options).forEach(option => {
+        if (option.value === "" && (option.textContent.includes('Seçiniz') || option.textContent.includes('Önce'))) return;
+        const optionDiv = document.createElement('div');
+        optionDiv.textContent = option.textContent;
+        optionDiv.dataset.value = option.value;
+        optionDiv.className = 'p-2 cursor-pointer hover:bg-indigo-100 rounded text-sm';
+        optionDiv.addEventListener('click', () => {
+          selectElement.value = option.value;
+          displaySpan.textContent = option.textContent;
+          displaySpan.classList.remove('text-gray-400');
+          dropdown.classList.add('hidden');
+          selectElement.dispatchEvent(new Event('change'));
+        });
+        optionsList.appendChild(optionDiv);
+      });
+      const selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`) || selectElement.options[0];
+      if (selectedOption) {
+        displaySpan.textContent = selectedOption.textContent;
+        if (selectedOption.value === "" || selectElement.disabled) displaySpan.classList.add('text-gray-400');
+        else displaySpan.classList.remove('text-gray-400');
+      }
     };
-
-    // --- ARAYÜZ FONKSİYONLARI ---
-    function createSearchableDropdown(selectElement) {
-        const container = document.createElement('div');
-        container.className = 'searchable-select-container relative';
-        selectElement.parentNode.insertBefore(container, selectElement);
-        selectElement.style.display = 'none';
-        container.appendChild(selectElement);
-        const displayButton = document.createElement('button');
-        displayButton.type = 'button';
-        displayButton.className = 'form-input-base text-left flex justify-between items-center';
-        const displaySpan = document.createElement('span');
-        displaySpan.className = 'truncate';
-        displayButton.appendChild(displaySpan);
-        const icon = document.createElement('i');
-        icon.className = 'fas fa-chevron-down text-gray-400';
-        displayButton.appendChild(icon);
-        container.appendChild(displayButton);
-        const dropdown = document.createElement('div');
-        dropdown.className = 'searchable-select-dropdown hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg';
-        const searchInput = document.createElement('input');
-        searchInput.type = 'text';
-        searchInput.placeholder = 'Ara...';
-        searchInput.className = 'block w-full p-2 border-b border-gray-200 focus:outline-none';
-        dropdown.appendChild(searchInput);
-        const optionsList = document.createElement('div');
-        optionsList.className = 'p-1';
-        dropdown.appendChild(optionsList);
-        container.appendChild(dropdown);
-        const updateOptions = () => {
-            optionsList.innerHTML = '';
-            Array.from(selectElement.options).forEach(option => {
-                if (option.value === "" && (option.textContent.includes('Seçiniz') || option.textContent.includes('Önce'))) return;
-                const optionDiv = document.createElement('div');
-                optionDiv.textContent = option.textContent;
-                optionDiv.dataset.value = option.value;
-                optionDiv.className = 'p-2 cursor-pointer hover:bg-indigo-100 rounded text-sm';
-                optionDiv.addEventListener('click', () => {
-                    selectElement.value = option.value;
-                    displaySpan.textContent = option.textContent;
-                    displaySpan.classList.remove('text-gray-400');
-                    dropdown.classList.add('hidden');
-                    selectElement.dispatchEvent(new Event('change'));
-                });
-                optionsList.appendChild(optionDiv);
-            });
-            const selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`) || selectElement.options[0];
-            if (selectedOption) {
-                displaySpan.textContent = selectedOption.textContent;
-                if(selectedOption.value === "" || selectElement.disabled) displaySpan.classList.add('text-gray-400');
-                else displaySpan.classList.remove('text-gray-400');
-            }
-        };
-        searchInput.addEventListener('input', () => {
-            const filter = searchInput.value.toLowerCase();
-            optionsList.querySelectorAll('div').forEach(optionDiv => {
-                const text = optionDiv.textContent.toLowerCase();
-                optionDiv.style.display = text.includes(filter) ? '' : 'none';
-            });
-        });
-        displayButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if(selectElement.disabled) return;
-            document.querySelectorAll('.searchable-select-dropdown').forEach(d => {
-                if(d !== dropdown) d.classList.add('hidden');
-            });
-            dropdown.classList.toggle('hidden');
-            if(!dropdown.classList.contains('hidden')) {
-                searchInput.value = '';
-                searchInput.dispatchEvent(new Event('input'));
-                searchInput.focus();
-            }
-        });
-        selectElement.updateDropdown = updateOptions;
-        updateOptions();
-    }
-    
-    document.querySelectorAll('.searchable-select').forEach(createSearchableDropdown);
-    document.addEventListener('click', () => { document.querySelectorAll('.searchable-select-dropdown').forEach(d => d.classList.add('hidden')); });
-    
-    const updateSelectDisplay = (selectElement) => {
-        if(selectElement && selectElement.updateDropdown) {
-           selectElement.updateDropdown();
-        }
-    }
-
-    sinavTuruSelect.addEventListener('change', () => {
-        const secilenSinavTuru = sinavTuruSelect.value;
-        const branslar = bransListeleri[secilenSinavTuru] || [];
-        bransSelect.innerHTML = '<option value="" selected>Seçiniz...</option>';
-        uniteSelect.innerHTML = '<option value="" selected>Önce branş seçiniz...</option>';
-        bransSelect.disabled = branslar.length === 0;
-        uniteSelect.disabled = true;
-        branslar.forEach(brans => {
-            const option = document.createElement('option');
-            option.value = brans;
-            option.textContent = brans;
-            bransSelect.appendChild(option);
-        });
-        updateSelectDisplay(bransSelect);
-        updateSelectDisplay(uniteSelect);
+    searchInput.addEventListener('input', () => {
+      const filter = searchInput.value.toLowerCase();
+      optionsList.querySelectorAll('div').forEach(optionDiv => {
+        const text = optionDiv.textContent.toLowerCase();
+        optionDiv.style.display = text.includes(filter) ? '' : 'none';
+      });
     });
-
-    bransSelect.addEventListener('change', () => {
-        const secilenBrans = bransSelect.value;
-        const uniteler = uniteListeleri[secilenBrans] || [];
-        uniteSelect.innerHTML = '<option value="" selected>Seçiniz...</option>';
-        uniteSelect.disabled = uniteler.length === 0;
-        uniteler.forEach(unite => {
-            const option = document.createElement('option');
-            option.value = unite;
-            option.textContent = unite;
-            uniteSelect.appendChild(option);
-        });
-        updateSelectDisplay(uniteSelect);
+    displayButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (selectElement.disabled) return;
+      document.querySelectorAll('.searchable-select-dropdown').forEach(d => { if (d !== dropdown) d.classList.add('hidden'); });
+      dropdown.classList.toggle('hidden');
+      if (!dropdown.classList.contains('hidden')) {
+        searchInput.value = '';
+        searchInput.dispatchEvent(new Event('input'));
+        searchInput.focus();
+      }
     });
+    selectElement.updateDropdown = updateOptions;
+    updateOptions();
+  }
 
-    function updateCollapsibleHeight(contentElement) {
-        if (contentElement.style.maxHeight && contentElement.style.maxHeight !== '0px') {
-            requestAnimationFrame(() => {
-                contentElement.style.maxHeight = contentElement.scrollHeight + 'px';
-            });
-        }
-    }
+  document.querySelectorAll('.searchable-select').forEach(createSearchableDropdown);
+  document.addEventListener('click', () => { document.querySelectorAll('.searchable-select-dropdown').forEach(d => d.classList.add('hidden')); });
 
-    document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
-        trigger.addEventListener('click', () => {
-            const content = document.getElementById(trigger.dataset.target);
-            const icon = trigger.querySelector('i.fas');
-            if (content.style.maxHeight && content.style.maxHeight !== '0px'){
-                content.style.maxHeight = null;
-                icon.classList.remove('rotate-180');
-            } else {
-                content.style.maxHeight = content.scrollHeight + "px";
-                icon.classList.add('rotate-180');
-            } 
-        });
+  const updateSelectDisplay = (selectElement) => { if (selectElement && selectElement.updateDropdown) selectElement.updateDropdown(); };
+
+  sinavTuruSelect.addEventListener('change', () => {
+    const branslar = bransListeleri[sinavTuruSelect.value] || [];
+    bransSelect.innerHTML = '<option value="" selected>Seçiniz...</option>';
+    uniteSelect.innerHTML = '<option value="" selected>Önce branş seçiniz...</option>';
+    bransSelect.disabled = branslar.length === 0;
+    uniteSelect.disabled = true;
+    branslar.forEach(brans => {
+      const opt = document.createElement('option'); opt.value = brans; opt.textContent = brans; bransSelect.appendChild(opt);
     });
+    updateSelectDisplay(bransSelect); updateSelectDisplay(uniteSelect);
+  });
 
-    // --- SUPABASE & TABLO İŞLEMLERİ ---
+  bransSelect.addEventListener('change', () => {
+    const uniteler = uniteListeleri[bransSelect.value] || [];
+    uniteSelect.innerHTML = '<option value="" selected>Seçiniz...</option>';
+    uniteSelect.disabled = uniteler.length === 0;
+    uniteler.forEach(unite => {
+      const opt = document.createElement('option'); opt.value = unite; opt.textContent = unite; uniteSelect.appendChild(opt);
+    });
+    updateSelectDisplay(uniteSelect);
+  });
 
-    async function loadCekimlerFromSupabase() {
+  async function loadCekimlerFromSupabase() {
     const { data, error } = await supabaseClient
-        .from('cekimler')
-        .select('*')
-        .order('cekimTarihi', { ascending: false })
-        .range(0, 4999);
+      .from('cekimler')
+      .select('*')
+      .order('cekimTarihi', { ascending: false })
+      .range(0, 999);
+    if (error) { console.error(error); showNotification('Veriler yüklenirken hata oluştu.', 'error'); allCekimler = []; }
+    else { allCekimler = data || []; }
+  }
 
-    console.log("Supabase'den gelen kayıt sayısı:", data ? data.length : 0); // <-- BU SATIRI EKLEYİN
+  function renderFilteredData() {
+    const filtered = allCekimler;
+    tableBody.innerHTML = '';
+    filtered.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="p-1 border">${formatDate(row.cekimTarihi)}</td>
+        <td class="p-1 border">${row.sinavTuru||''}</td>
+        <td class="p-1 border">${row.anlatimTuru||''}</td>
+        <td class="p-1 border">${row.videoKodu||''}</td>
+        <td class="p-1 border">${row.brans||''}</td>
+        <td class="p-1 border">${row.unite||''}</td>
+        <td class="p-1 border">${row.bolum||''}</td>
+        <td class="p-1 border">${row.ders||''}</td>
+        <td class="p-1 border">${row.testAdi||''}</td>
+        <td class="p-1 border">${row.soruSayisi||''}</td>
+        <td class="p-1 border">${row.not||''}</td>
+        <td class="p-1 border">${row.anlaticiOgretmen||''}</td>
+        <td class="p-1 border">${row.yonetmen||''}</td>
+        <td class="p-1 border">${row.akademikDinleyici||''}</td>
+        <td class="p-1 border">${formatDate(row.kurguBaslamaTarihi)}</td>
+        <td class="p-1 border">${formatDate(row.kurguBitisTarihi)}</td>
+        <td class="p-1 border">${row.kurguOperatoru||''}</td>
+        <td class="p-1 border">${row.kurguDurumu||''}</td>
+        <td class="p-1 border">${row.teknikEkipUyesi||''}</td>
+        <td class="p-1 border">${formatDate(row.teknikIzlemeTarihi)}</td>
+        <td class="p-1 border">${row.akademikIzlemeOgretmeni||''}</td>
+        <td class="p-1 border">${formatDate(row.akademikIzlemeTarihi)}</td>
+        <td class="p-1 border">${row.yuklenmeDurumu||''}</td>
+        <td class="p-1 border">${row.yazilimYuklemeUyesi||''}</td>
+        <td class="p-1 border">${formatDate(row.yazilimaYuklemeTarihi)}</td>
+        <td class="p-1 border">${row.yuklemeDurumu||''}</td>
+        <td class="p-1 border">
+          <button class="duzenle px-2 py-1 bg-indigo-600 text-white rounded" data-id="${row.id}">Düzenle</button>
+        </td>`;
+      tableBody.appendChild(tr);
+    });
+    recordCountEl.textContent = `Toplam ${filtered.length} kayıt bulundu.`;
+  }
 
-        if (error) {
-            console.error('Veri çekerken hata:', error);
-            showNotification('Veriler yüklenirken bir hata oluştu.', 'error');
-            allCekimler = [];
-        } else {
-            allCekimler = data || [];
-        }
-    }
+  async function renderTable() { await loadCekimlerFromSupabase(); renderFilteredData(); }
 
-    function renderFilteredData() {
-        const filters = Array.from(filterInputs).map(i => i.value.toLowerCase());
-        const filteredCekimler = allCekimler.filter(row => {
-            return filters.every((filter, index) => {
-                if (!filter) return true;
-               const columns = [
-    formatDate(row.cekimTarihi), row.sinavTuru, row.anlatimTuru, row.videoKodu, row.brans, row.unite, row.bolum, row.ders, row.testAdi,
-    row.soruSayisi, row.not, row.anlaticiOgretmen, row.yonetmen, row.akademikDinleyici, formatDate(row.kurguBaslamaTarihi),
-    formatDate(row.kurguBitisTarihi), row.kurguOperatoru, row.kurguDurumu,
-    (row.teknikIzlemeDurumu === 'Yapıldı' ? row.teknikEkipUyesi : ''), 
-    (row.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(row.teknikIzlemeTarihi) : ''),
-    (row.akademikIzlemeDurumu === 'Yapıldı' ? row.akademikIzlemeOgretmeni : ''),
-    (row.akademikIzlemeDurumu === 'Yapıldı' ? formatDate(row.akademikIzlemeTarihi) : ''),
-    row.yazilimYuklemeUyesi,
-    formatDate(row.yazilimaYuklemeTarihi),
-    row.yuklemeDurumu // YENİ EKLENEN FİLTRE ALANI
-];
-                return (columns[index] || '').toString().toLowerCase().includes(filter);
-            });
-        });
-        
-        // YENİ: Veriyi video koduna göre grupla
-        const groupedData = Object.values(filteredCekimler.reduce((acc, item) => {
-            const key = item.videoKodu || `no-code-${item.id}`; // Kodu olmayanlar için benzersiz anahtar
-            if (!acc[key]) acc[key] = [];
-            acc[key].push(item);
-            return acc;
-        }, {}));
+  cekForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(cekForm);
+    const data = Object.fromEntries(formData.entries());
+    const editingId = data.id; if (!editingId) delete data.id;
+    Object.keys(data).forEach(k => { if (k.toLowerCase().includes('tarih') && !data[k]) data[k] = null; });
+    data.soruSayisi = data.soruSayisi ? parseInt(data.soruSayisi, 10) : null;
 
-        recordCountEl.textContent = `Toplam ${filteredCekimler.length} kayıt bulundu.`;
-        displayPage(groupedData); // YENİ: Gruplanmış veriyi gönder
-        setupPagination(groupedData); // YENİ: Gruplanmış veriyi gönder
-        updateCollapsibleHeight(document.getElementById('liste-tablo-alani'));
-    }
+    const { error } = editingId
+      ? await supabaseClient.from('cekimler').update(data).eq('id', editingId)
+      : await supabaseClient.from('cekimler').insert([data]);
 
-    async function renderTable(clearFilters = false) {
-        if (clearFilters) filterInputs.forEach(input => input.value = '');
-        await loadCekimlerFromSupabase();
-        renderFilteredData();
-    }
+    if (error) showNotification((editingId?'Güncelleme':'Kayıt') + ' hatası: ' + error.message, 'error');
+    else showNotification(editingId ? 'Kayıt güncellendi!' : 'Kayıt eklendi!');
 
-    filterInputs.forEach(input => {
-        input.addEventListener('keyup', () => {
-            currentPage = 1;
-            renderFilteredData();
-        });
+    await renderTable();
+    cekForm.reset();
+    document.getElementById('editing-row-id').value = '';
+    document.getElementById('form-title').innerHTML = '<i class="fas fa-plus-circle mr-3 text-indigo-500"></i>Çekim Ekle';
+    document.getElementById('submit-text').textContent = 'Kaydet';
+    document.getElementById('submit-icon').className = 'fas fa-check mr-2';
+    cekForm.querySelectorAll('select').forEach(el => el.updateDropdown && el.updateDropdown());
+  });
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.duzenle');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    const cekim = allCekimler.find(c => String(c.id) === String(id));
+    if (!cekim) return;
+
+    Object.keys(cekim).forEach(key => {
+      const el = cekForm.elements[key];
+      if (el && el.tagName !== 'SELECT') el.value = cekim[key] ?? '';
     });
 
-    cekForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const formData = new FormData(cekForm);
-        const data = Object.fromEntries(formData.entries());
-        const editingId = data.id;
-        
-        if (!editingId) {
-            delete data.id;
-        }
-        
-        Object.keys(data).forEach(key => {
-            if (key.toLowerCase().includes('tarih') && !data[key]) {
-                data[key] = null;
-            }
-        });
-        if(data.soruSayisi) data.soruSayisi = parseInt(data.soruSayisi, 10); else data.soruSayisi = null;
+    if (cekim.sinavTuru) setSelectByValueOrText(sinavTuruSelect, cekim.sinavTuru); else { sinavTuruSelect.value = ''; sinavTuruSelect.updateDropdown && sinavTuruSelect.updateDropdown(); sinavTuruSelect.dispatchEvent(new Event('change')); }
+    if (cekim.brans) setTimeout(()=> setSelectByValueOrText(bransSelect, cekim.brans), 60);
+    if (cekim.unite) setTimeout(()=> setSelectByValueOrText(uniteSelect, cekim.unite), 120);
+    const anlatimSelect = document.getElementById('anlatim-turu-select'); if (anlatimSelect) setSelectByValueOrText(anlatimSelect, cekim.anlatimTuru || '');
+    ['bolum','ders','anlaticiOgretmen','yuklenmeDurumu'].forEach(name => { const el = cekForm.elements[name]; if (el) setSelectByValueOrText(el, cekim[name] || ''); });
 
-        if (editingId) {
-            const { error } = await supabaseClient.from('cekimler').update(data).eq('id', editingId);
-            if (error) {
-                showNotification('Kayıt güncellenirken hata: ' + error.message, 'error');
-            } else {
-                showNotification('Kayıt başarıyla güncellendi!');
-            }
-        } else {
-            const { error } = await supabaseClient.from('cekimler').insert([data]);
-            if (error) {
-                showNotification('Kayıt eklenirken hata: ' + error.message, 'error');
-            } else {
-                showNotification('Kayıt başarıyla eklendi!');
-            }
-        }
-        
-        currentPage = 1;
-        await renderTable(true);
-        resetForm();
+    document.getElementById('editing-row-id').value = id;
+    document.getElementById('form-title').innerHTML = '<i class="fas fa-edit mr-3 text-indigo-500"></i>Kaydı Düzenle';
+    document.getElementById('submit-text').textContent = 'Güncelle';
+    document.getElementById('submit-icon').className = 'fas fa-sync-alt mr-2';
+
+    const formContent = document.getElementById('cekim-ekle-form');
+    if (!formContent.style.maxHeight || formContent.style.maxHeight === '0px') {
+      formContent.parentElement.querySelector('.collapsible-trigger').click();
+    }
+    document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  function initializePage() {
+    document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
+      const content = document.getElementById(trigger.dataset.target);
+      const icon = trigger.querySelector('i.fas');
+      if (content && icon) {
+        setTimeout(() => { content.style.maxHeight = content.scrollHeight + 'px'; icon.classList.add('rotate-180'); }, 200);
+      }
     });
 
-    // --- GRUPLAMA VE SAYFALAMA MANTIĞI İLE GÜNCELLENEN displayPage FONKSİYONU ---
-    function displayPage(groups) {
-        tableBody.innerHTML = '';
-        const start = (currentPage - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-        const paginatedGroups = groups.slice(start, end);
+    const anlaticiSelect = document.querySelector('select[name="anlaticiOgretmen"]');
+    anlaticiOgretmenler.sort().forEach(o => { const opt=document.createElement('option'); opt.value=o; opt.textContent=o; anlaticiSelect.appendChild(opt); });
+    anlaticiSelect.updateDropdown && anlaticiSelect.updateDropdown();
 
-        paginatedGroups.forEach(groupItems => {
-            groupItems.forEach((data, index) => {
-                const newRow = tableBody.insertRow();
-                const isMaster = index === 0;
-                const isGrouped = groupItems.length > 1;
+    const testDatalist = document.getElementById('test-adi-list');
+    testAdlari.forEach(t => { const opt=document.createElement('option'); opt.value=t; testDatalist.appendChild(opt); });
 
-                newRow.className = 'text-xs';
-                if (isMaster) {
-                    newRow.classList.add('group-master');
-                } else {
-                    newRow.classList.add('group-child');
-                    newRow.dataset.group = data.videoKodu || `no-code-${data.id}`;
-                }
+    renderTable();
+  }
 
-                let statusClass = '';
-                switch(data.kurguDurumu) {
-                    case 'Sırada': statusClass = 'status-sirada'; break;
-                    case 'Kurguda': statusClass = 'status-kurguda'; break;
-                    case 'Tamamlandı': statusClass = 'status-tamamlandi'; break;
-                    case 'Revize': statusClass = 'status-revize'; break;
-                }
-
-                const timecodeFileIcon = (data.timecodeFiles && data.timecodeFiles.length > 0) ? `<button class="download-files-btn ml-2 text-indigo-500 hover:text-indigo-700" title="Time Code Dosyalarını İndir" data-id="${data.id}"><i class="fas fa-download"></i></button>` : '';
-                const teknikIzlemeYapildi = data.teknikIzlemeDurumu === 'Yapıldı';
-                const revizyonNotuIcon = teknikIzlemeYapildi && data.revizyonNotu && data.revizyonNotu.content ? `<button class="download-notes-btn ml-2 text-green-500 hover:text-green-700" title="Revizyon Notunu İndir" data-id="${data.id}"><i class="fas fa-file-alt"></i></button>` : '';
-                const teknikEkipUyesiHtml = teknikIzlemeYapildi ? `${data.teknikEkipUyesi || ''}${revizyonNotuIcon}` : (data.teknikEkipUyesi || '');
-                const teknikIzlemeTarihiHtml = teknikIzlemeYapildi ? formatDate(data.teknikIzlemeTarihi) : '';
-                const akademikIzlemeYapildi = data.akademikIzlemeDurumu === 'Yapıldı';
-                const akademikNotuIcon = akademikIzlemeYapildi && data.akademikIzlemeNotu && data.akademikIzlemeNotu.content ? `<button class="download-akademik-notes-btn ml-2 text-green-500 hover:text-green-700" title="Akademik Notu İndir" data-id="${data.id}"><i class="fas fa-file-alt"></i></button>` : '';
-                const viewAkademikIcon = data.akademikIzlemeOgretmeni ? `<button class="view-akademik-btn ml-2 text-gray-500 hover:text-blue-600" title="Akademik İzleme Sayfasına Git" data-id="${data.id}"><i class="fas fa-eye"></i></button>` : '';
-                const akademikOgretmenHtml = akademikIzlemeYapildi ? `${data.akademikIzlemeOgretmeni || ''}${akademikNotuIcon}${viewAkademikIcon}` : (data.akademikIzlemeOgretmeni ? `${data.akademikIzlemeOgretmeni}${viewAkademikIcon}`: '');
-                const akademikTarihHtml = akademikIzlemeYapildi ? formatDate(data.akademikIzlemeTarihi) : '';
-                
-                const videoKoduHtml = isMaster && isGrouped 
-                    ? `<div class="flex items-center justify-start">
-                         <i class="fas fa-chevron-down group-toggle-icon" data-group="${data.videoKodu}"></i>
-                         <span class="ml-2">${data.videoKodu || ''}</span>
-                         <span class="group-count-badge">${groupItems.length}</span>
-                       </div>`
-                    : (data.videoKodu || '');
-
-                newRow.innerHTML = `
-                    <td class="p-2 align-middle border">${formatDate(data.cekimTarihi)}</td>
-                    <td class="p-2 align-middle border">${data.sinavTuru || ''}</td>
-                    <td class="p-2 align-middle border">${data.anlatimTuru || ''}</td>
-                    <td class="p-2 align-middle border">${videoKoduHtml}</td>
-                    <td class="p-2 align-middle border">${data.brans || ''}</td>
-                    <td class="p-2 align-middle border">${data.unite || ''}</td>
-                    <td class="p-2 align-middle border">${data.bolum || ''}</td>
-                    <td class="p-2 align-middle border">${data.ders || ''}</td>
-                    <td class="p-2 align-middle border">${data.testAdi || ''}</td>
-                    <td class="p-2 align-middle border">${data.soruSayisi || ''}</td>
-                    <td class="p-2 align-middle border"><div class="max-w-[100px] mx-auto whitespace-nowrap overflow-hidden text-ellipsis" title="${data.not || ''}">${(data.not || '').substring(0,15)}${(data.not || '').length > 15 ? '...' : ''}</div></td>
-                    <td class="p-2 align-middle border">${data.anlaticiOgretmen || ''}</td>
-                    <td class="p-2 align-middle border">${data.yonetmen || ''}${timecodeFileIcon}</td>
-                    <td class="p-2 align-middle border">${data.akademikDinleyici || ''}</td>
-                    <td class="p-2 align-middle border">${formatDate(data.kurguBaslamaTarihi)}</td>
-                    <td class="p-2 align-middle border">${formatDate(data.kurguBitisTarihi)}</td>
-                    <td class="p-2 align-middle border">${data.kurguOperatoru || ''}</td>
-                    <td class="p-2 align-middle border">${data.kurguDurumu ? `<span class="status-badge ${statusClass}">${data.kurguDurumu}</span>` : ''}</td>
-                    <td class="p-2 align-middle border">${teknikEkipUyesiHtml}</td>
-                    <td class="p-2 align-middle border">${teknikIzlemeTarihiHtml}</td>
-                    <td class="p-2 align-middle border">${akademikOgretmenHtml}</td>
-                    <td class="p-2 align-middle border">${akademikTarihHtml}</td>
-                    <td class="p-2 align-middle border">${data.yuklenmeDurumu || ''}</td>
-                    <td class="p-2 align-middle border">${data.yazilimYuklemeUyesi || ''}</td>
-                    <td class="p-2 align-middle border">${formatDate(data.yazilimaYuklemeTarihi)}</td>
-                    <td class="p-2 align-middle border">${data.yuklemeDurumu || ''}</td>
-                    <td class="p-2 align-middle border">
-    <div class="flex items-center justify-center space-x-2">
-                            <button title="Düzenle" class="text-indigo-600 hover:text-indigo-900 p-2 rounded-full hover:bg-indigo-100 edit-row" data-id="${data.id}"><i class="fas fa-edit"></i></button>
-                            <button title="Sil" class="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-100 delete-row" data-id="${data.id}"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </td>
-                `;
-            });
-        });
-    }
-
-    // YENİ: PAGINATION ARTIK GRUPLAR ÜZERİNDEN YAPILIYOR
-    function setupPagination(groups) {
-    paginationControlsEl.innerHTML = '';
-    const pageCount = Math.ceil(groups.length / rowsPerPage);
-    if (pageCount <= 1) return;
-
-    // Önceki Butonu
-    const prevButton = document.createElement('button');
-    prevButton.innerHTML = `<i class="fas fa-chevron-left"></i>`;
-    prevButton.className = 'pagination-button';
-    prevButton.disabled = currentPage === 1;
-    prevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderFilteredData(); } });
-    paginationControlsEl.appendChild(prevButton);
-
-    // Sayfa Numaralarını Oluşturma Mantığı
-    const pageNumbers = new Set();
-    pageNumbers.add(1); // Her zaman ilk sayfayı göster
-    if (pageCount > 1) pageNumbers.add(pageCount); // Her zaman son sayfayı göster
-
-    // Mevcut sayfanın etrafındaki sayfaları ekle
-    if (currentPage > 1) pageNumbers.add(currentPage - 1);
-    pageNumbers.add(currentPage);
-    if (currentPage < pageCount) pageNumbers.add(currentPage + 1);
-
-    const sortedPages = Array.from(pageNumbers).sort((a, b) => a - b);
-    let lastPage = 0;
-
-    sortedPages.forEach(page => {
-        // Sayfalar arasında boşluk varsa '...' ekle
-        if (page > lastPage + 1) {
-            const ellipsis = document.createElement('span');
-            ellipsis.className = 'px-3 py-2 text-gray-500';
-            ellipsis.textContent = '...';
-            paginationControlsEl.appendChild(ellipsis);
-        }
-
-        // Sayfa numarasını ekle
-        const btn = document.createElement('button');
-        btn.innerText = page;
-        btn.className = 'pagination-button';
-        if (page === currentPage) btn.classList.add('active');
-        btn.addEventListener('click', () => { currentPage = page; renderFilteredData(); });
-        paginationControlsEl.appendChild(btn);
-        
-        lastPage = page;
-    });
-
-    // Sonraki Butonu
-    const nextButton = document.createElement('button');
-    nextButton.innerHTML = `<i class="fas fa-chevron-right"></i>`;
-    nextButton.className = 'pagination-button';
-    nextButton.disabled = currentPage === pageCount;
-    nextButton.addEventListener('click', () => { if (currentPage < pageCount) { currentPage++; renderFilteredData(); } });
-    paginationControlsEl.appendChild(nextButton);
-}
-    
-    function resetForm() {
-        cekForm.reset();
-        document.getElementById('editing-row-id').value = '';
-        document.getElementById('form-title').innerHTML = '<i class="fas fa-plus-circle mr-3 text-indigo-500"></i>Çekim Ekle';
-        document.getElementById('submit-text').textContent = 'Kaydet';
-        document.getElementById('submit-icon').className = 'fas fa-check mr-2';
-        cekForm.querySelectorAll('.searchable-select').forEach(sel => {
-            sel.value = '';
-            updateSelectDisplay(sel);
-        });
-        bransSelect.disabled = true;
-        uniteSelect.disabled = true;
-        bransSelect.innerHTML = '<option value="">Önce sınav türü seçiniz...</option>';
-        uniteSelect.innerHTML = '<option value="">Önce branş seçiniz...</option>';
-        updateSelectDisplay(bransSelect);
-        updateSelectDisplay(uniteSelect);
-    }
-
-    tableBody.addEventListener('click', async function(e) {
-        const toggleIcon = e.target.closest('.group-toggle-icon');
-        if (toggleIcon) {
-            e.stopPropagation();
-            const group = toggleIcon.dataset.group;
-            const children = tableBody.querySelectorAll(`.group-child[data-group="${group}"]`);
-            children.forEach(child => {
-                child.style.display = child.style.display === 'table-row' ? 'none' : 'table-row';
-            });
-            toggleIcon.classList.toggle('expanded');
-            
-            // YENİ: Konteynerin yüksekliğini güncelle
-            updateCollapsibleHeight(document.getElementById('liste-tablo-alani'));
-            return;
-        }
-
-        const clickedRow = e.target.closest('tr');
-        if (clickedRow) {
-            const currentlySelected = tableBody.querySelector('.satir-secili');
-            if (currentlySelected) {
-                currentlySelected.classList.remove('satir-secili');
-            }
-            clickedRow.classList.add('satir-secili');
-        }
-        
-        const deleteButton = e.target.closest('.delete-row');
-        const editButton = e.target.closest('.edit-row');
-        const downloadFilesBtn = e.target.closest('.download-files-btn');
-        const downloadNotesBtn = e.target.closest('.download-notes-btn');
-        const downloadAkademikNotesBtn = e.target.closest('.download-akademik-notes-btn');
-        const viewAkademikBtn = e.target.closest('.view-akademik-btn');
-
-        if (viewAkademikBtn) {
-            e.preventDefault();
-            const id = viewAkademikBtn.dataset.id;
-            localStorage.setItem('selectedCekimId', id);
-            window.location.href = 'akademik-izleme.html';
-        }
-        
-        if (deleteButton) {
-            e.preventDefault();
-            const id = deleteButton.dataset.id;
-            if (confirm('Bu kaydı silmek istediğinizden emin misiniz?')) {
-                const { error } = await supabaseClient.from('cekimler').delete().eq('id', id);
-                if (error) {
-                    showNotification('Kayıt silinirken hata: ' + error.message, 'error');
-                } else {
-                    showNotification('Kayıt başarıyla silindi.', 'error');
-                    await renderTable();
-                }
-            }
-        }
-
-        if (editButton) {
-            e.preventDefault();
-            const id = editButton.dataset.id;
-            const cekim = allCekimler.find(c => c.id == id);
-            if (!cekim) return;
-            
-            Object.keys(cekim).forEach(key => {
-                const element = cekForm.elements[key];
-                if (element) {
-                    element.value = cekim[key] || '';
-                }
-            });
-
-            cekForm.querySelectorAll('.searchable-select').forEach(updateSelectDisplay);
-            sinavTuruSelect.dispatchEvent(new Event('change'));
-            setTimeout(() => {
-                bransSelect.value = cekim.brans || '';
-                updateSelectDisplay(bransSelect);
-                bransSelect.dispatchEvent(new Event('change'));
-                setTimeout(() => {
-                    uniteSelect.value = cekim.unite || '';
-                    updateSelectDisplay(uniteSelect);
-                }, 100);
-            }, 100);
-
-            document.getElementById('editing-row-id').value = id;
-            document.getElementById('form-title').innerHTML = '<i class="fas fa-edit mr-3 text-indigo-500"></i>Kaydı Düzenle';
-            document.getElementById('submit-text').textContent = 'Güncelle';
-            document.getElementById('submit-icon').className = 'fas fa-sync-alt mr-2';
-            const formContent = document.getElementById('cekim-ekle-form');
-            if (!formContent.style.maxHeight || formContent.style.maxHeight === '0px') {
-                formContent.parentElement.querySelector('.collapsible-trigger').click();
-            }
-            document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        if (downloadFilesBtn) { /* ... JSZip indirme kodu ... */ }
-        if (downloadNotesBtn) {
-            e.preventDefault();
-            const id = downloadNotesBtn.dataset.id;
-            const kayit = allCekimler.find(k => k.id == id);
-            if (kayit && kayit.revizyonNotu && kayit.revizyonNotu.content) {
-                const blob = new Blob([kayit.revizyonNotu.content], { type: 'text/plain;charset=utf-8' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = kayit.revizyonNotu.fileName || `revizyon_${kayit.videoKodu}.txt`;
-                link.click();
-            }
-        }
-        if (downloadAkademikNotesBtn) {
-            e.preventDefault();
-            const id = downloadAkademikNotesBtn.dataset.id;
-            const kayit = allCekimler.find(k => k.id == id);
-            if (kayit && kayit.akademikIzlemeNotu && kayit.akademikIzlemeNotu.content) {
-                const blob = new Blob([kayit.akademikIzlemeNotu.content], { type: 'text/plain;charset=utf-8' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = kayit.akademikIzlemeNotu.fileName || `akademik_not_${kayit.videoKodu}.txt`;
-                link.click();
-            }
-        }
-    });
-
-    // --- SAYFA YÜKLENDİĞİNDE ÇALIŞACAK KODLAR ---
-    function initializePage() {
-        document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
-            const content = document.getElementById(trigger.dataset.target);
-            const icon = trigger.querySelector('i.fas');
-            if (content && icon) {
-                setTimeout(() => {
-                    content.style.maxHeight = content.scrollHeight + "px";
-                    icon.classList.add('rotate-180');
-                }, 200);
-            }
-        });
-        
-        const anlaticiOgretmenSelect = document.querySelector('select[name="anlaticiOgretmen"]');
-        anlaticiOgretmenler.sort().forEach(ogretmen => {
-            const option = document.createElement('option');
-            option.value = ogretmen;
-            option.textContent = ogretmen;
-            anlaticiOgretmenSelect.appendChild(option);
-        });
-        updateSelectDisplay(anlaticiOgretmenSelect);
-
-        const testAdiDatalist = document.getElementById('test-adi-list');
-        testAdlari.forEach(test => {
-            const option = document.createElement('option');
-            option.value = test;
-            testAdiDatalist.appendChild(option);
-        });
-        
-        renderTable(); 
-    }
-    
-    initializePage();
+  initializePage();
 });
 </script>
-
 </body>
 </html>
