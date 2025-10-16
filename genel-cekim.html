@@ -623,7 +623,7 @@ function setSelectByValueOrText(selectEl, rawVal) {
                     <td class="p-2 align-middle border">${teknikIzlemeTarihiHtml}</td>
                     <td class="p-2 align-middle border">${akademikOgretmenHtml}</td>
                     <td class="p-2 align-middle border">${akademikTarihHtml}</td>
-                    <td class="p-2 align-middle border">${data.yuklenmeDurumu || ''}</td>
+                    <td class="p-2 align-middle border">${renderBadge(data.yuklenmeDurumu)}</td>
                     <td class="p-2 align-middle border">${data.yazilimYuklemeUyesi || ''}</td>
                     <td class="p-2 align-middle border">${formatDate(data.yazilimaYuklemeTarihi)}</td>
                     <td class="p-2 align-middle border">${data.yuklemeDurumu || ''}</td>
@@ -876,5 +876,6 @@ cekForm.querySelectorAll('.searchable-select').forEach(updateSelectDisplay);
 
 </body>
 </html>
+
 
 
