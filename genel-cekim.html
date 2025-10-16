@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- GLOBAL DEĞİŞKENLER ve SABİT VERİLER ---
     let currentPage = 1;
-    const rowsPerPage = 20; // YENİ: Sayfa başına gösterilecek grup sayısı 20'ye çıkarıldı.
+    const rowsPerPage = 20;
     let allCekimler = []; 
 
     const anlaticiOgretmenler = ['Ali Saçan', 'Altuğ Güneş', 'Anıl Gül', 'Bayram Meral', 'Betül Büyükkalaycı', 'Buğra Arslan', 'Burak Onay', 'Büşra Altınok', 'Cebrail Karaoğlan', 'Celal Gündüz', 'Deniz Bozkurt', 'Didar Baskın', 'Emrah Karcı', 'Enes Avcı', 'Erdal Aydemir', 'Erkan Ayrancı', 'Erkan Özaslan', 'Erkan Tunçer', 'Ersen Örenler', 'Eyüp Boncuk', 'Fatih Demirkaya', 'Fatih Sefi', 'Görkem Şahin', 'Gülhan Şen', 'Hale Karataş', 'İbrahim Taş', 'İbrahim Ulaş Baldemir', 'İlayda Gültekin', 'İlhan Aslan', 'İlyas Güneş', 'İsmail Kocabaş', 'İsmail Tolga Aktaş', 'Kader Altınel', 'Kadir Gümüş', 'Kadir Sefi', 'Kemal Coşkun', 'Kenan Kara', 'Mahsum Öztürk', 'Mehmet Celal Özyıldız', 'Mehmet Dural', 'Mehmet Durmuş', 'Mehmet Özalp', 'Melih Akgündüz', 'Mesut Uğurdoğan', 'Murat Namlı', 'Mustafa Öztürk', 'Mustafa Yağcı', 'Nagihan Damargüç', 'Nurtaç Kozak', 'Nurten Aydın', 'Onur Soğuk', 'Önay Çepe', 'Özcan Aykın', 'Özer Akgümüş', 'Öznur Saat Yıldırım', 'Rahim Ural', 'Recep Üstünel', 'Rıdvan Çelebi', 'Rümeysa Enise Özdemir', 'Rüştü Bayındır', 'Salih Yıldırır', 'Selim Yüksel', 'Semih Akpınar', 'Sercan Dural', 'Serkan Yeşilkan', 'Sinan Aydın', 'Şenol Aydın', 'Sinem Şentürk', 'Şükrü Akkoyun', 'Tuncay Ateş', 'Umut Öncül', 'Uzay Arslantürk', 'Veysel Boynueğri', 'Yaşar Aslan', 'Yavuz Tuna', 'Yunus Turan'];
@@ -237,7 +237,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isNaN(date.getTime())) return '';
         return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
     };
+    
+    // YENİ FONKSİYON: Yüklenme Durumu seçimine göre rengi günceller
+    function updateYuklenmeDurumuColor() {
+        const yuklenmeDurumuSelect = document.querySelector('select[name="yuklenmeDurumu"]');
+        if (!yuklenmeDurumuSelect) return;
+        
+        // DÜZELTME: Hedef butonu daha güvenilir bir şekilde buluyoruz
+        const displayButton = yuklenmeDurumuSelect.closest('.searchable-select-container').querySelector('button');
+        if (!displayButton) return;
 
+        const statusClasses = ['status-yuklendi', 'status-yuklenmedi', 'status-yuklenmeye-hazir', 'status-kontrol-ediliyor', 'status-kontrol-bekliyor', 'status-teknik-duzeltmede', 'status-akademik-izlemede'];
+        displayButton.classList.remove(...statusClasses);
+        const selectedValue = yuklenmeDurumuSelect.value;
+        if (selectedValue) {
+            const newClass = (selectedValue || '').toLowerCase()
+                .replace(/ /g, '-').replace(/ı/g, 'i').replace(/ğ/g, 'g').replace(/ü/g, 'u')
+                .replace(/ş/g, 's').replace(/ö/g, 'o').replace(/ç/g, 'c');
+            displayButton.classList.add(`status-${newClass}`);
+        }
+    }
+    
     // --- ARAYÜZ FONKSİYONLARI ---
     function createSearchableDropdown(selectElement) {
         const container = document.createElement('div');
@@ -379,13 +399,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- SUPABASE & TABLO İŞLEMLERİ ---
 
     async function loadCekimlerFromSupabase() {
-    const { data, error } = await supabaseClient
-        .from('cekimler')
-        .select('*')
-        .order('cekimTarihi', { ascending: false })
-        .range(0, 4999);
-
-    console.log("Supabase'den gelen kayıt sayısı:", data ? data.length : 0); // <-- BU SATIRI EKLEYİN
+        const { data, error } = await supabaseClient
+            .from('cekimler')
+            .select('*')
+            .order('cekimTarihi', { ascending: false })
+            .range(0, 4999);
 
         if (error) {
             console.error('Veri çekerken hata:', error);
@@ -395,39 +413,39 @@ document.addEventListener('DOMContentLoaded', () => {
             allCekimler = data || [];
         }
     }
-
+    
     function renderFilteredData() {
         const filters = Array.from(filterInputs).map(i => i.value.toLowerCase());
         const filteredCekimler = allCekimler.filter(row => {
             return filters.every((filter, index) => {
                 if (!filter) return true;
                const columns = [
-    formatDate(row.cekimTarihi), row.sinavTuru, row.anlatimTuru, row.videoKodu, row.brans, row.unite, row.bolum, row.ders, row.testAdi,
-    row.soruSayisi, row.not, row.anlaticiOgretmen, row.yonetmen, row.akademikDinleyici, formatDate(row.kurguBaslamaTarihi),
-    formatDate(row.kurguBitisTarihi), row.kurguOperatoru, row.kurguDurumu,
-    (row.teknikIzlemeDurumu === 'Yapıldı' ? row.teknikEkipUyesi : ''), 
-    (row.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(row.teknikIzlemeTarihi) : ''),
-    (row.akademikIzlemeDurumu === 'Yapıldı' ? row.akademikIzlemeOgretmeni : ''),
-    (row.akademikIzlemeDurumu === 'Yapıldı' ? formatDate(row.akademikIzlemeTarihi) : ''),
-    row.yazilimYuklemeUyesi,
-    formatDate(row.yazilimaYuklemeTarihi),
-    row.yuklemeDurumu // YENİ EKLENEN FİLTRE ALANI
-];
+                    formatDate(row.cekimTarihi), row.sinavTuru, row.anlatimTuru, row.videoKodu, row.brans, row.unite, row.bolum, row.ders, row.testAdi,
+                    row.soruSayisi, row.not, row.anlaticiOgretmen, row.yonetmen, row.akademikDinleyici, formatDate(row.kurguBaslamaTarihi),
+                    formatDate(row.kurguBitisTarihi), row.kurguOperatoru, row.kurguDurumu,
+                    (row.teknikIzlemeDurumu === 'Yapıldı' ? row.teknikEkipUyesi : ''), 
+                    (row.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(row.teknikIzlemeTarihi) : ''),
+                    (row.akademikIzlemeDurumu === 'Yapıldı' ? row.akademikIzlemeOgretmeni : ''),
+                    (row.akademikIzlemeDurumu === 'Yapıldı' ? formatDate(row.akademikIzlemeTarihi) : ''),
+                    row.yuklenmeDurumu,
+                    row.yazilimYuklemeUyesi,
+                    formatDate(row.yazilimaYuklemeTarihi),
+                    row.yuklemeDurumu
+                ];
                 return (columns[index] || '').toString().toLowerCase().includes(filter);
             });
         });
         
-        // YENİ: Veriyi video koduna göre grupla
         const groupedData = Object.values(filteredCekimler.reduce((acc, item) => {
-            const key = item.videoKodu || `no-code-${item.id}`; // Kodu olmayanlar için benzersiz anahtar
+            const key = item.videoKodu || `no-code-${item.id}`;
             if (!acc[key]) acc[key] = [];
             acc[key].push(item);
             return acc;
         }, {}));
 
         recordCountEl.textContent = `Toplam ${filteredCekimler.length} kayıt bulundu.`;
-        displayPage(groupedData); // YENİ: Gruplanmış veriyi gönder
-        setupPagination(groupedData); // YENİ: Gruplanmış veriyi gönder
+        displayPage(groupedData);
+        setupPagination(groupedData);
         updateCollapsibleHeight(document.getElementById('liste-tablo-alani'));
     }
 
@@ -482,7 +500,6 @@ document.addEventListener('DOMContentLoaded', () => {
         resetForm();
     });
 
-    // --- GRUPLAMA VE SAYFALAMA MANTIĞI İLE GÜNCELLENEN displayPage FONKSİYONU ---
     function displayPage(groups) {
         tableBody.innerHTML = '';
         const start = (currentPage - 1) * rowsPerPage;
@@ -553,12 +570,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="p-2 align-middle border">${teknikIzlemeTarihiHtml}</td>
                     <td class="p-2 align-middle border">${akademikOgretmenHtml}</td>
                     <td class="p-2 align-middle border">${akademikTarihHtml}</td>
-                    <td class="p-2 align-middle border">${data.yuklenmeDurumu || ''}</td>
+                    <td class="p-2 align-middle border">
+                        ${ data.yuklenmeDurumu ? 
+                            `<span class="status-badge ${ 
+                                (data.yuklenmeDurumu || 'belirtilmedi').toLowerCase()
+                                    .replace(/ /g, '-')
+                                    .replace(/ı/g, 'i').replace(/ğ/g, 'g').replace(/ü/g, 'u')
+                                    .replace(/ş/g, 's').replace(/ö/g, 'o').replace(/ç/g, 'c') 
+                            }">${data.yuklenmeDurumu}</span>` 
+                            : '' 
+                        }
+                    </td>
                     <td class="p-2 align-middle border">${data.yazilimYuklemeUyesi || ''}</td>
                     <td class="p-2 align-middle border">${formatDate(data.yazilimaYuklemeTarihi)}</td>
                     <td class="p-2 align-middle border">${data.yuklemeDurumu || ''}</td>
                     <td class="p-2 align-middle border">
-    <div class="flex items-center justify-center space-x-2">
+                        <div class="flex items-center justify-center space-x-2">
                             <button title="Düzenle" class="text-indigo-600 hover:text-indigo-900 p-2 rounded-full hover:bg-indigo-100 edit-row" data-id="${data.id}"><i class="fas fa-edit"></i></button>
                             <button title="Sil" class="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-100 delete-row" data-id="${data.id}"><i class="fas fa-trash"></i></button>
                         </div>
@@ -568,61 +595,54 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // YENİ: PAGINATION ARTIK GRUPLAR ÜZERİNDEN YAPILIYOR
     function setupPagination(groups) {
-    paginationControlsEl.innerHTML = '';
-    const pageCount = Math.ceil(groups.length / rowsPerPage);
-    if (pageCount <= 1) return;
+        paginationControlsEl.innerHTML = '';
+        const pageCount = Math.ceil(groups.length / rowsPerPage);
+        if (pageCount <= 1) return;
 
-    // Önceki Butonu
-    const prevButton = document.createElement('button');
-    prevButton.innerHTML = `<i class="fas fa-chevron-left"></i>`;
-    prevButton.className = 'pagination-button';
-    prevButton.disabled = currentPage === 1;
-    prevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderFilteredData(); } });
-    paginationControlsEl.appendChild(prevButton);
+        const prevButton = document.createElement('button');
+        prevButton.innerHTML = `<i class="fas fa-chevron-left"></i>`;
+        prevButton.className = 'pagination-button';
+        prevButton.disabled = currentPage === 1;
+        prevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderFilteredData(); } });
+        paginationControlsEl.appendChild(prevButton);
 
-    // Sayfa Numaralarını Oluşturma Mantığı
-    const pageNumbers = new Set();
-    pageNumbers.add(1); // Her zaman ilk sayfayı göster
-    if (pageCount > 1) pageNumbers.add(pageCount); // Her zaman son sayfayı göster
+        const pageNumbers = new Set();
+        pageNumbers.add(1); 
+        if (pageCount > 1) pageNumbers.add(pageCount); 
 
-    // Mevcut sayfanın etrafındaki sayfaları ekle
-    if (currentPage > 1) pageNumbers.add(currentPage - 1);
-    pageNumbers.add(currentPage);
-    if (currentPage < pageCount) pageNumbers.add(currentPage + 1);
+        if (currentPage > 1) pageNumbers.add(currentPage - 1);
+        pageNumbers.add(currentPage);
+        if (currentPage < pageCount) pageNumbers.add(currentPage + 1);
 
-    const sortedPages = Array.from(pageNumbers).sort((a, b) => a - b);
-    let lastPage = 0;
+        const sortedPages = Array.from(pageNumbers).sort((a, b) => a - b);
+        let lastPage = 0;
 
-    sortedPages.forEach(page => {
-        // Sayfalar arasında boşluk varsa '...' ekle
-        if (page > lastPage + 1) {
-            const ellipsis = document.createElement('span');
-            ellipsis.className = 'px-3 py-2 text-gray-500';
-            ellipsis.textContent = '...';
-            paginationControlsEl.appendChild(ellipsis);
-        }
+        sortedPages.forEach(page => {
+            if (page > lastPage + 1) {
+                const ellipsis = document.createElement('span');
+                ellipsis.className = 'px-3 py-2 text-gray-500';
+                ellipsis.textContent = '...';
+                paginationControlsEl.appendChild(ellipsis);
+            }
 
-        // Sayfa numarasını ekle
-        const btn = document.createElement('button');
-        btn.innerText = page;
-        btn.className = 'pagination-button';
-        if (page === currentPage) btn.classList.add('active');
-        btn.addEventListener('click', () => { currentPage = page; renderFilteredData(); });
-        paginationControlsEl.appendChild(btn);
-        
-        lastPage = page;
-    });
+            const btn = document.createElement('button');
+            btn.innerText = page;
+            btn.className = 'pagination-button';
+            if (page === currentPage) btn.classList.add('active');
+            btn.addEventListener('click', () => { currentPage = page; renderFilteredData(); });
+            paginationControlsEl.appendChild(btn);
+            
+            lastPage = page;
+        });
 
-    // Sonraki Butonu
-    const nextButton = document.createElement('button');
-    nextButton.innerHTML = `<i class="fas fa-chevron-right"></i>`;
-    nextButton.className = 'pagination-button';
-    nextButton.disabled = currentPage === pageCount;
-    nextButton.addEventListener('click', () => { if (currentPage < pageCount) { currentPage++; renderFilteredData(); } });
-    paginationControlsEl.appendChild(nextButton);
-}
+        const nextButton = document.createElement('button');
+        nextButton.innerHTML = `<i class="fas fa-chevron-right"></i>`;
+        nextButton.className = 'pagination-button';
+        nextButton.disabled = currentPage === pageCount;
+        nextButton.addEventListener('click', () => { if (currentPage < pageCount) { currentPage++; renderFilteredData(); } });
+        paginationControlsEl.appendChild(nextButton);
+    }
     
     function resetForm() {
         cekForm.reset();
@@ -640,6 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
         uniteSelect.innerHTML = '<option value="">Önce branş seçiniz...</option>';
         updateSelectDisplay(bransSelect);
         updateSelectDisplay(uniteSelect);
+        updateYuklenmeDurumuColor();
     }
 
     tableBody.addEventListener('click', async function(e) {
@@ -652,8 +673,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 child.style.display = child.style.display === 'table-row' ? 'none' : 'table-row';
             });
             toggleIcon.classList.toggle('expanded');
-            
-            // YENİ: Konteynerin yüksekliğini güncelle
             updateCollapsibleHeight(document.getElementById('liste-tablo-alani'));
             return;
         }
@@ -700,26 +719,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = editButton.dataset.id;
             const cekim = allCekimler.find(c => c.id == id);
             if (!cekim) return;
-
-            // 1. Formu sıfırla ve temel bilgileri doldur
+            
             cekForm.reset();
-            document.getElementById('editing-row-id').value = id;
-            cekForm.elements['cekimTarihi'].value = cekim.cekimTarihi || '';
-            cekForm.elements['videoKodu'].value = cekim.videoKodu || '';
-            cekForm.elements['testAdi'].value = cekim.testAdi || '';
-            cekForm.elements['soruSayisi'].value = cekim.soruSayisi || '';
-            cekForm.elements['not'].value = cekim.not || '';
-
-            // 2. Bağımsız seçim kutularını doldur ve görünümlerini güncelle
-            ['anlatimTuru', 'bolum', 'ders', 'anlaticiOgretmen', 'yuklenmeDurumu'].forEach(name => {
-                const selectElement = cekForm.elements[name];
-                if (selectElement) {
-                    selectElement.value = cekim[name] || '';
-                    updateSelectDisplay(selectElement);
+            
+            Object.keys(cekim).forEach(key => {
+                const element = cekForm.elements[key];
+                if (element && !element.multiple) {
+                    element.value = cekim[key] || '';
                 }
             });
 
-            // 3. Birbirine bağlı seçim kutularını sıralı ve garantili bir şekilde doldur
+            ['anlatimTuru', 'bolum', 'ders', 'anlaticiOgretmen', 'yuklenmeDurumu'].forEach(name => {
+                const el = cekForm.elements[name];
+                if(el) updateSelectDisplay(el);
+            });
+
             const sinavTuruSelect = document.getElementById('sinav-turu-select');
             sinavTuruSelect.value = cekim.sinavTuru || '';
             updateSelectDisplay(sinavTuruSelect);
@@ -735,20 +749,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     const uniteSelect = document.getElementById('unite-select');
                     uniteSelect.value = cekim.unite || '';
                     updateSelectDisplay(uniteSelect);
-                }, 150); // İç içe zamanlayıcı için biraz daha süre
-            }, 150); // Branş listesinin dolması için bekleme süresi
+                }, 100);
+            }, 100);
 
-            // 4. Form başlığını ve buton metnini güncelle
+            document.getElementById('editing-row-id').value = id;
             document.getElementById('form-title').innerHTML = '<i class="fas fa-edit mr-3 text-indigo-500"></i>Kaydı Düzenle';
             document.getElementById('submit-text').textContent = 'Güncelle';
             document.getElementById('submit-icon').className = 'fas fa-sync-alt mr-2';
-
-            // 5. Formu görünür hale getir ve kaydır
             const formContent = document.getElementById('cekim-ekle-form');
             if (!formContent.style.maxHeight || formContent.style.maxHeight === '0px') {
                 formContent.parentElement.querySelector('.collapsible-trigger').click();
             }
             document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
+            updateYuklenmeDurumuColor();
         }
 
         if (downloadFilesBtn) { /* ... JSZip indirme kodu ... */ }
@@ -778,7 +791,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- SAYFA YÜKLENDİĞİNDE ÇALIŞACAK KODLAR ---
+    document.querySelector('select[name="yuklenmeDurumu"]').addEventListener('change', updateYuklenmeDurumuColor);
+    
     function initializePage() {
         document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
             const content = document.getElementById(trigger.dataset.target);
@@ -808,6 +822,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         renderTable(); 
+        document.querySelector('select[name="yuklenmeDurumu"]').addEventListener('change', updateYuklenmeDurumuColor);
     }
     
     initializePage();
@@ -816,4 +831,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
-
