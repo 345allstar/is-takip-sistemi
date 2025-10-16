@@ -19,14 +19,15 @@
         .group-toggle-icon.expanded { transform: rotate(180deg); }
         .group-count-badge { background-color: #e0e7ff; color: #4338ca; padding: 2px 6px; border-radius: 8px; font-size: 0.7rem; font-weight: 500; margin-left: 8px; }
         #cekim-tablosu-body tr.satir-secili { outline: 2px solid #ef4444; outline-offset: -2px; }
-        .status-yuklendi { background-color: #dcfce7; color: #166534; } /* Green */
-.status-yuklenmedi { background-color: #fee2e2; color: #991b1b; } /* Red */
-.status-yuklenmeye-hazir { background-color: #dbeafe; color: #1d4ed8; } /* Blue */
-.status-kontrol-ediliyor { background-color: #fef3c7; color: #92400e; } /* Amber */
-.status-kontrol-bekliyor { background-color: #f3f4f6; color: #4b5563; } /* Gray */
-.status-teknik-duzeltmede { background-color: #e5e0ff; color: #5b21b6; } /* Violet */
-.status-akademik-izlemede { background-color: #cffafe; color: #0e7490; } /* Cyan */
-.status-belirtilmedi { background-color: #f3f4f6; color: #4b5563; } /* Gray */
+        /* Farklı durumlar için renk stilleri */
+.status-yuklendi { background-color: #dcfce7 !important; color: #166534 !important; }
+.status-yuklenmedi { background-color: #fee2e2 !important; color: #991b1b !important; }
+.status-yuklenmeye-hazir { background-color: #dbeafe !important; color: #1d4ed8 !important; }
+.status-kontrol-ediliyor { background-color: #fef3c7 !important; color: #92400e !important; }
+.status-kontrol-bekliyor { background-color: #f3f4f6 !important; color: #4b5563 !important; }
+.status-teknik-duzeltmede { background-color: #e5e0ff !important; color: #5b21b6 !important; }
+.status-akademik-izlemede { background-color: #cffafe !important; color: #0e7490 !important; }
+.status-belirtilmedi { background-color: #f3f4f6 !important; color: #4b5563 !important; }
     </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
@@ -250,19 +251,14 @@ document.addEventListener('DOMContentLoaded', () => {
 function updateYuklenmeDurumuColor() {
     const yuklenmeDurumuSelect = document.querySelector('select[name="yuklenmeDurumu"]');
     if (!yuklenmeDurumuSelect) return;
-
-    const displayButton = yuklenmeDurumuSelect.previousElementSibling; // Bu, görünürdeki butondur
+    const displayButton = yuklenmeDurumuSelect.previousElementSibling;
     if (!displayButton) return;
-
-    // Önceki tüm renk sınıflarını temizle
     const statusClasses = ['status-yuklendi', 'status-yuklenmedi', 'status-yuklenmeye-hazir', 'status-kontrol-ediliyor', 'status-kontrol-bekliyor', 'status-teknik-duzeltmede', 'status-akademik-izlemede'];
     displayButton.classList.remove(...statusClasses);
-
     const selectedValue = yuklenmeDurumuSelect.value;
     if (selectedValue) {
         const newClass = (selectedValue || '').toLowerCase()
-            .replace(/ /g, '-')
-            .replace(/ı/g, 'i').replace(/ğ/g, 'g').replace(/ü/g, 'u')
+            .replace(/ /g, '-').replace(/ı/g, 'i').replace(/ğ/g, 'g').replace(/ü/g, 'u')
             .replace(/ş/g, 's').replace(/ö/g, 'o').replace(/ç/g, 'c');
         displayButton.classList.add(`status-${newClass}`);
     }
@@ -583,7 +579,21 @@ function updateYuklenmeDurumuColor() {
                     <td class="p-2 align-middle border">${teknikIzlemeTarihiHtml}</td>
                     <td class="p-2 align-middle border">${akademikOgretmenHtml}</td>
                     <td class="p-2 align-middle border">${akademikTarihHtml}</td>
-                    <td class="p-2 align-middle border">${data.yuklenmeDurumu || ''}</td>
+                    <td class="p-2 align-middle border">
+    ${ data.yuklenmeDurumu ? 
+        `<span class="status-badge ${ 
+            (data.yuklenmeDurumu || 'belirtilmedi').toLowerCase()
+                .replace(/ /g, '-')
+                .replace(/ı/g, 'i')
+                .replace(/ğ/g, 'g')
+                .replace(/ü/g, 'u')
+                .replace(/ş/g, 's')
+                .replace(/ö/g, 'o')
+                .replace(/ç/g, 'c') 
+        }">${data.yuklenmeDurumu}</span>` 
+        : '' 
+    }
+</td>
                     <td class="p-2 align-middle border">${data.yazilimYuklemeUyesi || ''}</td>
                     <td class="p-2 align-middle border">${formatDate(data.yazilimaYuklemeTarihi)}</td>
                     <td class="p-2 align-middle border">${data.yuklemeDurumu || ''}</td>
@@ -824,13 +834,14 @@ document.querySelector('select[name="yuklenmeDurumu"]').addEventListener('change
         
         renderTable(); 
     }
-    
+    document.querySelector('select[name="yuklenmeDurumu"]').addEventListener('change', updateYuklenmeDurumuColor);
     initializePage();
 });
 </script>
 
 </body>
 </html>
+
 
 
 
