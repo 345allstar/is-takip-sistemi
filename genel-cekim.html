@@ -110,11 +110,17 @@
                                     </select>
                                 </div>
                                 <div class="lg:col-span-3"><label class="form-label">Not</label><textarea name="not" rows="2" class="form-input-base" placeholder="Eklemek istediğiniz notlar..."></textarea></div>
-                                <div class="md:col-span-2 lg:col-span-3 text-right pt-4">
-                                    <button id="submit-button" type="submit" class="inline-flex items-center justify-center py-2 px-6 border border-transparent shadow-lg text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700">
-                                        <i id="submit-icon" class="fas fa-check mr-2"></i><span id="submit-text">Kaydet</span>
-                                    </button>
-                                </div>
+                                <div class="md:col-span-2 lg:col-span-3 flex items-center justify-end gap-3 pt-4">
+  <button id="reset-button" type="button"
+    class="inline-flex items-center justify-center py-2 px-5 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50">
+    <i class="fas fa-eraser mr-2"></i>Temizle
+  </button>
+
+  <button id="submit-button" type="submit"
+    class="inline-flex items-center justify-center py-2 px-6 border border-transparent shadow-lg text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700">
+    <i id="submit-icon" class="fas fa-check mr-2"></i><span id="submit-text">Kaydet</span>
+  </button>
+</div>
                             </form>
                         </div>
                     </div>
@@ -706,7 +712,18 @@ function setSelectByValueOrText(selectEl, rawVal) {
         updateSelectDisplay(bransSelect);
         updateSelectDisplay(uniteSelect);
     }
+// Temizle butonu tıklanınca formu sıfırla
+const clearBtn = document.createElement('button');
+clearBtn.type = 'button';
+clearBtn.className = 'ml-3 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg shadow-sm transition';
+clearBtn.innerHTML = '<i class="fas fa-undo mr-2"></i>Temizle';
+clearBtn.addEventListener('click', resetForm);
 
+const submitButton = document.querySelector('#cek-form button[type="submit"]');
+if (submitButton && submitButton.parentElement) {
+    submitButton.parentElement.appendChild(clearBtn);
+}
+    
     tableBody.addEventListener('click', async function(e) {
         const toggleIcon = e.target.closest('.group-toggle-icon');
         if (toggleIcon) {
@@ -871,6 +888,7 @@ cekForm.querySelectorAll('.searchable-select').forEach(updateSelectDisplay);
 
 </body>
 </html>
+
 
 
 
