@@ -286,31 +286,6 @@ function renderBadge(text) {
         icon.className = 'fas fa-chevron-down text-gray-400';
         displayButton.appendChild(icon);
         container.appendChild(displayButton);
-        // Temizle (x) butonu
-const clearBtn = document.createElement('button');
-clearBtn.type = 'button';
-clearBtn.title = 'Seçimi temizle';
-clearBtn.className = 'ml-2 text-gray-400 hover:text-gray-600';
-clearBtn.innerHTML = '<i class="fas fa-times-circle"></i>';
-// displayButton'ın hemen sağına koy
-const headerWrap = document.createElement('div');
-headerWrap.className = 'flex items-center';
-headerWrap.appendChild(displayButton);
-headerWrap.appendChild(clearBtn);
-container.appendChild(headerWrap);
-
-// clear butonunu göster/gizle
-function updateClearBtn() {
-  const hasValue = !!selectElement.value;
-  clearBtn.style.display = hasValue ? '' : 'none';
-}
-
-clearBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  selectElement.value = '';
-  if (typeof selectElement.updateDropdown === 'function') selectElement.updateDropdown();
-  selectElement.dispatchEvent(new Event('change'));
-});
         const dropdown = document.createElement('div');
         dropdown.className = 'searchable-select-dropdown hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg';
         const searchInput = document.createElement('input');
@@ -337,29 +312,14 @@ if ((selectElement.getAttribute('name') || selectElement.id || '').toLowerCase()
   optionDiv.textContent = option.textContent;
 }
                 optionDiv.addEventListener('click', () => {
-  selectElement.value = option.value;
-  if (typeof selectElement.updateDropdown === 'function') selectElement.updateDropdown(); // görünümü yenile
-  dropdown.classList.add('hidden');
-  selectElement.dispatchEvent(new Event('change'));
-});
+                    selectElement.value = option.value;
+                    displaySpan.textContent = option.textContent;
+                    displaySpan.classList.remove('text-gray-400');
+                    dropdown.classList.add('hidden');
+                    selectElement.dispatchEvent(new Event('change'));
+                });
                 optionsList.appendChild(optionDiv);
             });
-            // En üste "Seçimi temizle" satırı (seçili bir değer varsa)
-if (selectElement.value) {
-  const clearRow = document.createElement('div');
-  clearRow.className = 'p-2 text-xs text-gray-600 cursor-pointer hover:bg-red-50 rounded';
-  clearRow.innerHTML = '<i class="fas fa-eraser mr-1"></i> Seçimi temizle';
-  clearRow.addEventListener('click', () => {
-    selectElement.value = '';
-    if (typeof selectElement.updateDropdown === 'function') selectElement.updateDropdown();
-    selectElement.dispatchEvent(new Event('change'));
-    dropdown.classList.add('hidden');
-  });
-  optionsList.appendChild(clearRow);
-  const sep = document.createElement('div');
-  sep.className = 'h-px bg-gray-200 my-1';
-  optionsList.appendChild(sep);
-}
             // daha toleranslı seçim (value yoksa görünen metne bak)
 const _n = s => (s ?? '').toString().replace(/\s+/g,' ').trim().toLowerCase();
 
@@ -370,9 +330,7 @@ if (!selectedOption) {
 }
 if (!selectedOption) selectedOption = selectElement.options[0];
 
-if (selectedOption) 
-updateClearBtn(); // x butonunun görünürlüğünü güncelle
-}
+if (selectedOption) {
   // "Yüklenme Durumu" ise rozet, değilse düz metin
   if ((selectElement.getAttribute('name') || selectElement.id || '').toLowerCase() === 'yuklenmedurumu' && selectedOption.value !== "") {
     displaySpan.innerHTML = renderBadge(selectedOption.textContent);
@@ -930,10 +888,3 @@ cekForm.querySelectorAll('.searchable-select').forEach(updateSelectDisplay);
 
 </body>
 </html>
-
-
-
-
-
-
-
