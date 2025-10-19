@@ -94,11 +94,14 @@
                                 <div><label class="form-label">Soru Sayısı</label>
                                     <input name="soruSayisi" type="number" min="1" max="50" placeholder="Örn: 8" class="form-input-base">
                                 </div>
-                                 <!-- Tekrar Çekim (checkbox) -->
-<div class="flex items-center">
-  <input id="tekrar-cekim" name="tekrarCekim" type="checkbox"
-         class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-  <label for="tekrar-cekim" class="ml-2 text-sm font-medium text-gray-700">Tekrar Çekim</label>
+                                <div>
+  <label class="form-label">Tekrar Çekim</label>
+  <div class="mt-2">
+    <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+      <input type="checkbox" name="tekrarCekim" class="w-4 h-4 rounded border-gray-300">
+      <span>Evet</span>
+    </label>
+  </div>
 </div>
                                 <div><label class="form-label">Anlatıcı Öğretmen</label>
                                     <select name="anlaticiOgretmen" class="searchable-select">
@@ -527,16 +530,18 @@ function setSelectByValueOrText(selectEl, rawVal) {
             return filters.every((filter, index) => {
                 if (!filter) return true;
                const columns = [
-    formatDate(row.cekimTarihi), row.sinavTuru, row.anlatimTuru, row.videoKodu, row.brans, row.unite, row.bolum, row.ders, row.testAdi,
-    row.soruSayisi, row.not, row.tekrarCekim ? 'Evet' : 'Hayır'), row.anlaticiOgretmen, row.yonetmen, row.akademikDinleyici, formatDate(row.kurguBaslamaTarihi),
-    formatDate(row.kurguBitisTarihi), row.kurguOperatoru, row.kurguDurumu,
-    (row.teknikIzlemeDurumu === 'Yapıldı' ? row.teknikEkipUyesi : ''), 
-    (row.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(row.teknikIzlemeTarihi) : ''),
-    (row.akademikIzlemeDurumu === 'Yapıldı' ? row.akademikIzlemeOgretmeni : ''),
-    (row.akademikIzlemeDurumu === 'Yapıldı' ? formatDate(row.akademikIzlemeTarihi) : ''),
-    row.yazilimYuklemeUyesi,
-    formatDate(row.yazilimaYuklemeTarihi),
-    row.yuklemeDurumu // YENİ EKLENEN FİLTRE ALANI
+  formatDate(row.cekimTarihi), row.sinavTuru, row.anlatimTuru, row.videoKodu, row.brans, row.unite, row.bolum, row.ders, row.testAdi,
+  row.soruSayisi, row.not,
+  (row.tekrarCekim ? 'Evet' : 'Hayır'),   // <<< EKLENEN SÜTUN
+  row.anlaticiOgretmen, row.yonetmen, row.akademikDinleyici, formatDate(row.kurguBaslamaTarihi),
+  formatDate(row.kurguBitisTarihi), row.kurguOperatoru, row.kurguDurumu,
+  (row.teknikIzlemeDurumu === 'Yapıldı' ? row.teknikEkipUyesi : ''), 
+  (row.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(row.teknikIzlemeTarihi) : ''),
+  (row.akademikIzlemeDurumu === 'Yapıldı' ? row.akademikIzlemeOgretmeni : ''),
+  (row.akademikIzlemeDurumu === 'Yapıldı' ? formatDate(row.akademikIzlemeTarihi) : ''),
+  row.yazilimYuklemeUyesi,
+  formatDate(row.yazilimaYuklemeTarihi),
+  row.yuklemeDurumu
 ];
                 return (columns[index] || '').toString().toLowerCase().includes(filter);
             });
@@ -951,6 +956,7 @@ cekForm.querySelectorAll('.searchable-select').forEach(updateSelectDisplay);
 
 </body>
 </html>
+
 
 
 
