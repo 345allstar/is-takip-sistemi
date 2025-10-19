@@ -93,18 +93,19 @@ label > span.rounded-full.shadow { box-shadow: 0 1px 2px rgba(0,0,0,.08); }
                                     <input name="testAdi" type="text" list="test-adi-list" placeholder="Test adını yazın..." class="form-input-base">
                                     <datalist id="test-adi-list"></datalist>
                                 </div>
-                                <div><label class="form-label">Soru Sayısı</label>
-                                    <input name="soruSayisi" type="number" min="1" max="50" placeholder="Örn: 8" class="form-input-base">
-                                </div>
-                                <div>
-  <label for="tekrar-cekim" class="inline-flex items-center gap-3 cursor-pointer select-none mt-2">
-  <input id="tekrar-cekim" name="tekrarCekim" type="checkbox" class="sr-only peer">
-  <div class="w-11 h-6 rounded-full bg-gray-200 transition peer-checked:bg-emerald-500 relative
-              after:content-[''] after:absolute after:top-0.5 after:left-0.5
-              after:w-5 after:h-5 after:bg-white after:rounded-full after:shadow
-              after:transition-all peer-checked:after:translate-x-5"></div>
-  <span class="text-sm font-medium text-gray-700">Tekrar Çekim</span>
-</label>
+                                <!-- Soru Sayısı (değişmiyor) -->
+<div><label class="form-label">Soru Sayısı</label>
+  <input name="soruSayisi" type="number" min="1" max="50" placeholder="Örn: 8" class="form-input-base">
+</div>
+
+<!-- Tekrar Çekim: tek hücre içinde label + toggle -->
+<div>
+  <label class="form-label">Tekrar Çekim</label>
+  <div class="mt-2">
+    <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+      <input type="checkbox" name="tekrarCekim" class="w-4 h-4 rounded border-gray-300">
+      <span>Evet</span>
+    </label>
   </div>
 </div>
                                 <div><label class="form-label">Anlatıcı Öğretmen</label>
@@ -960,6 +961,7 @@ cekForm.querySelectorAll('.searchable-select').forEach(updateSelectDisplay);
 
 </body>
 </html>
+
 
 
 
