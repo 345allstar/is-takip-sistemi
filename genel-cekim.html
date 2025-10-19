@@ -277,15 +277,45 @@ function renderBadge(text) {
         selectElement.style.display = 'none';
         container.appendChild(selectElement);
         const displayButton = document.createElement('button');
-        displayButton.type = 'button';
-        displayButton.className = 'form-input-base text-left flex justify-between items-center';
-        const displaySpan = document.createElement('span');
-        displaySpan.className = 'truncate';
-        displayButton.appendChild(displaySpan);
-        const icon = document.createElement('i');
-        icon.className = 'fas fa-chevron-down text-gray-400';
-        displayButton.appendChild(icon);
-        container.appendChild(displayButton);
+       const displayButton = document.createElement('button');
+displayButton.type = 'button';
+displayButton.className = 'form-input-base text-left flex justify-between items-center';
+
+const displaySpan = document.createElement('span');
+displaySpan.className = 'truncate';
+displayButton.appendChild(displaySpan);
+
+const icon = document.createElement('i');
+icon.className = 'fas fa-chevron-down text-gray-400';
+displayButton.appendChild(icon);
+
+// Temizle (x) butonu
+const clearBtn = document.createElement('button');
+clearBtn.type = 'button';
+clearBtn.title = 'Seçimi temizle';
+clearBtn.className = 'ml-2 text-gray-400 hover:text-gray-600';
+clearBtn.innerHTML = '<i class="fas fa-times-circle"></i>';
+
+// display + x butonunu aynı satıra koy
+const headerWrap = document.createElement('div');
+headerWrap.className = 'flex items-center';
+headerWrap.appendChild(displayButton);
+headerWrap.appendChild(clearBtn);
+container.appendChild(headerWrap);
+
+// x butonunun görünürlüğünü yöneten yardımcı
+function updateClearBtn() {
+  const hasValue = !!selectElement.value;
+  clearBtn.style.display = hasValue ? '' : 'none';
+}
+
+// x butonu tıklanınca seçimi temizle
+clearBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  selectElement.value = '';
+  if (typeof selectElement.updateDropdown === 'function') selectElement.updateDropdown();
+  selectElement.dispatchEvent(new Event('change')); // bağımlıları tetikler (örn. Branş/Ünite)
+});
         const dropdown = document.createElement('div');
         dropdown.className = 'searchable-select-dropdown hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg';
         const searchInput = document.createElement('input');
@@ -299,6 +329,23 @@ function renderBadge(text) {
         container.appendChild(dropdown);
         const updateOptions = () => {
             optionsList.innerHTML = '';
+            // En üste "Seçimi temizle" satırı (değer varsa göster)
+if (selectElement.value) {
+  const clearRow = document.createElement('div');
+  clearRow.className = 'p-2 text-xs text-gray-600 cursor-pointer hover:bg-red-50 rounded';
+  clearRow.innerHTML = '<i class="fas fa-eraser mr-1"></i> Seçimi temizle';
+  clearRow.addEventListener('click', () => {
+    selectElement.value = '';
+    if (typeof selectElement.updateDropdown === 'function') selectElement.updateDropdown();
+    selectElement.dispatchEvent(new Event('change'));
+    dropdown.classList.add('hidden');
+  });
+  optionsList.appendChild(clearRow);
+
+  const sep = document.createElement('div');
+  sep.className = 'h-px bg-gray-200 my-1';
+  optionsList.appendChild(sep);
+}
             Array.from(selectElement.options).forEach(option => {
                 if (option.value === "" && (option.textContent.includes('Seçiniz') || option.textContent.includes('Önce'))) return;
                 const optionDiv = document.createElement('div');
@@ -312,12 +359,11 @@ if ((selectElement.getAttribute('name') || selectElement.id || '').toLowerCase()
   optionDiv.textContent = option.textContent;
 }
                 optionDiv.addEventListener('click', () => {
-                    selectElement.value = option.value;
-                    displaySpan.textContent = option.textContent;
-                    displaySpan.classList.remove('text-gray-400');
-                    dropdown.classList.add('hidden');
-                    selectElement.dispatchEvent(new Event('change'));
-                });
+  selectElement.value = option.value;
+  if (typeof selectElement.updateDropdown === 'function') selectElement.updateDropdown();
+  dropdown.classList.add('hidden');
+  selectElement.dispatchEvent(new Event('change'));
+});
                 optionsList.appendChild(optionDiv);
             });
             // daha toleranslı seçim (value yoksa görünen metne bak)
@@ -339,6 +385,7 @@ if (selectedOption) {
     displaySpan.textContent = selectedOption.textContent;
     if (selectedOption.value === "" || selectElement.disabled) displaySpan.classList.add('text-gray-400');
     else displaySpan.classList.remove('text-gray-400');
+      updateClearBtn(); // x butonunun görünürlüğünü güncelle
   }
 }
 };
@@ -888,3 +935,4 @@ cekForm.querySelectorAll('.searchable-select').forEach(updateSelectDisplay);
 
 </body>
 </html>
+
