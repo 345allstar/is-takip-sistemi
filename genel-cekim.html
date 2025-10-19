@@ -94,6 +94,12 @@
                                 <div><label class="form-label">Soru Sayısı</label>
                                     <input name="soruSayisi" type="number" min="1" max="50" placeholder="Örn: 8" class="form-input-base">
                                 </div>
+                                 <!-- Tekrar Çekim (checkbox) -->
+<div class="flex items-center">
+  <input id="tekrar-cekim" name="tekrarCekim" type="checkbox"
+         class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+  <label for="tekrar-cekim" class="ml-2 text-sm font-medium text-gray-700">Tekrar Çekim</label>
+</div>
                                 <div><label class="form-label">Anlatıcı Öğretmen</label>
                                     <select name="anlaticiOgretmen" class="searchable-select">
                                         <option value="">Seçiniz...</option>
@@ -148,6 +154,7 @@
                                             <th class="p-2 border">Test Adı</th>
                                             <th class="p-2 border">Soru Sayısı</th>
                                             <th class="p-2 border">Not</th>
+                                            <th class="p-2 border">Tekrar Çekim</th>
                                             <th class="p-2 border">Anlatıcı Öğretmen</th>
                                             <th class="p-2 border">Yönetmen</th>
                                             <th class="p-2 border">Akademik Dinleyici</th>
@@ -177,6 +184,7 @@
                                             <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
                                             <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
                                             <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
+                                            <td class="p-1 border"><input type="text" placeholder="Evet/Hayır" class="filter-input w-full text-xs p-1 rounded"></td>
                                             <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
                                             <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
                                             <td class="p-1 border"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 rounded"></td>
@@ -520,7 +528,7 @@ function setSelectByValueOrText(selectEl, rawVal) {
                 if (!filter) return true;
                const columns = [
     formatDate(row.cekimTarihi), row.sinavTuru, row.anlatimTuru, row.videoKodu, row.brans, row.unite, row.bolum, row.ders, row.testAdi,
-    row.soruSayisi, row.not, row.anlaticiOgretmen, row.yonetmen, row.akademikDinleyici, formatDate(row.kurguBaslamaTarihi),
+    row.soruSayisi, row.not, row.tekrarCekim ? 'Evet' : 'Hayır'), row.anlaticiOgretmen, row.yonetmen, row.akademikDinleyici, formatDate(row.kurguBaslamaTarihi),
     formatDate(row.kurguBitisTarihi), row.kurguOperatoru, row.kurguDurumu,
     (row.teknikIzlemeDurumu === 'Yapıldı' ? row.teknikEkipUyesi : ''), 
     (row.teknikIzlemeDurumu === 'Yapıldı' ? formatDate(row.teknikIzlemeTarihi) : ''),
@@ -565,6 +573,8 @@ function setSelectByValueOrText(selectEl, rawVal) {
         e.preventDefault();
         const formData = new FormData(cekForm);
         const data = Object.fromEntries(formData.entries());
+        // Checkbox değeri: true/false olarak yaz
+data.tekrarCekim = !!cekForm.elements['tekrarCekim'].checked;
         const editingId = data.id;
         
         if (!editingId) {
@@ -659,6 +669,7 @@ function setSelectByValueOrText(selectEl, rawVal) {
                     <td class="p-2 align-middle border">${data.testAdi || ''}</td>
                     <td class="p-2 align-middle border">${data.soruSayisi || ''}</td>
                     <td class="p-2 align-middle border"><div class="max-w-[100px] mx-auto whitespace-nowrap overflow-hidden text-ellipsis" title="${data.not || ''}">${(data.not || '').substring(0,15)}${(data.not || '').length > 15 ? '...' : ''}</div></td>
+                    <td class="p-2 align-middle border">${data.tekrarCekim ? 'Evet' : 'Hayır'}</td>
                     <td class="p-2 align-middle border">${data.anlaticiOgretmen || ''}</td>
                     <td class="p-2 align-middle border">${data.yonetmen || ''}${timecodeFileIcon}</td>
                     <td class="p-2 align-middle border">${data.akademikDinleyici || ''}</td>
@@ -744,6 +755,9 @@ function setSelectByValueOrText(selectEl, rawVal) {
     function resetForm() {
         cekForm.reset();
         document.getElementById('editing-row-id').value = '';
+            // Tekrar Çekim'i sıfırla
+    const chkTekrar = cekForm.elements['tekrarCekim'];
+    if (chkTekrar) chkTekrar.checked = false;
         document.getElementById('form-title').innerHTML = '<i class="fas fa-plus-circle mr-3 text-indigo-500"></i>Çekim Ekle';
         document.getElementById('submit-text').textContent = 'Kaydet';
         document.getElementById('submit-icon').className = 'fas fa-check mr-2';
@@ -834,6 +848,9 @@ Object.keys(cekim).forEach(key => {
   const el = cekForm.elements[key];
   if (el && el.tagName !== 'SELECT') el.value = cekim[key] ?? '';
 });
+            // Tekrar Çekim checkbox'ını set et
+const chkTekrar = cekForm.elements['tekrarCekim'];
+if (chkTekrar) chkTekrar.checked = !!cekim.tekrarCekim;
 
 // toleranslı seçim yardımcısını kullan (3. adımdaki fonksiyon)
 setSelectByValueOrText(sinavTuruSelect, cekim.sinavTuru);
@@ -934,5 +951,6 @@ cekForm.querySelectorAll('.searchable-select').forEach(updateSelectDisplay);
 
 </body>
 </html>
+
 
 
