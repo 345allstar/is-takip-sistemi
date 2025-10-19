@@ -26,6 +26,8 @@
 .badge-kontrol-bekliyor{ background:#fef9c3; color:#854d0e; }    /* Kontrol Bekliyor  -> sarı */
 .badge-teknik{ background:#fee2e2; color:#991b1b; }              /* Teknik Düzeltmede -> kırmızı */
 .badge-akademik{ background:#ede9fe; color:#5b21b6; }            /* Akademik İzlemede -> mor */
+        /* Switch knob tıklama hissi için */
+label > span.rounded-full.shadow { box-shadow: 0 1px 2px rgba(0,0,0,.08); }
     </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
@@ -95,12 +97,14 @@
                                     <input name="soruSayisi" type="number" min="1" max="50" placeholder="Örn: 8" class="form-input-base">
                                 </div>
                                 <div>
-  <label class="form-label">Tekrar Çekim</label>
-  <div class="mt-2">
-    <label class="inline-flex items-center gap-2 text-sm text-gray-700">
-      <input type="checkbox" name="tekrarCekim" class="w-4 h-4 rounded border-gray-300">
-      <span>Evet</span>
-    </label>
+  <label for="tekrar-cekim" class="inline-flex items-center gap-3 cursor-pointer select-none mt-2">
+  <input id="tekrar-cekim" name="tekrarCekim" type="checkbox" class="sr-only peer">
+  <div class="w-11 h-6 rounded-full bg-gray-200 transition peer-checked:bg-emerald-500 relative
+              after:content-[''] after:absolute after:top-0.5 after:left-0.5
+              after:w-5 after:h-5 after:bg-white after:rounded-full after:shadow
+              after:transition-all peer-checked:after:translate-x-5"></div>
+  <span class="text-sm font-medium text-gray-700">Tekrar Çekim</span>
+</label>
   </div>
 </div>
                                 <div><label class="form-label">Anlatıcı Öğretmen</label>
@@ -532,7 +536,7 @@ function setSelectByValueOrText(selectEl, rawVal) {
                const columns = [
   formatDate(row.cekimTarihi), row.sinavTuru, row.anlatimTuru, row.videoKodu, row.brans, row.unite, row.bolum, row.ders, row.testAdi,
   row.soruSayisi, row.not,
-  (row.tekrarCekim ? 'Evet' : 'Hayır'),   // <<< EKLENEN SÜTUN
+  (row.tekrarCekim ? 'Evet' : ''),   // <<< EKLENEN SÜTUN
   row.anlaticiOgretmen, row.yonetmen, row.akademikDinleyici, formatDate(row.kurguBaslamaTarihi),
   formatDate(row.kurguBitisTarihi), row.kurguOperatoru, row.kurguDurumu,
   (row.teknikIzlemeDurumu === 'Yapıldı' ? row.teknikEkipUyesi : ''), 
@@ -674,7 +678,7 @@ data.tekrarCekim = !!cekForm.elements['tekrarCekim'].checked;
                     <td class="p-2 align-middle border">${data.testAdi || ''}</td>
                     <td class="p-2 align-middle border">${data.soruSayisi || ''}</td>
                     <td class="p-2 align-middle border"><div class="max-w-[100px] mx-auto whitespace-nowrap overflow-hidden text-ellipsis" title="${data.not || ''}">${(data.not || '').substring(0,15)}${(data.not || '').length > 15 ? '...' : ''}</div></td>
-                    <td class="p-2 align-middle border">${data.tekrarCekim ? 'Evet' : 'Hayır'}</td>
+                    <td class="p-2 align-middle border">${data.tekrarCekim ? 'Evet' : ''}</td>
                     <td class="p-2 align-middle border">${data.anlaticiOgretmen || ''}</td>
                     <td class="p-2 align-middle border">${data.yonetmen || ''}${timecodeFileIcon}</td>
                     <td class="p-2 align-middle border">${data.akademikDinleyici || ''}</td>
@@ -956,6 +960,7 @@ cekForm.querySelectorAll('.searchable-select').forEach(updateSelectDisplay);
 
 </body>
 </html>
+
 
 
 
