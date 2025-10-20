@@ -26,6 +26,9 @@
 .badge-kontrol-bekliyor{ background:#fef9c3; color:#854d0e; }    /* Kontrol Bekliyor  -> sarı */
 .badge-teknik{ background:#fee2e2; color:#991b1b; }              /* Teknik Düzeltmede -> kırmızı */
 .badge-akademik{ background:#ede9fe; color:#5b21b6; }            /* Akademik İzlemede -> mor */
+        /* Yazılım yükleme rozetleri */
+.badge-yuklendi    { background:#dcfce7; color:#166534; }  /* yeşil */
+.badge-yuklenmedi  { background:#fee2e2; color:#991b1b; }  /* kırmızı */
         /* Switch knob tıklama hissi için */
 label > span.rounded-full.shadow { box-shadow: 0 1px 2px rgba(0,0,0,.08); }
     </style>
@@ -228,6 +231,16 @@ label > span.rounded-full.shadow { box-shadow: 0 1px 2px rgba(0,0,0,.08); }
     </div>
 
 <script>
+    function renderBadge(status) {
+    if (!status) return '';
+    const statusMap = {
+        'Yüklendi': 'bg-green-100 text-green-800 border border-green-300',
+        'Yüklenmedi': 'bg-red-100 text-red-800 border border-red-300',
+        'Bekliyor': 'bg-yellow-100 text-yellow-800 border border-yellow-300'
+    };
+    const css = statusMap[status] || 'bg-gray-100 text-gray-700 border border-gray-300';
+    return `<span class="px-2 py-1 text-xs font-semibold rounded-full ${css}">${status}</span>`;
+}
 document.addEventListener('DOMContentLoaded', () => {
     // --- SUPABASE BAĞLANTI BİLGİLERİ ---
     const SUPABASE_URL = 'https://nwxgigtsadesqjgflblr.supabase.co';
@@ -279,6 +292,8 @@ const YUKLENME_BADGE = {
   'Kontrol Bekliyor': 'badge badge-kontrol-bekliyor',
   'Teknik Düzeltmede': 'badge badge-teknik',
   'Akademik İzlemede': 'badge badge-akademik',
+    'Yüklendi': 'badge badge-yuklendi',
+'Yüklenmedi': 'badge badge-yuklenmedi',
 };
 
 // Metni uygun rozet HTML'ine çevirir; eşleşme yoksa düz metin döner.
@@ -995,6 +1010,7 @@ cekForm.querySelectorAll('.searchable-select').forEach(updateSelectDisplay);
 
 </body>
 </html>
+
 
 
 
