@@ -13,6 +13,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; } .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; } .searchable-select-container { position: relative; } .searchable-select-dropdown { width: 100%; max-height: 200px; overflow-y: auto; z-index: 50; } #form-container.is-active { position: relative; z-index: 60; } #cekim-tablosu { width: 100%; border-collapse: collapse; table-layout: auto; } #table-container { max-height: 800px; overflow-y: auto; } #cekim-tablosu th, #cekim-tablosu td { text-align: center; vertical-align: middle; border-left: 1px solid #e5e7eb; padding: 0.75rem 0.5rem; font-size: 0.75rem; line-height: 1rem; } #cekim-tablosu th { white-space: nowrap; font-weight: 600; } #cekim-tablosu td { word-break: break-word; } #cekim-tablosu th:first-child, #cekim-tablosu td:first-child { border-left: 0; } #cekim-tablosu thead tr:last-child th { border-bottom: 2px solid #d1d5db; } .pagination-button { padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; background-color: white; color: #374151; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s; } .pagination-button:hover:not(:disabled) { background-color: #f3f4f6; } .pagination-button.active { background-color: #4f46e5; color: white; border-color: #4f46e5; } .pagination-button:disabled { cursor: not-allowed; opacity: 0.5; } .notification { position: fixed; top: 1.25rem; right: 1.25rem; padding: 1rem; border-radius: 0.5rem; color: white; display: flex; align-items: center; gap: 0.75rem; z-index: 1000; opacity: 0; transform: translateX(100%); transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); } .notification.show { opacity: 1; transform: translateX(0); } .notification.success { background-color: #22c55e; } .notification.error { background-color: #ef4444; } .form-label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; } .form-input-base { margin-top: 0.25rem; width: 100%; padding: 0.5rem 0.75rem; background-color: #f9fafb; border: 1px solid #d1d5db; border-radius: 0.5rem; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); color: #111827; } .form-input-base:focus-within, .form-input-base:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 1px #6366f1; } .status-badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 9999px; font-weight: 500; } .status-sirada { background-color: #f3f4f6; color: #4b5563; } .status-kurguda { background-color: #dbeafe; color: #1d4ed8; } .status-tamamlandi { background-color: #dcfce7; color: #166534; } .status-revize { background-color: #fee2e2; color: #991b1b; }
+        /* --- Yüklenme Durumu Rozetleri --- */
+.badge { display:inline-block; padding:0.25rem 0.6rem; border-radius:9999px; font-weight:600; font-size:0.75rem; line-height:1; }
+.badge-hazir{ background:#bbf7d0; color:#15803d; }              /* Yüklenmeye Hazır  -> yeşil */
+.badge-kontrol-ediliyor{ background:#dbeafe; color:#1d4ed8; }    /* Kontrol Ediliyor  -> mavi */
+.badge-kontrol-bekliyor{ background:#fef9c3; color:#854d0e; }    /* Kontrol Bekliyor  -> sarı */
+.badge-teknik{ background:#fee2e2; color:#991b1b; }              /* Teknik Düzeltmede -> kırmızı */
+.badge-akademik{ background:#ede9fe; color:#5b21b6; }            /* Akademik İzlemede -> mor */
         #cekim-tablosu-body tr.satir-secili { outline: 2px solid #ef4444; outline-offset: -2px; }
         .group-child { display: none; }
         .group-master td { background-color: #f9fafb; }
@@ -82,6 +89,17 @@
                                 <option value="Yapılamaz">Yapılamaz</option>
                             </select>
                         </div>
+                        <div>
+  <label class="form-label">Yüklenme Durumu</label>
+  <select id="yuklenme-durumu" name="yuklenmeDurumu" class="searchable-select">
+    <option value="">Seçiniz...</option>
+    <option value="Yüklenmeye Hazır">Yüklenmeye Hazır</option>
+    <option value="Kontrol Ediliyor">Kontrol Ediliyor</option>
+    <option value="Kontrol Bekliyor">Kontrol Bekliyor</option>
+    <option value="Teknik Düzeltmede">Teknik Düzeltmede</option>
+    <option value="Akademik İzlemede">Akademik İzlemede</option>
+  </select>
+</div>
                         <div class="md:col-span-2 flex justify-end pt-4 mt-4 border-t">
                             <button type="submit" id="submit-button" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">
                                 <i class="fas fa-save mr-2"></i>Güncelle
@@ -173,6 +191,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const paginationControlsEl = document.getElementById('pagination-controls');
     const kurguOperatorleri = ["Naz Çetinkol", "Osman Doğutaş", "Büşra Pelin Demir", "Emrah Yıldırım", "Kübra Selin Demir", "Melisa Savaş", "Tuğçe Gökmen"];
     const kurguDurumlari = ["Sırada", "Kurguda", "Tamamlandı", "Revize"];
+    const YUKLENME_BADGE = {
+  'Yüklenmeye Hazır': 'badge badge-hazir',
+  'Kontrol Ediliyor': 'badge badge-kontrol-ediliyor',
+  'Kontrol Bekliyor': 'badge badge-kontrol-bekliyor',
+  'Teknik Düzeltmede': 'badge badge-teknik',
+  'Akademik İzlemede': 'badge badge-akademik'
+};
+function renderYuklenmeDurumu(text) {
+  const cls = YUKLENME_BADGE[text];
+  return cls ? `<span class="${cls}">${text}</span>` : (text || '');
+}
 
     function showNotification(message, type = 'success') { const container = document.getElementById('notification-container'); if (!container) return; const notification = document.createElement('div'); notification.className = `notification ${type}`; notification.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-times-circle'}"></i><span>${message}</span>`; container.appendChild(notification); setTimeout(() => notification.classList.add('show'), 10); setTimeout(() => { notification.classList.remove('show'); setTimeout(() => { if (notification.parentNode === container) container.removeChild(notification); }, 500); }, 3000); }
     const formatDate = (dateString) => { if (!dateString) return ''; const date = new Date(dateString + 'T00:00:00'); return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`; };
@@ -290,7 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
                        </div>`
                     : (kayit.videoKodu || '');
 
-                row.innerHTML = `<td>${formatDate(kayit.cekimTarihi)}</td><td>${kayit.anlatimTuru || ''}</td><td>${videoKoduHtml}</td><td>${kayit.anlaticiOgretmen || ''}</td><td>${kayit.yonetmen || ''}${timecodeFileIcon}</td><td>${formatDate(kayit.kurguBaslamaTarihi)}</td><td>${formatDate(kayit.kurguBitisTarihi)}</td><td>${kayit.kurguOperatoru || ''}</td><td><span class="status-badge ${statusClass}">${kayit.kurguDurumu || 'Belirtilmedi'}</span></td><td>${kayit.teknikIzlemeYapilabilirligi || ''}</td><td>${teknikEkipUyesiHtml}</td><td>${teknikIzlemeTarihiHtml}</td><td>${kayit.akademikIzlemeYapilabilirligi || ''}</td><td>${akademikOgretmenHtml}</td><td>${akademikTarihHtml}</td><td>${kayit.yuklenmeDurumu || ''}</td><td><button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="Düzenle"><i class="fas fa-pencil-alt"></i></button></td>`;
+                row.innerHTML = `<td>${formatDate(kayit.cekimTarihi)}</td><td>${kayit.anlatimTuru || ''}</td><td>${videoKoduHtml}</td><td>${kayit.anlaticiOgretmen || ''}</td><td>${kayit.yonetmen || ''}${timecodeFileIcon}</td><td>${formatDate(kayit.kurguBaslamaTarihi)}</td><td>${formatDate(kayit.kurguBitisTarihi)}</td><td>${kayit.kurguOperatoru || ''}</td><td><span class="status-badge ${statusClass}">${kayit.kurguDurumu || 'Belirtilmedi'}</span></td><td>${kayit.teknikIzlemeYapilabilirligi || ''}</td><td>${teknikEkipUyesiHtml}</td><td>${teknikIzlemeTarihiHtml}</td><td>${kayit.akademikIzlemeYapilabilirligi || ''}</td><td>${akademikOgretmenHtml}</td><td>${akademikTarihHtml}</td><td>${renderYuklenmeDurumu(kayit.yuklenmeDurumu)}</td><td><button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="Düzenle"><i class="fas fa-pencil-alt"></i></button></td>`;
             });
         });
     }
@@ -356,13 +385,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!id) { showNotification("Lütfen düzenlemek için bir çekim seçin.", "error"); return; }
         
         const updateData = {
-            kurguBaslamaTarihi: document.getElementById('kurgu-baslama-tarihi').value || null,
-            kurguBitisTarihi: document.getElementById('kurgu-bitis-tarihi').value || null,
-            kurguOperatoru: document.getElementById('kurgu-operatoru').value,
-            kurguDurumu: document.getElementById('kurgu-durumu').value,
-            teknikIzlemeYapilabilirligi: document.getElementById('teknik-izleme').value,
-            akademikIzlemeYapilabilirligi: document.getElementById('akademik-izleme').value
-        };
+  kurguBaslamaTarihi: document.getElementById('kurgu-baslama-tarihi').value || null,
+  kurguBitisTarihi: document.getElementById('kurgu-bitis-tarihi').value || null,
+  kurguOperatoru: document.getElementById('kurgu-operatoru').value,
+  kurguDurumu: document.getElementById('kurgu-durumu').value,
+  teknikIzlemeYapilabilirligi: document.getElementById('teknik-izleme').value,
+  akademikIzlemeYapilabilirligi: document.getElementById('akademik-izleme').value,
+  yuklenmeDurumu: document.getElementById('yuklenme-durumu').value   // <-- YENİ
+};
 
         const { error } = await supabaseClient.from('cekimler').update(updateData).eq('id', id);
 
@@ -371,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showNotification('Kurgu bilgileri başarıyla güncellendi!');
             cekForm.reset();
             editingIdInput.value = '';
-            ['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme'].forEach(id => updateSelectDisplay(document.getElementById(id)));
+            ['kurgu-operatoru', 'kurgu-durumu', 'teknik-iz['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme', 'yuklenme-durumu'].forEach(id => updateSelectDisplay(document.getElementById(id)));leme', 'akademik-izleme'].forEach(id => updateSelectDisplay(document.getElementById(id)));
             await loadAndDisplayCekimler();
         }
     });
@@ -417,7 +447,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('kurgu-durumu').value = kayit.kurguDurumu || '';
                 document.getElementById('teknik-izleme').value = kayit.teknikIzlemeYapilabilirligi || '';
                 document.getElementById('akademik-izleme').value = kayit.akademikIzlemeYapilabilirligi || '';
-                ['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme'].forEach(id => updateSelectDisplay(document.getElementById(id)));
+             document.getElementById('yuklenme-durumu').value = kayit.yuklenmeDurumu || '';
+['kurgu-operatoru','kurgu-durumu','teknik-izleme','akademik-izleme','yuklenme-durumu']
+  .forEach(id => updateSelectDisplay(document.getElementById(id)));
                 document.getElementById('form-container').scrollIntoView({ behavior: 'smooth' });
             }
         }
@@ -433,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Sayfa İlk Yüklendiğinde Çalışacak Kod ---
     populateSelect('kurgu-operatoru', kurguOperatorleri);
     populateSelect('kurgu-durumu', kurguDurumlari);
-    ['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme'].forEach(id => createSearchableDropdown(document.getElementById(id)));
+    ['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme'].forEach(id => createSearchableDropdown(document.getElementB['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme', 'yuklenme-durumu'].forEach(id => createSearchableDropdown(document.getElementById(id)));yId(id)));
     
     // DÜZELTME: loadAndDisplayCekimler'ı bekleyip ardından panelleri açıyoruz
     loadAndDisplayCekimler().then(() => {
