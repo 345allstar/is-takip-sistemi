@@ -514,15 +514,16 @@ if (!dropdown.classList.contains('hidden')) {
     
     // DÜZELTME: loadAndDisplayCekimler'ı bekleyip ardından panelleri açıyoruz
     loadAndDisplayCekimler().then(() => {
-        document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
-            const content = trigger.nextElementSibling;
-            const icon = trigger.querySelector('i:last-child');
-            if (content && icon) {
-                content.style.maxHeight = content.scrollHeight + "px";
-                icon.classList.add('rotate-180');
-            }
-        });
-    });
+  document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
+    const content = trigger.nextElementSibling;
+    const icon = trigger.querySelector('i:last-child');
+    if (content && icon) {
+      content.style.maxHeight = content.scrollHeight + "px";
+      content.classList.add('expanded');      // <-- BUNU EKLE
+      icon.classList.add('rotate-180');
+    }
+  });
+});
 });
 </script>
 
