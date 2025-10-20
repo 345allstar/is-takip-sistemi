@@ -18,6 +18,11 @@
         .group-toggle-icon { cursor: pointer; transition: transform 0.2s ease-in-out; display: inline-block; }
         .group-toggle-icon.expanded { transform: rotate(180deg); }
         .group-count-badge { background-color: #e0e7ff; color: #4338ca; padding: 2px 6px; border-radius: 8px; font-size: 0.7rem; font-weight: 500; margin-left: 8px; }
+        /* --- Yükleme Durumu Rozetleri --- */
+.badge { display:inline-block; padding:0.25rem 0.6rem; border-radius:9999px; font-weight:600; font-size:0.75rem; line-height:1; }
+.badge-yuklendi{ background:#dcfce7; color:#166534; }     /* Yüklendi  -> yeşil */
+.badge-yuklenmedi{ background:#fee2e2; color:#991b1b; }   /* Yüklenmedi -> kırmızı */
+
     </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
@@ -134,6 +139,17 @@
     
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // Yükleme Durumu -> rozet sınıfı eşlemesi
+const YUKLEME_BADGE = {
+  'Yüklendi': 'badge badge-yuklendi',
+  'Yüklenmedi': 'badge badge-yuklenmedi',
+};
+
+// Metni uygun rozet HTML'ine çevirir; eşleşme yoksa düz metin döner.
+function renderBadge(text) {
+  const cls = YUKLEME_BADGE[text];
+  return cls ? `<span class="${cls}">${text}</span>` : (text || '');
+}
     // 1. SUPABASE BAĞLANTISI
     const SUPABASE_URL = 'https://nwxgigtsadesqjgflblr.supabase.co';
     // HATA DÜZELTİLDİ: Anahtardaki olası geçersiz karakter temizlendi.
@@ -177,7 +193,56 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    function createSearchableDropdown(selectElement) { const container = document.createElement('div'); container.className = 'searchable-select-container relative'; selectElement.parentNode.insertBefore(container, selectElement); selectElement.style.display = 'none'; container.appendChild(selectElement); const displayButton = document.createElement('button'); displayButton.type = 'button'; displayButton.className = 'form-input-base text-left flex justify-between items-center'; const displaySpan = document.createElement('span'); displaySpan.className = 'truncate'; displayButton.appendChild(displaySpan); const icon = document.createElement('i'); icon.className = 'fas fa-chevron-down text-gray-400'; displayButton.appendChild(icon); container.appendChild(displayButton); const dropdown = document.createElement('div'); dropdown.className = 'searchable-select-dropdown absolute hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg'; const searchInput = document.createElement('input'); searchInput.type = 'text'; searchInput.placeholder = 'Ara...'; searchInput.className = 'block w-full p-2 border-b border-gray-200 focus:outline-none'; dropdown.appendChild(searchInput); const optionsList = document.createElement('div'); optionsList.className = 'p-1 max-h-48 overflow-y-auto'; dropdown.appendChild(optionsList); container.appendChild(dropdown); const updateOptions = () => { optionsList.innerHTML = ''; Array.from(selectElement.options).forEach(option => { if (option.value === "" && option.textContent.includes('Seçiniz')) return; const optionDiv = document.createElement('div'); optionDiv.textContent = option.textContent; optionDiv.dataset.value = option.value; optionDiv.className = 'p-2 cursor-pointer hover:bg-indigo-100 rounded text-sm'; optionDiv.addEventListener('click', () => { selectElement.value = option.value; displaySpan.textContent = option.textContent; displaySpan.classList.remove('text-gray-400'); dropdown.classList.add('hidden'); selectElement.dispatchEvent(new Event('change')); }); optionsList.appendChild(optionDiv); }); const selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`) || selectElement.options[0]; if (selectedOption) { displaySpan.textContent = selectedOption.textContent; if(selectedOption.value === "") displaySpan.classList.add('text-gray-400'); else displaySpan.classList.remove('text-gray-400'); } }; searchInput.addEventListener('input', () => { const filter = searchInput.value.toLowerCase(); optionsList.querySelectorAll('div').forEach(optionDiv => { const text = optionDiv.textContent.toLowerCase(); optionDiv.style.display = text.includes(filter) ? '' : 'none'; }); }); displayButton.addEventListener('click', (e) => { e.stopPropagation(); if (selectElement.disabled) return; document.querySelectorAll('.searchable-select-dropdown').forEach(d => { if(d !== dropdown) d.classList.add('hidden'); }); dropdown.classList.toggle('hidden'); if(!dropdown.classList.contains('hidden')) { searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); searchInput.focus(); } }); selectElement.updateDropdown = updateOptions; updateOptions(); }
+    function createSearchableDropdown(selectElement) { const container = document.createElement('div'); container.className = 'searchable-select-container relative'; selectElement.parentNode.insertBefore(container, selectElement); selectElement.style.display = 'none'; container.appendChild(selectElement); const displayButton = document.createElement('button'); displayButton.type = 'button'; displayButton.className = 'form-input-base text-left flex justify-between items-center'; const displaySpan = document.createElement('span'); displaySpan.className = 'truncate'; displayButton.appendChild(displaySpan); const icon = document.createElement('i'); icon.className = 'fas fa-chevron-down text-gray-400'; displayButton.appendChild(icon); container.appendChild(displayButton); const dropdown = document.createElement('div'); dropdown.className = 'searchable-select-dropdown absolute hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg'; const searchInput = document.createElement('input'); searchInput.type = 'text'; searchInput.placeholder = 'Ara...'; searchInput.className = 'block w-full p-2 border-b border-gray-200 focus:outline-none'; dropdown.appendChild(searchInput); const optionsList = document.createElement('div'); optionsList.className = 'p-1 max-h-48 overflow-y-auto'; dropdown.appendChild(optionsList); container.appendChild(dropdown); const updateOptions = () => {
+  optionsList.innerHTML = '';
+  Array.from(selectElement.options).forEach(option => {
+    if (option.value === "" && option.textContent.includes('Seçiniz')) return;
+    const optionDiv = document.createElement('div');
+    optionDiv.dataset.value = option.value;
+    optionDiv.className = 'p-2 cursor-pointer hover:bg-indigo-100 rounded text-sm';
+
+    // Eğer bu select "Yükleme Durumu" ise rozetle göster, değilse düz metin
+    if ((selectElement.id || '').toLowerCase() === 'yukleme-durumu') {
+      optionDiv.innerHTML = renderBadge(option.textContent);
+    } else {
+      optionDiv.textContent = option.textContent;
+    }
+
+    optionDiv.addEventListener('click', () => {
+      selectElement.value = option.value;
+
+      // Seçili değeri butonda gösterirken de rozet uygula (sadece Yükleme Durumu için)
+      if ((selectElement.id || '').toLowerCase() === 'yukleme-durumu' && option.value) {
+        displaySpan.innerHTML = renderBadge(option.textContent);
+        displaySpan.classList.remove('text-gray-400');
+      } else {
+        displaySpan.textContent = option.textContent;
+        displaySpan.classList.remove('text-gray-400');
+      }
+
+      dropdown.classList.add('hidden');
+      selectElement.dispatchEvent(new Event('change'));
+    });
+    optionsList.appendChild(optionDiv);
+  });
+
+  // Başlangıçta seçili olanı göster
+  const selectedOption =
+    selectElement.querySelector(`option[value="${selectElement.value}"]`) ||
+    selectElement.options[0];
+
+  if (selectedOption) {
+    if ((selectElement.id || '').toLowerCase() === 'yukleme-durumu' && selectedOption.value) {
+      displaySpan.innerHTML = renderBadge(selectedOption.textContent);
+      displaySpan.classList.remove('text-gray-400');
+    } else {
+      displaySpan.textContent = selectedOption.textContent;
+      if (selectedOption.value === "") displaySpan.classList.add('text-gray-400');
+      else displaySpan.classList.remove('text-gray-400');
+    }
+  }
+};
+ searchInput.addEventListener('input', () => { const filter = searchInput.value.toLowerCase(); optionsList.querySelectorAll('div').forEach(optionDiv => { const text = optionDiv.textContent.toLowerCase(); optionDiv.style.display = text.includes(filter) ? '' : 'none'; }); }); displayButton.addEventListener('click', (e) => { e.stopPropagation(); if (selectElement.disabled) return; document.querySelectorAll('.searchable-select-dropdown').forEach(d => { if(d !== dropdown) d.classList.add('hidden'); }); dropdown.classList.toggle('hidden'); if(!dropdown.classList.contains('hidden')) { searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); searchInput.focus(); } }); selectElement.updateDropdown = updateOptions; updateOptions(); }
     const updateSelectDisplay = (selectElement) => { if(selectElement && selectElement.updateDropdown) { selectElement.updateDropdown(); } }
     function populateSelect(selectId, data) { const select = document.getElementById(selectId); if(!select) return; data.sort(); data.forEach(item => { const option = document.createElement('option'); option.value = item; option.textContent = item; select.appendChild(option); }); updateSelectDisplay(select); }
 
@@ -253,7 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
                        </div>`
                     : (kayit.videoKodu || '');
 
-                row.innerHTML = `<td class="p-2 border">${formatDate(kayit.cekimTarihi)}</td><td class="p-2 border">${kayit.anlatimTuru || ''}</td><td class="p-2 border">${videoKoduHtml}</td><td class="p-2 border">${kayit.brans || ''}</td><td class="p-2 border">${kayit.unite || ''}</td><td class="p-2 border">${kayit.bolum || ''}</td><td class="p-2 border">${kayit.ders || ''}</td><td class="p-2 border">${kayit.testAdi || ''}</td><td class="p-2 border">${kayit.soruSayisi || ''}</td><td class="p-2 border">${(kayit.akademikIzlemeOgretmeni || '') + viewAkademikIcon}</td><td class="p-2 border">${formatDate(kayit.yazilimaYuklemeTarihi)}</td><td class="p-2 border">${kayit.yazilimYuklemeUyesi || ''}</td><td class="p-2 border">${kayit.yuklemeDurumu || ''}</td><td class="p-2 border"><button class="edit-row text-blue-500 hover:text-blue-700 p-2" title="İşlem Yap"><i class="fas fa-pencil-alt"></i></button></td>`;
+                row.innerHTML = `<td class="p-2 border">${formatDate(kayit.cekimTarihi)}</td><td class="p-2 border">${kayit.anlatimTuru || ''}</td><td class="p-2 border">${videoKoduHtml}</td><td class="p-2 border">${kayit.brans || ''}</td><td class="p-2 border">${kayit.unite || ''}</td><td class="p-2 border">${kayit.bolum || ''}</td><td class="p-2 border">${kayit.ders || ''}</td><td class="p-2 border">${kayit.testAdi || ''}</td><td class="p-2 border">${kayit.soruSayisi || ''}</td><td class="p-2 border">${(kayit.akademikIzlemeOgretmeni || '') + viewAkademikIcon}</td><td class="p-2 border">${formatDate(kayit.yazilimaYuklemeTarihi)}</td><td class="p-2 border">${kayit.yazilimYuklemeUyesi || ''}</td><td class="p-2 border">${renderBadge(kayit.yuklemeDurumu || ''}</td><td class="p-2 border"><button class="edit-row text-blue-500 hover:text-blue-700 p-2" title="İşlem Yap"><i class="fas fa-pencil-alt"></i></button></td>`;
             });
         });
     }
