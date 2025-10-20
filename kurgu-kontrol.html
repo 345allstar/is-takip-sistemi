@@ -401,7 +401,8 @@ function renderYuklenmeDurumu(text) {
             showNotification('Kurgu bilgileri başarıyla güncellendi!');
             cekForm.reset();
             editingIdInput.value = '';
-            ['kurgu-operatoru', 'kurgu-durumu', 'teknik-iz['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme', 'yuklenme-durumu'].forEach(id => updateSelectDisplay(document.getElementById(id)));leme', 'akademik-izleme'].forEach(id => updateSelectDisplay(document.getElementById(id)));
+            ['kurgu-operatoru', 'kurgu-durumu', 'teknik-iz['kurgu-operatoru', 'kurgu-d['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme', 'yuklenme-durumu']
+  .forEach(id => updateSelectDisplay(document.getElementById(id)));urumu', 'teknik-izleme', 'akademik-izleme', 'yuklenme-durumu'].forEach(id => updateSelectDisplay(document.getElementById(id)));leme', 'akademik-izleme'].forEach(id => updateSelectDisplay(document.getElementById(id)));
             await loadAndDisplayCekimler();
         }
     });
@@ -465,7 +466,8 @@ function renderYuklenmeDurumu(text) {
     // --- Sayfa İlk Yüklendiğinde Çalışacak Kod ---
     populateSelect('kurgu-operatoru', kurguOperatorleri);
     populateSelect('kurgu-durumu', kurguDurumlari);
-    ['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme'].forEach(id => createSearchableDropdown(document.getElementB['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme', 'yuklenme-durumu'].forEach(id => createSearchableDropdown(document.getElementById(id)));yId(id)));
+    ['kurgu-operatoru', 'kurgu-durumu', 'teknik-izleme', 'akademik-izleme', 'yuklenme-durumu']
+  .forEach(id => createSearchableDropdown(document.getElementById(id)));
     
     // DÜZELTME: loadAndDisplayCekimler'ı bekleyip ardından panelleri açıyoruz
     loadAndDisplayCekimler().then(() => {
