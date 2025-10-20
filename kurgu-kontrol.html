@@ -19,6 +19,13 @@
         .group-toggle-icon { cursor: pointer; transition: transform 0.2s ease-in-out; display: inline-block; }
         .group-toggle-icon.expanded { transform: rotate(180deg); }
         .group-count-badge { background-color: #e0e7ff; color: #4338ca; padding: 2px 6px; border-radius: 8px; font-size: 0.7rem; font-weight: 500; margin-left: 8px; }
+        /* --- Yüklenme Durumu Rozetleri (Genel Çekim ile aynı) --- */
+.badge { display:inline-block; padding:0.25rem 0.6rem; border-radius:9999px; font-weight:600; font-size:0.75rem; line-height:1; }
+.badge-hazir{ background:#e5e7eb; color:#374151; }              /* Yüklenmeye Hazır */
+.badge-kontrol-ediliyor{ background:#dbeafe; color:#1d4ed8; }    /* Kontrol Ediliyor */
+.badge-kontrol-bekliyor{ background:#fef9c3; color:#854d0e; }    /* Kontrol Bekliyor */
+.badge-teknik{ background:#fee2e2; color:#991b1b; }              /* Teknik Düzeltmede */
+.badge-akademik{ background:#ede9fe; color:#5b21b6; }            /* Akademik İzlemede */
     </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
@@ -91,6 +98,18 @@
                 </div>
             </div>
 
+            <div>
+  <label class="form-label">Yüklenme Durumu</label>
+  <select id="yuklenme-durumu" name="yuklenmeDurumu" class="searchable-select">
+    <option value="">Seçiniz...</option>
+    <option value="Yüklenmeye Hazır">Yüklenmeye Hazır</option>
+    <option value="Kontrol Ediliyor">Kontrol Ediliyor</option>
+    <option value="Kontrol Bekliyor">Kontrol Bekliyor</option>
+    <option value="Teknik Düzeltmede">Teknik Düzeltmede</option>
+    <option value="Akademik İzlemede">Akademik İzlemede</option>
+  </select>
+</div>
+
             <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg">
                 <div class="collapsible-trigger flex justify-between items-center cursor-pointer">
                     <h2 class="text-xl font-bold text-gray-800 flex items-center"><i class="fas fa-list-ul mr-3 text-indigo-500"></i>Kurgu Bekleyen Çekimler</h2>
@@ -160,6 +179,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const SUPABASE_URL = 'https://nwxgigtsadesqjgflblr.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // --- Yüklenme Durumu -> badge sınıfı eşlemesi (Genel Çekim ile aynı) ---
+const YUKLENME_BADGE = {
+  'Yüklenmeye Hazır': 'badge badge-hazir',
+  'Kontrol Ediliyor': 'badge badge-kontrol-ediliyor',
+  'Kontrol Bekliyor': 'badge badge-kontrol-bekliyor',
+  'Teknik Düzeltmede': 'badge badge-teknik',
+  'Akademik İzlemede': 'badge badge-akademik',
+};
+
+// Metni uygun rozet HTML'ine çevirir; eşleşme yoksa düz metin döner.
+function renderBadge(text) {
+  const cls = YUKLENME_BADGE[text];
+  return cls ? `<span class="${cls}">${text}</span>` : (text || '');
+}
 
     let currentPage = 1;
     const rowsPerPage = 20;
@@ -198,7 +231,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    function createSearchableDropdown(selectElement) { const container = document.createElement('div'); container.className = 'searchable-select-container relative'; selectElement.parentNode.insertBefore(container, selectElement); selectElement.style.display = 'none'; container.appendChild(selectElement); const displayButton = document.createElement('button'); displayButton.type = 'button'; displayButton.className = 'form-input-base text-left flex justify-between items-center'; const displaySpan = document.createElement('span'); displaySpan.className = 'truncate'; displayButton.appendChild(displaySpan); const icon = document.createElement('i'); icon.className = 'fas fa-chevron-down text-gray-400'; displayButton.appendChild(icon); container.appendChild(displayButton); const dropdown = document.createElement('div'); dropdown.className = 'searchable-select-dropdown absolute hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg'; const searchInput = document.createElement('input'); searchInput.type = 'text'; searchInput.placeholder = 'Ara...'; searchInput.className = 'block w-full p-2 border-b border-gray-200 focus:outline-none'; dropdown.appendChild(searchInput); const optionsList = document.createElement('div'); optionsList.className = 'p-1 max-h-48 overflow-y-auto'; dropdown.appendChild(optionsList); container.appendChild(dropdown); const updateOptions = () => { optionsList.innerHTML = ''; Array.from(selectElement.options).forEach(option => { if (option.value === "" && option.textContent.includes('Seçiniz')) return; const optionDiv = document.createElement('div'); optionDiv.textContent = option.textContent; optionDiv.dataset.value = option.value; optionDiv.className = 'p-2 cursor-pointer hover:bg-indigo-100 rounded text-sm'; optionDiv.addEventListener('click', () => { selectElement.value = option.value; displaySpan.textContent = option.textContent; displaySpan.classList.remove('text-gray-400'); dropdown.classList.add('hidden'); selectElement.dispatchEvent(new Event('change')); }); optionsList.appendChild(optionDiv); }); const selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`) || selectElement.options[0]; if (selectedOption) { displaySpan.textContent = selectedOption.textContent; if(selectedOption.value === "") displaySpan.classList.add('text-gray-400'); else displaySpan.classList.remove('text-gray-400'); } }; searchInput.addEventListener('input', () => { const filter = searchInput.value.toLowerCase(); optionsList.querySelectorAll('div').forEach(optionDiv => { const text = optionDiv.textContent.toLowerCase(); optionDiv.style.display = text.includes(filter) ? '' : 'none'; }); }); displayButton.addEventListener('click', (e) => { e.stopPropagation(); if (selectElement.disabled) return; document.querySelectorAll('.searchable-select-dropdown').forEach(d => { if(d !== dropdown) d.classList.add('hidden'); }); dropdown.classList.toggle('hidden'); if(!dropdown.classList.contains('hidden')) { searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); searchInput.focus(); } }); selectElement.updateDropdown = updateOptions; updateOptions(); }
+    function createSearchableDropdown(selectElement) { const container = document.createElement('div'); container.className = 'searchable-select-container relative'; selectElement.parentNode.insertBefore(container, selectElement); selectElement.style.display = 'none'; container.appendChild(selectElement); const displayButton = document.createElement('button'); displayButton.type = 'button'; displayButton.className = 'form-input-base text-left flex justify-between items-center'; const displaySpan = document.createElement('span'); displaySpan.className = 'truncate'; displayButton.appendChild(displaySpan); const icon = document.createElement('i'); icon.className = 'fas fa-chevron-down text-gray-400'; displayButton.appendChild(icon); container.appendChild(displayButton); const dropdown = document.createElement('div'); dropdown.className = 'searchable-select-dropdown absolute hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg'; const searchInput = document.createElement('input'); searchInput.type = 'text'; searchInput.placeholder = 'Ara...'; searchInput.className = 'block w-full p-2 border-b border-gray-200 focus:outline-none'; dropdown.appendChild(searchInput); const optionsList = document.createElement('div'); optionsList.className = 'p-1 max-h-48 overflow-y-auto'; dropdown.appendChild(optionsList); container.appendChild(dropdown); const updateOptions = () => { optionsList.innerHTML = ''; Array.from(selectElement.options).forEach(option => { if (option.value === "" && option.textContent.includes('Seçiniz')) return; const optionDiv = document.createElement('div'); if ((selectElement.getAttribute('name') || selectElement.id || '').toLowerCase() === 'yuklenmedurumu' && selectedOption.value !== "") {
+  displaySpan.innerHTML = renderBadge(selectedOption.textContent);
+  displaySpan.classList.remove('text-gray-400');
+} else {
+  displaySpan.textContent = selectedOption.textContent;
+  // ... mevcut sınıf mantığını bırak
+}
+ optionDiv.dataset.value = option.value; optionDiv.className = 'p-2 cursor-pointer hover:bg-indigo-100 rounded text-sm'; optionDiv.addEventListener('click', () => { selectElement.value = option.value; displaySpan.textContent = option.textContent; displaySpan.classList.remove('text-gray-400'); dropdown.classList.add('hidden'); selectElement.dispatchEvent(new Event('change')); }); optionsList.appendChild(optionDiv); }); const selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`) || selectElement.options[0]; if (selectedOption) { displaySpan.textContent = selectedOption.textContent; if(selectedOption.value === "") displaySpan.classList.add('text-gray-400'); else displaySpan.classList.remove('text-gray-400'); } }; searchInput.addEventListener('input', () => { const filter = searchInput.value.toLowerCase(); optionsList.querySelectorAll('div').forEach(optionDiv => { const text = optionDiv.textContent.toLowerCase(); optionDiv.style.display = text.includes(filter) ? '' : 'none'; }); }); displayButton.addEventListener('click', (e) => { e.stopPropagation(); if (selectElement.disabled) return; document.querySelectorAll('.searchable-select-dropdown').forEach(d => { if(d !== dropdown) d.classList.add('hidden'); }); dropdown.classList.toggle('hidden'); if(!dropdown.classList.contains('hidden')) { searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); searchInput.focus(); } }); selectElement.updateDropdown = updateOptions; updateOptions(); }
     const updateSelectDisplay = (selectElement) => { if(selectElement && selectElement.updateDropdown) { selectElement.updateDropdown(); } }
     function populateSelect(selectId, data) { const select = document.getElementById(selectId); data.forEach(item => { const option = document.createElement('option'); option.value = item; option.textContent = item; select.appendChild(option); }); }
     
@@ -290,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
                        </div>`
                     : (kayit.videoKodu || '');
 
-                row.innerHTML = `<td>${formatDate(kayit.cekimTarihi)}</td><td>${kayit.anlatimTuru || ''}</td><td>${videoKoduHtml}</td><td>${kayit.anlaticiOgretmen || ''}</td><td>${kayit.yonetmen || ''}${timecodeFileIcon}</td><td>${formatDate(kayit.kurguBaslamaTarihi)}</td><td>${formatDate(kayit.kurguBitisTarihi)}</td><td>${kayit.kurguOperatoru || ''}</td><td><span class="status-badge ${statusClass}">${kayit.kurguDurumu || 'Belirtilmedi'}</span></td><td>${kayit.teknikIzlemeYapilabilirligi || ''}</td><td>${teknikEkipUyesiHtml}</td><td>${teknikIzlemeTarihiHtml}</td><td>${kayit.akademikIzlemeYapilabilirligi || ''}</td><td>${akademikOgretmenHtml}</td><td>${akademikTarihHtml}</td><td>${kayit.yuklenmeDurumu || ''}</td><td><button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="Düzenle"><i class="fas fa-pencil-alt"></i></button></td>`;
+                row.innerHTML = `<td>${formatDate(kayit.cekimTarihi)}</td><td>${kayit.anlatimTuru || ''}</td><td>${videoKoduHtml}</td><td>${kayit.anlaticiOgretmen || ''}</td><td>${kayit.yonetmen || ''}${timecodeFileIcon}</td><td>${formatDate(kayit.kurguBaslamaTarihi)}</td><td>${formatDate(kayit.kurguBitisTarihi)}</td><td>${kayit.kurguOperatoru || ''}</td><td><span class="status-badge ${statusClass}">${kayit.kurguDurumu || 'Belirtilmedi'}</span></td><td>${kayit.teknikIzlemeYapilabilirligi || ''}</td><td>${teknikEkipUyesiHtml}</td><td>${teknikIzlemeTarihiHtml}</td><td>${kayit.akademikIzlemeYapilabilirligi || ''}</td><td>${akademikOgretmenHtml}</td><td>${akademikTarihHtml}</td><td>${renderBadge(cek.yuklenmeDurumu)}</td><td><button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="Düzenle"><i class="fas fa-pencil-alt"></i></button></td>`;
             });
         });
     }
@@ -362,6 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
             kurguDurumu: document.getElementById('kurgu-durumu').value,
             teknikIzlemeYapilabilirligi: document.getElementById('teknik-izleme').value,
             akademikIzlemeYapilabilirligi: document.getElementById('akademik-izleme').value
+            yuklenmeDurumu: document.getElementById('yuklenme-durumu').value,
         };
 
         const { error } = await supabaseClient.from('cekimler').update(updateData).eq('id', id);
