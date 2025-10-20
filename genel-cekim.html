@@ -98,17 +98,21 @@ label > span.rounded-full.shadow { box-shadow: 0 1px 2px rgba(0,0,0,.08); }
   <input name="soruSayisi" type="number" min="1" max="50" placeholder="Örn: 8" class="form-input-base">
 </div>
 
-<!-- Tekrar Çekim: tek hücre içinde label + toggle -->
-<!-- Tekrar Çekim -->
-<div>
-  <label class="form-label">Tekrar Çekim</label>
-  <label class="mt-2 inline-flex items-center gap-2 text-sm text-gray-700 select-none">
-    <input type="checkbox" name="tekrarCekim"
-           class="w-4 h-4 rounded border-gray-300 focus:ring-2 focus:ring-indigo-500">
-    <span>Evet</span>
-  </label>
-</div>
-</div>
+<!-- Tekrar Çekim (switch + kutu) -->
+<div class="md:col-span-1 lg:col-span-1">
+  <div class="border border-gray-200 bg-white rounded-lg p-3 shadow-sm">
+    <label for="tekrar-cekim" class="block text-sm font-medium text-gray-700 mb-2">
+      Tekrar Çekim
+    </label>
+
+    <!-- iOS tarzı switch -->
+    <button type="button" id="tekrar-switch"
+            class="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-300 transition">
+      <span id="tekrar-knob" class="inline-block h-5 w-5 transform rounded-full bg-white translate-x-1 transition"></span>
+    </button>
+    <input id="tekrar-cekim" name="tekrarCekim" type="checkbox" class="hidden">
+  </div>
+
                                 <div><label class="form-label">Anlatıcı Öğretmen</label>
                                     <select name="anlaticiOgretmen" class="searchable-select">
                                         <option value="">Seçiniz...</option>
@@ -962,6 +966,7 @@ cekForm.querySelectorAll('.searchable-select').forEach(updateSelectDisplay);
 
 </body>
 </html>
+
 
 
 
