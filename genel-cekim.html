@@ -712,7 +712,7 @@ data.tekrarCekim = !!cekForm.elements['tekrarCekim'].checked;
                     <td class="p-2 align-middle border">${renderBadge(data.yuklenmeDurumu)}</td>
                     <td class="p-2 align-middle border">${data.yazilimYuklemeUyesi || ''}</td>
                     <td class="p-2 align-middle border">${formatDate(data.yazilimaYuklemeTarihi)}</td>
-                    <td class="p-2 align-middle border">${data.yuklemeDurumu || ''}</td>
+                    <td class="p-2 align-middle border">${renderBadge(data.yuklemeDurumu)}</td>
                     <td class="p-2 align-middle border">
     <div class="flex items-center justify-center space-x-2">
                             <button title="Düzenle" class="text-indigo-600 hover:text-indigo-900 p-2 rounded-full hover:bg-indigo-100 edit-row" data-id="${data.id}"><i class="fas fa-edit"></i></button>
@@ -1010,6 +1010,7 @@ cekForm.querySelectorAll('.searchable-select').forEach(updateSelectDisplay);
 
 </body>
 </html>
+
 
 
 
