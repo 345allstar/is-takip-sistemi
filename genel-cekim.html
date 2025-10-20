@@ -99,14 +99,15 @@ label > span.rounded-full.shadow { box-shadow: 0 1px 2px rgba(0,0,0,.08); }
 </div>
 
 <!-- Tekrar Çekim: tek hücre içinde label + toggle -->
+<!-- Tekrar Çekim -->
 <div>
   <label class="form-label">Tekrar Çekim</label>
-  <div class="mt-2">
-    <label class="inline-flex items-center gap-2 text-sm text-gray-700">
-      <input type="checkbox" name="tekrarCekim" class="w-4 h-4 rounded border-gray-300">
-      <span>Evet</span>
-    </label>
-  </div>
+  <label class="mt-2 inline-flex items-center gap-2 text-sm text-gray-700 select-none">
+    <input type="checkbox" name="tekrarCekim"
+           class="w-4 h-4 rounded border-gray-300 focus:ring-2 focus:ring-indigo-500">
+    <span>Evet</span>
+  </label>
+</div>
 </div>
                                 <div><label class="form-label">Anlatıcı Öğretmen</label>
                                     <select name="anlaticiOgretmen" class="searchable-select">
@@ -961,6 +962,7 @@ cekForm.querySelectorAll('.searchable-select').forEach(updateSelectDisplay);
 
 </body>
 </html>
+
 
 
 
