@@ -453,7 +453,25 @@ function renderBadge(text) {
             window.location.href = 'akademik-izleme.html';
         }
     });
-     
+     // -- Temizle butonu --
+const resetBtn = document.getElementById('reset-button');
+if (resetBtn) {
+  resetBtn.addEventListener('click', () => {
+    // Formu sıfırla
+    cekForm.reset();
+
+    // Özel dropdownların etiketini yenile
+    ['yazilim-yukleme-uyesi', 'yukleme-durumu'].forEach(id => {
+      const sel = document.getElementById(id);
+      if (sel && typeof sel.updateDropdown === 'function') sel.updateDropdown();
+      else if (sel) updateSelectDisplay(sel);
+    });
+
+    // Düzenleme modunu kapat
+    if (editingIdInput) editingIdInput.value = '';
+  });
+}
+
     document.querySelectorAll('.filter-input').forEach(input => {
         input.addEventListener('keyup', () => { 
             currentPage = 1; 
@@ -465,32 +483,6 @@ function renderBadge(text) {
         populateSelect('yazilim-yukleme-uyesi', yazilimYuklemeUyeleri);
         createSearchableDropdown(document.getElementById('yazilim-yukleme-uyesi'));
         createSearchableDropdown(document.getElementById('yukleme-durumu'));
-        <script>
-// -- Temizle butonu --
-const cekForm = document.getElementById('cek-form');
-const resetBtn = document.getElementById('reset-button');
-const editingIdInput = document.getElementById('editing-row-id');
-
-if (resetBtn) {
-  resetBtn.addEventListener('click', () => {
-    // Form alanlarını sıfırla
-    cekForm.reset();
-
-    // Custom dropdown etiketlerini tazele
-    ['yazilim-yukleme-uyesi', 'yukleme-durumu'].forEach(id => {
-      const sel = document.getElementById(id);
-      if (sel) updateSelectDisplay(sel);
-    });
-
-    // Düzenleme modunu kapat
-    if (editingIdInput) editingIdInput.value = '';
-
-    // Tarih alanını da temizlemiş olduk (reset ile)
-    // İstersen ekstra: document.getElementById('yazilima-yukleme-tarihi').value = '';
-  });
-}
-</script>
-        
         loadAndDisplayCekimler().then(() => {
             document.querySelectorAll('.collapsible-trigger').forEach(trigger => {
                 const content = trigger.nextElementSibling;
