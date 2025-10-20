@@ -112,13 +112,14 @@ label > span.rounded-full.shadow { box-shadow: 0 1px 2px rgba(0,0,0,.08); }
     </button>
     <input id="tekrar-cekim" name="tekrarCekim" type="checkbox" class="hidden">
   </div>
+    </div>
 
-                                <div><label class="form-label">Anlatıcı Öğretmen</label>
+                                <div class="lg:col-span-1"><label class="form-label">Anlatıcı Öğretmen</label>
                                     <select name="anlaticiOgretmen" class="searchable-select">
                                         <option value="">Seçiniz...</option>
                                     </select>
                                 </div>
-                                 <div><label class="form-label">Yüklenme Durumu</label>
+                                 <div class="lg:col-span-1"><label class="form-label">Yüklenme Durumu</label>
                                     <select name="yuklenmeDurumu" class="searchable-select">
                                         <option value="">Seçiniz...</option>
                                         <option value="Yüklenmeye Hazır">Yüklenmeye Hazır</option>
@@ -588,6 +589,7 @@ function setSelectByValueOrText(selectEl, rawVal) {
         e.preventDefault();
         const formData = new FormData(cekForm);
         const data = Object.fromEntries(formData.entries());
+        data.tekrarCekim = !!document.getElementById('tekrar-cekim')?.checked;
         // Checkbox değeri: true/false olarak yaz
 data.tekrarCekim = !!cekForm.elements['tekrarCekim'].checked;
         const editingId = data.id;
@@ -773,6 +775,7 @@ data.tekrarCekim = !!cekForm.elements['tekrarCekim'].checked;
             // Tekrar Çekim'i sıfırla
     const chkTekrar = cekForm.elements['tekrarCekim'];
     if (chkTekrar) chkTekrar.checked = false;
+        paintTekrarSwitch();
         document.getElementById('form-title').innerHTML = '<i class="fas fa-plus-circle mr-3 text-indigo-500"></i>Çekim Ekle';
         document.getElementById('submit-text').textContent = 'Kaydet';
         document.getElementById('submit-icon').className = 'fas fa-check mr-2';
@@ -787,6 +790,35 @@ data.tekrarCekim = !!cekForm.elements['tekrarCekim'].checked;
         updateSelectDisplay(bransSelect);
         updateSelectDisplay(uniteSelect);
     }
+    // --- Tekrar Çekim switch boyama & davranış ---
+function paintTekrarSwitch() {
+  const form = document.getElementById('cek-form');
+  if (!form) return;
+  const chk  = form.elements['tekrarCekim'];
+  const btn  = document.getElementById('tekrar-switch');
+  const knob = document.getElementById('tekrar-knob');
+  if (!chk || !btn || !knob) return;
+
+  if (chk.checked) {
+    btn.classList.remove('bg-gray-300'); btn.classList.add('bg-green-500');
+    knob.classList.remove('translate-x-1'); knob.classList.add('translate-x-6');
+  } else {
+    btn.classList.add('bg-gray-300'); btn.classList.remove('bg-green-500');
+    knob.classList.add('translate-x-1'); knob.classList.remove('translate-x-6');
+  }
+}
+
+document.getElementById('tekrar-switch')?.addEventListener('click', () => {
+  const form = document.getElementById('cek-form');
+  if (!form) return;
+  const chk = form.elements['tekrarCekim'];
+  if (!chk) return;
+  chk.checked = !chk.checked;
+  paintTekrarSwitch();
+});
+
+document.getElementById('tekrar-cekim')?.addEventListener('change', paintTekrarSwitch);
+    
 // Temizle butonu tıklanınca formu sıfırla
 const clearBtn = document.createElement('button');
 clearBtn.type = 'button';
@@ -866,6 +898,7 @@ Object.keys(cekim).forEach(key => {
             // Tekrar Çekim checkbox'ını set et
 const chkTekrar = cekForm.elements['tekrarCekim'];
 if (chkTekrar) chkTekrar.checked = !!cekim.tekrarCekim;
+         paintTekrarSwitch();   
 
 // toleranslı seçim yardımcısını kullan (3. adımdaki fonksiyon)
 setSelectByValueOrText(sinavTuruSelect, cekim.sinavTuru);
@@ -966,6 +999,7 @@ cekForm.querySelectorAll('.searchable-select').forEach(updateSelectDisplay);
 
 </body>
 </html>
+
 
 
 
