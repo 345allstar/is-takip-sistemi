@@ -40,6 +40,16 @@
 .left-cell{text-align:left}
 .th-group,.th-sub{background:#f8fafc}
 .list-chip{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;margin:.15rem .35rem .15rem 0;padding:.15rem .4rem;border-radius:9999px;background:#f4f4f5}
+    /* daha okunaklı liste satırı */
+.list-row { display:flex; align-items:center; gap:.45rem; margin:.15rem 0; }
+.list-row-title { font-weight:600; color:#111827; }
+
+/* tablo ızgarası ve zebra zaten vardı; chip'leri sadeleştirelim */
+.list-chip { background:transparent; padding:0; margin:0; }
+
+/* başlıkları çok hafif küçült + sıkılaştır */
+.th-group,.th-sub { font-weight:700; }
+.th-sub { font-size: .72rem; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -106,11 +116,25 @@
 
     /* 3) Yardımcılar */
     const up = s => (s ?? '').toString().toUpperCase('tr-TR').replaceAll('Ç','C');
+    // TR karakterlerini düz İng'e çevir + harf dışını at (GCÇK/GCCK vb. farkları yakalamak için)
+const normTR = s => (s ?? '')
+  .toString()
+  .toUpperCase('tr-TR')
+  .replaceAll('Ç','C').replaceAll('Ğ','G').replaceAll('İ','I')
+  .replaceAll('Ö','O').replaceAll('Ş','S').replaceAll('Ü','U')
+  .replace(/[^A-Z]/g,'');
     const SCOPE = {
   TABLETLI: { key:'TABLET', title:'TABLETLİ KONU ANLATIM', teacherSlots:2, match: t => up(t).includes('TABLET') },
   OZET:     { key:'OZET',   title:'ÖZET ANLATIM',          teacherSlots:1, match: t => up(t).includes('OZET')    },
   PRATIK:   { key:'PRATIK', title:'SORU PRATİĞİ',          teacherSlots:1, match: t => up(t).includes('PRAT')    },
-  GCCK:     { key:'GCCK',   title:'GCÇK',                  teacherSlots:1, match: t => up(t).includes('GCCK')    },
+  GCCK: {
+  key:'GCCK', title:'GCÇK', teacherSlots:1,
+  match: t => {
+    const n = normTR(t);
+    // "GCÇK", "GCCK", "G C Ç K", "GÇÇK" vb. tüm varyantları yakala
+    return n.includes('GCCK') || n.includes('GCC') || /G+C+K/.test(n);
+  }
+},
 };
 
     const safe = s => (s ?? '').toString().trim();
@@ -126,8 +150,9 @@
       }
     };
     const CEKIM_BADGE = count => count>0 ? `<span class="badge badge-ok">ÇEKİLDİ (${count} ders)</span>` : `<span class="badge badge-warn">Çekim yok</span>`;
-// Çekim listesi (her satır: "<isim> Çekildi (KOD) · 1 ders")
-// scKey: 'TABLETLI' | 'OZET' | 'PRATIK' | 'GCCK' (Soru Pratiği ve GCÇK'ta isim = testAdi)
+// Çekim listesi: "İSİM  ÇEKİLDİ  KOD"  formatı
+// PRATIK ve GCCK'ta isim = testAdi, diğerlerinde ders adı.
+// Hiçbir yerde "1 ders" yazmıyoruz. (Tabletli/Özet'te 1.DERS vb. zaten isimde var.)
 function renderCekimList(rows, scKey){
   if (!rows.length) return '<span class="text-gray-400">—</span>';
 
@@ -138,14 +163,13 @@ function renderCekimList(rows, scKey){
         ? (r.testAdi || '').toString().trim()
         : (r.ders || '').toString().trim();
 
-      const left = name ? `<span>${name}</span>` : '';
-      const code = `<span class="mono text-xs text-gray-700">( ${r.videoKodu} )</span>`;
+      const left = name ? `<span class="list-row-title">${name}</span>` : '';
+      const code = `<span class="mono text-xs text-gray-700">${r.videoKodu}</span>`;
       return `
-        <div class="list-chip">
+        <div class="list-row">
           ${left}
           <span class="badge badge-ok">ÇEKİLDİ</span>
           ${code}
-          <span class="text-xs text-gray-500">· 1 ders</span>
         </div>`;
     }).join('') || '<span class="text-gray-400">—</span>';
 }
@@ -237,7 +261,7 @@ function renderCekimList(rows, scKey){
   const yazHTML = YAZILIM_BADGE(yazRaw);
 
   return `
-  <td class="px-3 py-2 center-cell">${cekimHTML}</td>
+  <td class="px-3 py-2 left-cell">${cekimHTML}</td>
   <td class="px-3 py-2 center-cell">${akd}</td>
   <td class="px-3 py-2 center-cell">${yazHTML}</td>
 `;
