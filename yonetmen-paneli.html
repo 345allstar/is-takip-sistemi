@@ -254,13 +254,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 const akademikDinleyiciDurum = kayit.akademikDinleyici ? `<td class="font-semibold text-green-600 align-middle">${kayit.akademikDinleyici}</td>` : `<td class="font-semibold text-gray-500 align-middle">Atanmadı</td>`;
                 const buttonTitle = kayit.yonetmen ? "Düzenle" : "Ata";
 
-                const videoKoduHtml = isMaster && isGrouped 
-                    ? `<div class="flex items-center justify-center">
-                         <i class="fas fa-chevron-down group-toggle-icon" data-group="${kayit.videoKodu}"></i>
-                         <span class="ml-2">${kayit.videoKodu || ''}</span>
-                         <span class="group-count-badge">${groupItems.length}</span>
-                       </div>`
-                    : (kayit.videoKodu || '');
+                const uzunKod  = (kayit.videoKoduUzun || '').toString();
+const kisaKod  = (kayit.videoKodu || '').toString();
+const toggleBtn = uzunKod
+  ? `<button class="toggle-long ml-2 text-gray-500 hover:text-indigo-600" data-id="${kayit.id}" title="Uzun kodu göster">
+       <i class="fa-regular fa-eye"></i>
+     </button>`
+  : '';
+const uzunKodHtml = uzunKod
+  ? `<div class="long-code hidden mt-1 text-xs text-gray-600" data-id="${kayit.id}">${uzunKod}</div>`
+  : '';
+
+const videoKoduHtml = (isMaster && isGrouped)
+  ? `<div class="flex items-center justify-center">
+       <i class="fas fa-chevron-down group-toggle-icon" data-group="${kayit.videoKodu}"></i>
+       <span class="ml-2">${kisaKod}</span>
+       ${toggleBtn}
+       <span class="group-count-badge">${groupItems.length}</span>
+     </div>
+     ${uzunKodHtml}`
+  : `<div class="flex items-center justify-center">
+       <span>${kisaKod}</span>
+       ${toggleBtn}
+     </div>
+     ${uzunKodHtml}`;
 
                 row.innerHTML = `
                     <td class="align-middle">${formattedDate || ''}</td>
@@ -420,6 +437,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     tableBody.addEventListener('click', async function(e) {
+        // Göz ikonuna tıklayınca uzun kodu aç/kapat
+const toggleBtn = e.target.closest('.toggle-long');
+if (toggleBtn) {
+  e.preventDefault();
+  const id = toggleBtn.dataset.id;
+  const uzunDiv = tableBody.querySelector(`.long-code[data-id="${id}"]`);
+  if (uzunDiv) {
+    uzunDiv.classList.toggle('hidden');
+    const icon = toggleBtn.querySelector('i');
+    if (icon) {
+      icon.classList.toggle('fa-eye');
+      icon.classList.toggle('fa-eye-slash');
+    }
+    toggleBtn.title = uzunDiv.classList.contains('hidden') ? 'Uzun kodu göster' : 'Uzun kodu gizle';
+  }
+  return; // diğer click işlemlerini çalıştırma
+}
         const toggleIcon = e.target.closest('.group-toggle-icon');
         if (toggleIcon) {
             e.stopPropagation();
@@ -513,6 +547,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
 
 
