@@ -115,6 +115,7 @@
                                     <th>BRANŞ</th>
                                     <th>ÜNİTE</th>
                                     <th>BÖLÜM</th>
+                                    <th>DERS</th>
                                     <th>TEST ADI</th>
                                     <th style="width: 80px;">SORU SAYISI</th>
                                     <th>ANLATICI ÖĞRETMEN</th>
@@ -123,6 +124,7 @@
                                     <th style="width: 80px;">İŞLEMLER</th>
                                 </tr>
                                 <tr>
+                                    <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
                                     <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
                                     <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
                                     <th class="p-2"><input type="text" placeholder="Filtrele..." class="filter-input w-full text-xs p-1 border rounded"></th>
@@ -268,6 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="align-middle">${kayit.brans || ''}</td>
                     <td class="align-middle">${kayit.unite || ''}</td>
                     <td class="align-middle">${kayit.bolum || ''}</td>
+                    <td class="align-middle">${kayit.ders || ''}</td>
                     <td class="align-middle">${kayit.testAdi || ''}</td>
                     <td class="align-middle">${kayit.soruSayisi || ''}</td>
                     <td class="align-middle">${kayit.anlaticiOgretmen || ''}</td>
@@ -510,6 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
 
 
