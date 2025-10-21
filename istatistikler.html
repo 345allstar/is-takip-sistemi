@@ -50,6 +50,16 @@
 /* başlıkları çok hafif küçült + sıkılaştır */
 .th-group,.th-sub { font-weight:700; }
 .th-sub { font-size: .72rem; }
+    /* Hücre içindeki çoklu satırları ortala ve aralarına çizgi koy */
+.cell-stack { display:flex; flex-direction:column; align-items:center; }
+.cell-stack .list-row { display:flex; align-items:center; gap:.45rem; padding:.2rem 0; }
+.cell-stack .list-row + .list-row {             /* birden fazla kayıt varsa araya çizgi */
+  border-top: 1px solid #e5e7eb;                /* #e5e7eb -> Tailwind gray-200 */
+  margin-top: .2rem;
+}
+
+/* Hücreleri netçe ortalamak için yardımcı sınıf */
+.center-cell { text-align:center; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -156,7 +166,7 @@ const normTR = s => (s ?? '')
 function renderCekimList(rows, scKey){
   if (!rows.length) return '<span class="text-gray-400">—</span>';
 
-  return rows
+  const html = rows
     .filter(r => (r.videoKodu || '').toString().trim() !== '')
     .map(r => {
       const name = (scKey === 'PRATIK' || scKey === 'GCCK')
@@ -172,6 +182,7 @@ function renderCekimList(rows, scKey){
           ${code}
         </div>`;
     }).join('') || '<span class="text-gray-400">—</span>';
+  return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
 }
     
     /* 4) Veri yükle + başlıkları (öğretmen adlarıyla) oluştur + tabloyu yaz */
@@ -261,7 +272,7 @@ function renderCekimList(rows, scKey){
   const yazHTML = YAZILIM_BADGE(yazRaw);
 
   return `
-  <td class="px-3 py-2 left-cell">${cekimHTML}</td>
+  <td class="px-3 py-2 center-cell">${cekimHTML}</td>
   <td class="px-3 py-2 center-cell">${akd}</td>
   <td class="px-3 py-2 center-cell">${yazHTML}</td>
 `;
@@ -277,13 +288,13 @@ function renderCekimList(rows, scKey){
 
           if (i===0){
             const tdU = document.createElement('td');
-            tdU.className = 'px-3 py-2 align-top left-cell';
+            tdU.className = 'px-3 py-2 align-top center-cell';
             tdU.rowSpan = bolumEntries.length;
             tdU.textContent = u || '—';
             tr.appendChild(tdU);
           }
 
-          tr.innerHTML += `<td class="px-3 py-2 align-top left-cell">${b || '—'}</td>`;
+          tr.innerHTML += `<td class="px-3 py-2 align-top center-cell">${b || '—'}</td>`;
 
           // her grup için öğretmen listesine göre hücreler
           for (const key of Object.keys(SCOPE)){
