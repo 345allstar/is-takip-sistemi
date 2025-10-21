@@ -61,6 +61,37 @@
 .center-cell { text-align:center; }
     /* Tıklanmış satır vurgusu */
 .tr-focus { outline: 2px solid #ef4444; outline-offset: -2px; }
+    /* === EŞİT SATIR YÜKSEKLİĞİ === */
+:root {
+  --stack-row-h: 28px;      /* istersen 26–30px arası deneyebilirsin */
+}
+
+.cell-stack { 
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;     /* her satır aynı genişlikte */
+}
+
+.cell-stack .list-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;  /* ortalı */
+  gap: .45rem;
+  padding: 0;               /* iç boşlukları sabitleyelim */
+  height: var(--stack-row-h);
+  line-height: var(--stack-row-h);
+  white-space: nowrap;      /* satır kırılmasın (kod/isim taşmasın) */
+}
+
+.cell-stack .list-row + .list-row {
+  border-top: 1px solid #e5e7eb;  /* araya çizgi */
+  margin-top: 0;
+}
+
+/* rozet/kodların satır içinde ortada kalması için */
+.cell-stack .badge      { line-height: 1; }
+.cell-stack .mono,
+.cell-stack .list-row-title { line-height: 1; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
