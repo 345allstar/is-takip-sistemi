@@ -35,7 +35,6 @@
 .tbl thead th, .tbl td{border-right:1px solid #e5e7eb}
 .tbl thead tr:last-child th, .tbl tbody td{border-bottom:1px solid #e5e7eb}
 .tbl thead th:first-child, .tbl td:first-child{border-left:1px solid #e5e7eb}
-.tbl tbody tr:nth-child(odd){background:#fafafa}
 .center-cell{text-align:center}
 .left-cell{text-align:left}
 .th-group,.th-sub{background:#f8fafc}
@@ -60,6 +59,8 @@
 
 /* Hücreleri netçe ortalamak için yardımcı sınıf */
 .center-cell { text-align:center; }
+    /* Tıklanmış satır vurgusu */
+.tr-focus { outline: 2px solid #ef4444; outline-offset: -2px; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -159,6 +160,31 @@ const normTR = s => (s ?? '')
         default: return v || "—";
       }
     };
+    // Akademik İzleme rozeti (Yapıldı / Yapılmadı / boş)
+const AKD_BADGE = v => {
+  const s = (v ?? '').toString().trim().toUpperCase('tr-TR');
+  if (s === 'YAPILDI')   return `<span class="badge badge-ok">Yapıldı</span>`;
+  if (s === 'YAPILMADI') return `<span class="badge badge-danger">Yapılmadı</span>`;
+  return v || '—';
+};
+
+// Akademik liste (çekimdeki yapının aynısı, çokluysa çizgiyle ayır)
+function renderAkdList(rows){
+  const html = rows.map(r => `
+    <div class="list-row">${AKD_BADGE(r.akademikIzlemeDurumu)}</div>
+  `).join('');
+  return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
+}
+
+// Yükleme (Yazılım) liste
+function renderYazList(rows){
+  const html = rows.map(r => {
+    const v = (r.yuklemeDurumu ?? r.yuklenmeDurumu) || '';
+    return `<div class="list-row">${YAZILIM_BADGE(v)}</div>`;
+  }).join('');
+  return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
+}
+
     const CEKIM_BADGE = count => count>0 ? `<span class="badge badge-ok">ÇEKİLDİ (${count} ders)</span>` : `<span class="badge badge-warn">Çekim yok</span>`;
 // Çekim listesi: "İSİM  ÇEKİLDİ  KOD"  formatı
 // PRATIK ve GCCK'ta isim = testAdi, diğerlerinde ders adı.
@@ -195,7 +221,7 @@ function renderCekimList(rows, scKey){
       // Gerekli alanlar
       const { data, error } = await db
         .from('cekimler')
-        .select('id, unite, bolum, ders, testAdi, videoKodu, anlatimTuru, anlaticiOgretmen, akademikIzlemeYapilabilirligi, yuklemeDurumu, yuklenmeDurumu, brans')
+        .select('id, unite, bolum, ders, testAdi, videoKodu, anlatimTuru, anlaticiOgretmen, akademikIzlemeDurumu, yuklemeDurumu, yuklenmeDurumu, brans')
         .eq('brans', brans);
 
       if (error){ console.error(error); tbody.innerHTML=''; return; }
@@ -261,19 +287,18 @@ function renderCekimList(rows, scKey){
     (teacherName ? safe(x.anlaticiOgretmen) === teacherName : true)
   );
 
-  // 1) Çekim: kodlu liste (PRATIK & GCCK -> testAdi, diğerleri -> ders)
-  const cekimHTML = renderCekimList(rows, scKey);
+  // 1) Çekim: kodlu liste
+const cekimHTML = renderCekimList(rows, scKey);
 
-  // 2) Akademik İzleme: son dolu değer
-  const akd = rows.map(x => safe(x.akademikIzlemeYapilabilirligi)).filter(Boolean).pop() || '—';
+// 2) Akademik İzleme: LISTE (yapıldı/yapılmadı)
+const akdHTML = renderAkdList(rows);
 
-  // 3) Yazılım: yuklemeDurumu (yoksa yuklenmeDurumu) son değer (rozetli)
-  const yazRaw = rows.map(x => safe(x.yuklemeDurumu) || safe(x.yuklenmeDurumu)).filter(Boolean).pop() || '—';
-  const yazHTML = YAZILIM_BADGE(yazRaw);
+// 3) Yazılım: LISTE (rozetli)
+const yazHTML = renderYazList(rows);
 
-  return `
+return `
   <td class="px-3 py-2 center-cell">${cekimHTML}</td>
-  <td class="px-3 py-2 center-cell">${akd}</td>
+  <td class="px-3 py-2 center-cell">${akdHTML}</td>
   <td class="px-3 py-2 center-cell">${yazHTML}</td>
 `;
 }
@@ -310,6 +335,13 @@ function renderCekimList(rows, scKey){
       });
 
       document.getElementById('rowCount').textContent = `${satir} satır`;
+      // satıra tıklayınca kırmızı çerçeve
+tbody.addEventListener('click', (e)=>{
+  const tr = e.target.closest('tr');
+  if(!tr) return;
+  [...tbody.querySelectorAll('tr.tr-focus')].forEach(x=>x.classList.remove('tr-focus'));
+  tr.classList.add('tr-focus');
+});
     }
 
     // Başlangıç
