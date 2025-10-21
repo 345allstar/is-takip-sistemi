@@ -231,6 +231,34 @@ function renderYuklenmeDurumu(text) {
     });
 
     function createSearchableDropdown(selectElement) { const container = document.createElement('div'); container.className = 'searchable-select-container relative'; selectElement.parentNode.insertBefore(container, selectElement); selectElement.style.display = 'none'; container.appendChild(selectElement); const displayButton = document.createElement('button'); displayButton.type = 'button'; displayButton.className = 'form-input-base text-left flex justify-between items-center'; const displaySpan = document.createElement('span'); displaySpan.className = 'truncate'; displayButton.appendChild(displaySpan); const icon = document.createElement('i'); icon.className = 'fas fa-chevron-down text-gray-400'; displayButton.appendChild(icon); container.appendChild(displayButton); const dropdown = document.createElement('div'); dropdown.className = 'searchable-select-dropdown absolute hidden bg-white border border-gray-300 rounded-lg mt-1 shadow-lg'; const searchInput = document.createElement('input'); searchInput.type = 'text'; searchInput.placeholder = 'Ara...'; searchInput.className = 'block w-full p-2 border-b border-gray-200 focus:outline-none'; dropdown.appendChild(searchInput); const optionsList = document.createElement('div'); optionsList.className = 'p-1 max-h-48 overflow-y-auto'; dropdown.appendChild(optionsList); container.appendChild(dropdown); const updateOptions = () => { optionsList.innerHTML = ''; Array.from(selectElement.options).forEach(option => { if (option.value === "" && option.textContent.includes('Seçiniz')) return; const optionDiv = document.createElement('div'); optionDiv.textContent = option.textContent; optionDiv.dataset.value = option.value; optionDiv.className = 'p-2 cursor-pointer hover:bg-indigo-100 rounded text-sm'; optionDiv.addEventListener('click', () => { selectElement.value = option.value; displaySpan.textContent = option.textContent; displaySpan.classList.remove('text-gray-400'); dropdown.classList.add('hidden'); selectElement.dispatchEvent(new Event('change')); document.getElementById('form-container').classList.remove('is-active'); }); optionsList.appendChild(optionDiv); }); const selectedOption = selectElement.querySelector(`option[value="${selectElement.value}"]`) || selectElement.options[0]; if (selectedOption) { displaySpan.textContent = selectedOption.textContent; if(selectedOption.value === "") displaySpan.classList.add('text-gray-400'); else displaySpan.classList.remove('text-gray-400'); } }; searchInput.addEventListener('input', () => { const filter = searchInput.value.toLowerCase(); optionsList.querySelectorAll('div').forEach(optionDiv => { const text = optionDiv.textContent.toLowerCase(); optionDiv.style.display = text.includes(filter) ? '' : 'none'; }); }); displayButton.addEventListener('click', (e) => {
+        // --- Seçimi Temizle (tüm alanlar için) ---
+const clearDiv = document.createElement('div');
+clearDiv.textContent = 'Seçimi temizle';
+clearDiv.className = 'p-2 cursor-pointer text-red-600 hover:bg-red-50 rounded text-sm font-medium';
+clearDiv.addEventListener('click', () => {
+  // değeri boşalt
+  selectElement.value = '';
+
+  // placeholder metnini göster (ilk option'ın metni ya da 'Seçiniz...')
+  const placeholderText = (selectElement.options[0]?.textContent || 'Seçiniz...');
+  displaySpan.textContent = placeholderText;
+  displaySpan.classList.add('text-gray-400');
+
+  // dropdown’ı kapat + üst z-index sınıfını kaldır
+  dropdown.classList.add('hidden');
+  document.getElementById('form-container').classList.remove('is-active');
+
+  // dışarıya change eventi gönder (form logic’in çalışsın)
+  selectElement.dispatchEvent(new Event('change'));
+});
+
+// üstte ince bir ayraç da ekleyelim
+const divider = document.createElement('div');
+divider.className = 'my-1 border-t';
+
+optionsList.appendChild(clearDiv);
+optionsList.appendChild(divider);
+
   e.stopPropagation();
   if (selectElement.disabled) return;
 
