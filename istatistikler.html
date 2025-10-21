@@ -116,7 +116,30 @@
       }
     };
     const CEKIM_BADGE = count => count>0 ? `<span class="badge badge-ok">ÇEKİLDİ (${count} ders)</span>` : `<span class="badge badge-warn">Çekim yok</span>`;
+// Çekim listesi (her satır: "<isim> Çekildi (KOD) · 1 ders")
+// scKey: 'TABLETLI' | 'OZET' | 'PRATIK' | 'GCCK' (Soru Pratiği ve GCÇK'ta isim = testAdi)
+function renderCekimList(rows, scKey){
+  if (!rows.length) return '<span class="text-gray-400">—</span>';
 
+  return rows
+    .filter(r => (r.videoKodu || '').toString().trim() !== '')
+    .map(r => {
+      const name = (scKey === 'PRATIK' || scKey === 'GCCK')
+        ? (r.testAdi || '').toString().trim()
+        : (r.ders || '').toString().trim();
+
+      const left = name ? `<span>${name}</span>` : '';
+      const code = `<span class="mono text-xs text-gray-700">( ${r.videoKodu} )</span>`;
+      return `
+        <div class="list-chip">
+          ${left}
+          <span class="badge badge-ok">ÇEKİLDİ</span>
+          ${code}
+          <span class="text-xs text-gray-500">· 1 ders</span>
+        </div>`;
+    }).join('') || '<span class="text-gray-400">—</span>';
+}
+    
     /* 4) Veri yükle + başlıkları (öğretmen adlarıyla) oluştur + tabloyu yaz */
     async function loadFor(brans){
       document.getElementById('panelTitle').textContent = `${brans} — Ünite/Bölüm tablosu`;
@@ -188,16 +211,27 @@
 
       // 4.4 Hücre üretici (tek öğretmen için 3 alt hücre)
       function cellsFor(records, scKey, teacherName){
-        const rows = records.filter(x => SCOPE[scKey].match(safe(x.anlatimTuru)) && safe(x.anlaticiOgretmen) === teacherName);
-        const cekimCount = rows.filter(x => safe(x.videoKodu)).length;
-        const akd = rows.map(x=>safe(x.akademikIzlemeYapilabilirligi)).filter(Boolean).pop() || '—';
-        const yaz = rows.map(x=>safe(x.yuklemeDurumu) || safe(x.yuklenmeDurumu)).filter(Boolean).pop() || '—';
-        return `
-          <td class="px-3 py-2">${CEKIM_BADGE(cekimCount)}</td>
-          <td class="px-3 py-2">${akd}</td>
-          <td class="px-3 py-2">${YAZILIM_BADGE(yaz)}</td>
-        `;
-      }
+  const rows = records.filter(x =>
+    SCOPE[scKey].match(safe(x.anlatimTuru)) &&
+    (teacherName ? safe(x.anlaticiOgretmen) === teacherName : true)
+  );
+
+  // 1) Çekim: kodlu liste (PRATIK & GCCK -> testAdi, diğerleri -> ders)
+  const cekimHTML = renderCekimList(rows, scKey);
+
+  // 2) Akademik İzleme: son dolu değer
+  const akd = rows.map(x => safe(x.akademikIzlemeYapilabilirligi)).filter(Boolean).pop() || '—';
+
+  // 3) Yazılım: yuklemeDurumu (yoksa yuklenmeDurumu) son değer (rozetli)
+  const yazRaw = rows.map(x => safe(x.yuklemeDurumu) || safe(x.yuklenmeDurumu)).filter(Boolean).pop() || '—';
+  const yazHTML = YAZILIM_BADGE(yazRaw);
+
+  return `
+    <td class="px-3 py-2">${cekimHTML}</td>
+    <td class="px-3 py-2">${akd}</td>
+    <td class="px-3 py-2">${yazHTML}</td>
+  `;
+}
 
       // 4.5 Satırları yaz
       tbody.innerHTML = '';
