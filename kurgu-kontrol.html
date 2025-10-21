@@ -379,13 +379,30 @@ if (!dropdown.classList.contains('hidden')) {
                 let statusClass = '';
                 switch(kayit.kurguDurumu) { case 'Sırada': statusClass = 'status-sirada'; break; case 'Kurguda': statusClass = 'status-kurguda'; break; case 'Tamamlandı': statusClass = 'status-tamamlandi'; break; case 'Revize': statusClass = 'status-revize'; break; }
 
-                const videoKoduHtml = isMaster && isGrouped 
-                    ? `<div class="flex items-center justify-center" style="white-space: nowrap;">
-                         <i class="fas fa-chevron-down group-toggle-icon" data-group="${kayit.videoKodu}"></i>
-                         <span class="ml-2">${kayit.videoKodu || ''}</span>
-                         <span class="group-count-badge">${groupItems.length}</span>
-                       </div>`
-                    : (kayit.videoKodu || '');
+                const uzunKod  = (kayit.videoKoduUzun || '').toString();
+const kisaKod  = (kayit.videoKodu || '').toString();
+const toggleBtn = uzunKod
+  ? `<button class="toggle-long ml-2 text-gray-500 hover:text-indigo-600" data-id="${kayit.id}" title="Uzun kodu göster">
+       <i class="fa-regular fa-eye"></i>
+     </button>`
+  : '';
+const uzunKodHtml = uzunKod
+  ? `<div class="long-code hidden mt-1 text-xs text-gray-600" data-id="${kayit.id}">${uzunKod}</div>`
+  : '';
+
+const videoKoduHtml = (isMaster && isGrouped)
+  ? `<div class="flex items-center justify-center" style="white-space: nowrap;">
+       <i class="fas fa-chevron-down group-toggle-icon" data-group="${kayit.videoKodu}"></i>
+       <span class="ml-2">${kisaKod}</span>
+       ${toggleBtn}
+       <span class="group-count-badge">${groupItems.length}</span>
+     </div>
+     ${uzunKodHtml}`
+  : `<div class="flex items-center justify-center" style="white-space: nowrap;">
+       <span>${kisaKod}</span>
+       ${toggleBtn}
+     </div>
+     ${uzunKodHtml}`;
 
                 row.innerHTML = `<td>${formatDate(kayit.cekimTarihi)}</td><td>${kayit.anlatimTuru || ''}</td><td>${videoKoduHtml}</td><td>${kayit.anlaticiOgretmen || ''}</td><td>${kayit.yonetmen || ''}${timecodeFileIcon}</td><td>${formatDate(kayit.kurguBaslamaTarihi)}</td><td>${formatDate(kayit.kurguBitisTarihi)}</td><td>${kayit.kurguOperatoru || ''}</td><td><span class="status-badge ${statusClass}">${kayit.kurguDurumu || 'Belirtilmedi'}</span></td><td>${kayit.teknikIzlemeYapilabilirligi || ''}</td><td>${teknikEkipUyesiHtml}</td><td>${teknikIzlemeTarihiHtml}</td><td>${kayit.akademikIzlemeYapilabilirligi || ''}</td><td>${akademikOgretmenHtml}</td><td>${akademikTarihHtml}</td><td>${renderYuklenmeDurumu(kayit.yuklenmeDurumu)}</td><td><button class="edit-row text-blue-500 hover:text-blue-700 transition-colors" title="Düzenle"><i class="fas fa-pencil-alt"></i></button></td>`;
             });
@@ -476,6 +493,23 @@ if (!dropdown.classList.contains('hidden')) {
     });
 
     tableBody.addEventListener('click', function(e) {
+    // Göz ikonuna basınca uzun kodu aç/kapat
+const toggleBtn = e.target.closest('.toggle-long');
+if (toggleBtn) {
+  e.preventDefault();
+  const id = toggleBtn.dataset.id;
+  const uzunDiv = tableBody.querySelector(`.long-code[data-id="${id}"]`);
+  if (uzunDiv) {
+    uzunDiv.classList.toggle('hidden');
+    const icon = toggleBtn.querySelector('i');
+    if (icon) {
+      icon.classList.toggle('fa-eye');
+      icon.classList.toggle('fa-eye-slash');
+    }
+    toggleBtn.title = uzunDiv.classList.contains('hidden') ? 'Uzun kodu göster' : 'Uzun kodu gizle';
+  }
+  return; // diğer click işlemlerini çalıştırma
+}
         const toggleIcon = e.target.closest('.group-toggle-icon');
         if (toggleIcon) {
             e.stopPropagation();
