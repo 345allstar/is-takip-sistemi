@@ -125,30 +125,49 @@
       : `<span class="badge badge-warn">Çekim yok</span>`;
 
     // Öğretmen başlıklı liste (öğretmene göre grupla ve dersleri yaz)
-    function teacherGroupedHTML(items){
-      if (!items.length) return '<span class="text-gray-400">—</span>';
-      // { ogretmen: [{ders,kod}, ...] }
-      const map = new Map();
-      items.forEach(it=>{
-        const t = safe(it.ogretmen) || 'Öğretmen';
-        if (!map.has(t)) map.set(t, []);
-        map.get(t).push(it);
-      });
-      return [...map.entries()].map(([t, arr])=>{
-        const chips = arr.map((x,idx)=>`
-          <span class="list-chip">
-            <span>${idx+1}. ${safe(x.ders)||'Ders'}</span>
-            ${safe(x.kod) ? `<span class="mono text-xs text-gray-600">(${safe(x.kod)})</span>` : ''}
-          </span>
-        `).join('');
-        return `
-          <div class="mb-1">
-            <div class="text-xs font-semibold text-indigo-700">${t}</div>
-            <div class="mt-0.5">${chips}</div>
-          </div>
-        `;
-      }).join('');
-    }
+    // Öğretmene göre gruplar; her öğretmenin altında 3 satır göster:
+// 1) Dersler (kodlu)  2) Akademik İzleme  3) Yazılım
+function teacherGroupedHTML(items){
+  if (!items.length) return '<span class="text-gray-400">—</span>';
+
+  // öğretmen -> { dersler:[], akd:'', yaz:'' }
+  const map = new Map();
+  items.forEach(it=>{
+    const t = (it.ogretmen ?? '').toString().trim() || 'Öğretmen';
+    if (!map.has(t)) map.set(t, { dersler: [], akd: '', yaz: '' });
+    const bag = map.get(t);
+    bag.dersler.push(it);                               // {ders, kod}
+    bag.akd = (it.akd ?? bag.akd) || '';               // son dolu değer
+    bag.yaz = (it.yaz ?? bag.yaz) || '';               // son dolu değer
+  });
+
+  return [...map.entries()].map(([t, bag])=>{
+    // 1) Dersler (1., 2., 3. ... )  (KOD)
+    const derslerHTML = bag.dersler.map((x,idx)=>`
+      <span class="list-chip">
+        <span>${idx+1}. ${(x.ders||'Ders')}</span>
+        ${x.kod ? `<span class="mono text-xs text-gray-600">(${x.kod})</span>` : ''}
+      </span>
+    `).join('');
+
+    // 2) Akademik İzleme (düz metin)
+    const akdHTML = (bag.akd || '').toString().trim() || '—';
+
+    // 3) Yazılım (rozetli)
+    const yazHTML = YAZILIM_BADGE((bag.yaz || '').toString().trim());
+
+    return `
+      <div class="mb-2">
+        <div class="text-xs font-semibold text-indigo-700">${t}</div>
+        <div class="mt-1 space-y-0.5">
+          <div>• <span class="font-medium">Ders:</span> ${derslerHTML || '—'}</div>
+          <div>• <span class="font-medium">Akademik İzleme:</span> ${akdHTML}</div>
+          <div>• <span class="font-medium">Yazılım:</span> ${yazHTML}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
 
     /* 4) Seçilen branşa göre veriyi çek → ÜNİTE → BÖLÜM kırılımında yaz */
     async function loadTable(brans) {
@@ -178,7 +197,13 @@
         const col = COLS.find(c => c.match(t));
         if (col){
           if (!node.groups[col.key]) node.groups[col.key] = [];
-          node.groups[col.key].push({ ders: row.ders, kod: row.videoKodu, ogretmen: row.anlaticiOgretmen });
+          node.groups[col.key].push({
+  ders: row.ders,
+  kod: row.videoKodu,
+  ogretmen: row.anlaticiOgretmen,
+  akd: row.akademikIzlemeYapilabilirligi,
+  yaz: (row.yuklemeDurumu ?? row.yuklenmeDurumu)
+});
           if (safe(row.videoKodu)) node.cekimTop += 1;
         }
         node.akd = row.akademikIzlemeYapilabilirligi ?? node.akd;
