@@ -677,13 +677,39 @@ data.tekrarCekim = !!cekForm.elements['tekrarCekim'].checked;
                 const akademikOgretmenHtml = akademikIzlemeYapildi ? `${data.akademikIzlemeOgretmeni || ''}${akademikNotuIcon}${viewAkademikIcon}` : (data.akademikIzlemeOgretmeni ? `${data.akademikIzlemeOgretmeni}${viewAkademikIcon}`: '');
                 const akademikTarihHtml = akademikIzlemeYapildi ? formatDate(data.akademikIzlemeTarihi) : '';
                 
-                const videoKoduHtml = isMaster && isGrouped 
-                    ? `<div class="flex items-center justify-start">
-                         <i class="fas fa-chevron-down group-toggle-icon" data-group="${data.videoKodu}"></i>
-                         <span class="ml-2">${data.videoKodu || ''}</span>
-                         <span class="group-count-badge">${groupItems.length}</span>
-                       </div>`
-                    : (data.videoKodu || '');
+                // UZUN KOD toggle destekli Video Kodu hücresi
+const uzunKod = (data.videoKoduUzun || '').toString();
+const kisaKod = (data.videoKodu || '').toString();
+
+const toggleBtn = uzunKod
+  ? `<button class="ml-2 text-gray-400 hover:text-indigo-600 toggle-long"
+              title="Uzun kodu göster" data-id="${data.id}">
+       <i class="fa-regular fa-eye"></i>
+     </button>`
+  : '';
+
+const uzunKodHtml = uzunKod
+  ? `<div class="long-code mt-1 text-xs text-gray-600 hidden"
+           data-id="${data.id}">${uzunKod}</div>`
+  : '';
+
+const videoKoduHtml = (isMaster && isGrouped)
+  ? `
+    <div class="flex items-center justify-start">
+      <i class="fas fa-chevron-down group-toggle-icon" data-group="${data.videoKodu}"></i>
+      <span class="ml-2">${kisaKod}</span>
+      ${toggleBtn}
+      <span class="group-count-badge">${groupItems.length}</span>
+    </div>
+    ${uzunKodHtml}
+  `
+  : `
+    <div class="flex items-center justify-start">
+      <span>${kisaKod}</span>
+      ${toggleBtn}
+    </div>
+    ${uzunKodHtml}
+  `;
 
                 newRow.innerHTML = `
                     <td class="p-2 align-middle border">${formatDate(data.cekimTarihi)}</td>
@@ -857,7 +883,26 @@ if (submitButton && submitButton.parentElement) {
             updateCollapsibleHeight(document.getElementById('liste-tablo-alani'));
             return;
         }
+// "Göz" ikonuna basınca uzun kodu aç/kapat
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.toggle-long');
+  if (!btn) return;
 
+  const id = btn.dataset.id;
+  const uzunDiv = document.querySelector(`.long-code[data-id="${id}"]`);
+  if (!uzunDiv) return;
+
+  uzunDiv.classList.toggle('hidden');
+
+  // ikon değişsin (eye <-> eye-slash) ve tooltip güncellensin
+  const icon = btn.querySelector('i');
+  const acik = !uzunDiv.classList.contains('hidden');
+  icon.classList.toggle('fa-eye', !acik);
+  icon.classList.toggle('fa-eye-slash', acik);
+  btn.title = acik ? 'Uzun kodu gizle' : 'Uzun kodu göster';
+});
+
+        
         const clickedRow = e.target.closest('tr');
         if (clickedRow) {
             const currentlySelected = tableBody.querySelector('.satir-secili');
@@ -1010,6 +1055,7 @@ cekForm.querySelectorAll('.searchable-select').forEach(updateSelectDisplay);
 
 </body>
 </html>
+
 
 
 
