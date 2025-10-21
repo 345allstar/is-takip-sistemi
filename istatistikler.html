@@ -5,13 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>İstatistikler | All Star İş Takip Programı</title>
 
-  <!-- Tailwind (projendeki gibi CDN) -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font Awesome (ikonlar için) -->
+  <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
   <style>
-    /* Rozetler ve tablo görünümü */
     .badge{display:inline-block;padding:.22rem .55rem;border-radius:9999px;font-weight:700;font-size:.75rem;line-height:1}
     .badge-ok{background:#bbf7d0;color:#166534}
     .badge-warn{background:#fef9c3;color:#854d0e}
@@ -37,12 +36,12 @@
   </header>
 
   <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    <!-- 6 sabit branş butonu -->
-    <div id="branButtons" class="flex flex-wrap gap-2"></div>
+    <!-- 6 sabit branş butonu (segmented control) -->
+    <div id="branButtons" class="inline-flex rounded-full bg-white shadow-sm p-1 gap-1"></div>
 
     <!-- Kart + Tablo -->
     <div class="mt-4 bg-white rounded-2xl shadow p-4">
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between gap-4 flex-wrap">
         <h2 id="panelTitle" class="text-lg font-semibold">Branş seçiniz</h2>
         <div id="rowCount" class="text-sm text-gray-500"></div>
       </div>
@@ -75,7 +74,7 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    /* 2) Branş butonları (sabit) */
+    /* 2) Branş butonları */
     const BRANSLAR = [
       "LGS TÜRKÇE",
       "LGS MATEMATİK",
@@ -85,15 +84,15 @@
       "LGS İNGİLİZCE"
     ];
     const branEl = document.getElementById('branButtons');
-
-    BRANSLAR.forEach((b, i) => {
+    BRANSLAR.forEach((b,i)=>{
       const btn = document.createElement('button');
-      btn.className = 'px-3 py-2 rounded-full border bg-white hover:bg-indigo-50 text-sm ' + (i===0 ? 'ring-2 ring-indigo-500' : '');
+      btn.className = 'px-4 py-2 rounded-full text-sm font-medium transition ' +
+                      (i===0 ? 'bg-indigo-600 text-white shadow' : 'text-gray-700 hover:bg-indigo-50');
       btn.textContent = b;
       btn.dataset.bran = b;
-      btn.addEventListener('click', () => {
-        branEl.querySelectorAll('button').forEach(x=>x.classList.remove('ring-2','ring-indigo-500'));
-        btn.classList.add('ring-2','ring-indigo-500');
+      btn.addEventListener('click', ()=>{
+        branEl.querySelectorAll('button').forEach(x=>x.className='px-4 py-2 rounded-full text-sm font-medium transition text-gray-700 hover:bg-indigo-50');
+        btn.className='px-4 py-2 rounded-full text-sm font-medium transition bg-indigo-600 text-white shadow';
         loadTable(b);
       });
       branEl.appendChild(btn);
@@ -101,16 +100,16 @@
 
     /* 3) Yardımcılar */
     const safe = s => (s ?? '').toString().trim();
-    const tUpper = s => safe(s).toLocaleUpperCase('tr-TR'); // TR büyük harf eşleşmesi
+    const tUpper = s => safe(s).toLocaleUpperCase('tr-TR'); // TR büyük harf
 
-    // Anlatım türü sütunları (PDF'teki düzen)
+    // Anlatım türü sütunları
     const COLS = [
       { key: "TABLET", label: "Tabletli Konu Anlatım", match: t => tUpper(t).includes("TABLET") },
       { key: "OZET",   label: "Özet Anlatım",          match: t => tUpper(t).includes("ÖZET")   },
       { key: "PRATIK", label: "Soru Pratiği",          match: t => tUpper(t).includes("PRAT")   },
     ];
 
-    // Yazılım (yüklenme) rozeti
+    // Yazılım (YÜKLEME DURUMU) rozetleri
     const YAZILIM_BADGE = v => {
       switch (v) {
         case "Yüklenmeye Hazır":  return `<span class="badge badge-ok">${v}</span>`;
@@ -125,14 +124,30 @@
       ? `<span class="badge badge-ok">ÇEKİLDİ (${adet} ders)</span>`
       : `<span class="badge badge-warn">Çekim yok</span>`;
 
-    function dersListesiHTML(items){
+    // Öğretmen başlıklı liste (öğretmene göre grupla ve dersleri yaz)
+    function teacherGroupedHTML(items){
       if (!items.length) return '<span class="text-gray-400">—</span>';
-      return items.map(it =>
-        `<span class="list-chip">
-           <span>${safe(it.ders) || 'Ders'}</span>
-           ${safe(it.kod) ? `<span class="mono text-xs text-gray-600">(${safe(it.kod)})</span>` : ''}
-         </span>`
-      ).join('');
+      // { ogretmen: [{ders,kod}, ...] }
+      const map = new Map();
+      items.forEach(it=>{
+        const t = safe(it.ogretmen) || 'Öğretmen';
+        if (!map.has(t)) map.set(t, []);
+        map.get(t).push(it);
+      });
+      return [...map.entries()].map(([t, arr])=>{
+        const chips = arr.map((x,idx)=>`
+          <span class="list-chip">
+            <span>${idx+1}. ${safe(x.ders)||'Ders'}</span>
+            ${safe(x.kod) ? `<span class="mono text-xs text-gray-600">(${safe(x.kod)})</span>` : ''}
+          </span>
+        `).join('');
+        return `
+          <div class="mb-1">
+            <div class="text-xs font-semibold text-indigo-700">${t}</div>
+            <div class="mt-0.5">${chips}</div>
+          </div>
+        `;
+      }).join('');
     }
 
     /* 4) Seçilen branşa göre veriyi çek → ÜNİTE → BÖLÜM kırılımında yaz */
@@ -141,45 +156,41 @@
       const tbody = document.getElementById('tblBody');
       tbody.innerHTML = `<tr><td class="px-3 py-6 text-gray-500" colspan="8">Yükleniyor…</td></tr>`;
 
-      // Genel Çekim Takipte listelediğin alanlar
+      // Not: 'yuklemeDurumu' alanı kullanılıyor, yoksa 'yuklenmeDurumu'na düşer.
       const { data, error } = await supabaseClient
         .from('cekimler')
-        .select('id, unite, bolum, ders, videoKodu, anlatimTuru, kurguDurumu, akademikIzlemeYapilabilirligi, yuklenmeDurumu, brans')
+        .select('id, unite, bolum, ders, videoKodu, anlatimTuru, kurguDurumu, akademikIzlemeYapilabilirligi, yuklemeDurumu, yuklenmeDurumu, brans, anlaticiOgretmen')
         .eq('brans', brans);
 
-      if (error) { console.error(error); tbody.innerHTML = ''; return; }
+      if (error) { console.error(error); tbody.innerHTML=''; return; }
 
-      // Ünite -> Bölüm -> sütun başına ders listeleri, çekim sayısı ve son durumlar
+      // Ünite -> Bölüm -> sütun başına { dersler[], cekimTop, akd, yaz }
       const byUnite = new Map();
-      data.forEach(row => {
+      data.forEach(row=>{
         const u = safe(row.unite);
         const b = safe(row.bolum);
-
         if (!byUnite.has(u)) byUnite.set(u, new Map());
         const byBolum = byUnite.get(u);
-        if (!byBolum.has(b)) byBolum.set(b, { groups: {}, cekimTop: 0, akd: null, yaz: null });
+        if (!byBolum.has(b)) byBolum.set(b, { groups:{}, cekimTop:0, akd:null, yaz:null });
 
         const node = byBolum.get(b);
         const t = row.anlatimTuru || '';
-
         const col = COLS.find(c => c.match(t));
-        if (col) {
+        if (col){
           if (!node.groups[col.key]) node.groups[col.key] = [];
-          node.groups[col.key].push({ ders: row.ders, kod: row.videoKodu });
+          node.groups[col.key].push({ ders: row.ders, kod: row.videoKodu, ogretmen: row.anlaticiOgretmen });
           if (safe(row.videoKodu)) node.cekimTop += 1;
         }
-        // En son görülen akademik & yazılım durumlarını yaz (istersen en "kötüsüne" öncelik verecek mantık ekleriz)
         node.akd = row.akademikIzlemeYapilabilirligi ?? node.akd;
-        node.yaz = row.yuklenmeDurumu ?? node.yaz;
+        node.yaz = (row.yuklemeDurumu ?? row.yuklenmeDurumu) ?? node.yaz; // YÜKLEME durumu öncelikli
       });
 
       // Yaz
       tbody.innerHTML = '';
       let satir = 0;
-
-      [...byUnite.entries()].forEach(([u, bolumMap]) => {
+      [...byUnite.entries()].forEach(([u, bolumMap])=>{
         const bolumEntries = [...bolumMap.entries()];
-        bolumEntries.forEach(([b, node], idx) => {
+        bolumEntries.forEach(([b, node], idx)=>{
           const tr = document.createElement('tr');
           tr.className = 'hover:bg-gray-50';
 
@@ -195,10 +206,10 @@
           // BÖLÜM
           tr.innerHTML += `<td class="px-3 py-2 align-top">${b || '-'}</td>`;
 
-          // 3 anlatım türü sütunu
-          COLS.forEach(col => {
+          // 3 anlatım türü (öğretmen kırılımı)
+          COLS.forEach(col=>{
             const list = node.groups[col.key] || [];
-            tr.innerHTML += `<td class="px-3 py-2 align-top">${dersListesiHTML(list)}</td>`;
+            tr.innerHTML += `<td class="px-3 py-2 align-top">${teacherGroupedHTML(list)}</td>`;
           });
 
           // Çekim | Akademik | Yazılım
