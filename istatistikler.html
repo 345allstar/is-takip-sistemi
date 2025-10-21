@@ -4,13 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>İstatistikler | All Star İş Takip Programı</title>
+
+  <!-- Tailwind (projendeki gibi CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome (ikonlar için) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
   <style>
-    .badge{display:inline-block;padding:.2rem .55rem;border-radius:9999px;font-weight:600;font-size:.75rem;line-height:1}
+    /* Rozetler ve tablo görünümü */
+    .badge{display:inline-block;padding:.22rem .55rem;border-radius:9999px;font-weight:700;font-size:.75rem;line-height:1}
     .badge-ok{background:#bbf7d0;color:#166534}
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+    .badge-warn{background:#fef9c3;color:#854d0e}
+    .badge-info{background:#dbeafe;color:#1d4ed8}
+    .badge-danger{background:#fee2e2;color:#991b1b}
+    .badge-purple{background:#ede9fe;color:#5b21b6}
+    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, monospace}
+    .list-chip{display:inline-flex;align-items:center;gap:.25rem;margin:.15rem .35rem .15rem 0}
     .tbl th,.tbl td{border-bottom:1px solid #eef2f7}
     .sticky-head thead th{position:sticky;top:0;background:#f8fafc;z-index:1}
   </style>
@@ -20,7 +29,7 @@
   <header class="bg-white shadow-sm">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-3">
       <a href="index.html" class="flex items-center gap-2">
-        <img src="logo.png" class="h-10 w-auto" alt="Logo"/>
+        <img src="logo.png" alt="ÜçDörtBeş All Star" class="h-10 w-auto"/>
         <span class="text-xl font-semibold">İstatistikler</span>
       </a>
       <a href="index.html" class="ml-auto text-indigo-600 hover:text-indigo-800"><i class="fa-solid fa-house"></i> Ana sayfa</a>
@@ -28,10 +37,8 @@
   </header>
 
   <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    <!-- 6 Branş butonu -->
-    <div id="branButtons" class="flex flex-wrap gap-2">
-      <!-- butonlar js ile basılacak -->
-    </div>
+    <!-- 6 sabit branş butonu -->
+    <div id="branButtons" class="flex flex-wrap gap-2"></div>
 
     <!-- Kart + Tablo -->
     <div class="mt-4 bg-white rounded-2xl shadow p-4">
@@ -44,11 +51,14 @@
         <table class="tbl sticky-head min-w-full text-sm">
           <thead>
             <tr>
-              <th class="px-3 py-2 text-left w-48">Ünite</th>
-              <th class="px-3 py-2 text-left w-40">Bölüm</th>
-              <th class="px-3 py-2 text-left w-28">Ders Sayısı</th>
-              <th class="px-3 py-2 text-left">Dersler (Ad + Kod)</th>
-              <th class="px-3 py-2 text-left w-40">Tablet Anlatım (adet)</th>
+              <th class="px-3 py-2 w-48 text-left">Ünite</th>
+              <th class="px-3 py-2 w-44 text-left">Bölüm</th>
+              <th class="px-3 py-2 text-left">Tabletli Konu Anlatım</th>
+              <th class="px-3 py-2 text-left">Özet Anlatım</th>
+              <th class="px-3 py-2 text-left">Soru Pratiği</th>
+              <th class="px-3 py-2 w-40 text-left">Çekim</th>
+              <th class="px-3 py-2 w-44 text-left">Akademik İzleme</th>
+              <th class="px-3 py-2 w-40 text-left">Yazılım</th>
             </tr>
           </thead>
           <tbody id="tblBody"></tbody>
@@ -60,12 +70,12 @@
   <!-- Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
-    // === 1) Supabase init (kendi değerlerinle değiştir) ===
-    const SUPABASE_URL = "/* SUPABASE_URL */";
-    const SUPABASE_ANON_KEY = "/* SUPABASE_ANON_KEY */";
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    /* 1) Supabase init — BURAYI DOLDUR */
+    const SUPABASE_URL = 'https://nwxgigtsadesqjgflblr.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // === 2) Branş butonları (sabit 6’lı) ===
+    /* 2) Branş butonları (sabit) */
     const BRANSLAR = [
       "LGS TÜRKÇE",
       "LGS MATEMATİK",
@@ -89,101 +99,124 @@
       branEl.appendChild(btn);
     });
 
-    // === 3) Yardımcılar ===
-    const safe = s => (s ?? '').toString();
+    /* 3) Yardımcılar */
+    const safe = s => (s ?? '').toString().trim();
+    const tUpper = s => safe(s).toLocaleUpperCase('tr-TR'); // TR büyük harf eşleşmesi
+
+    // Anlatım türü sütunları (PDF'teki düzen)
+    const COLS = [
+      { key: "TABLET", label: "Tabletli Konu Anlatım", match: t => tUpper(t).includes("TABLET") },
+      { key: "OZET",   label: "Özet Anlatım",          match: t => tUpper(t).includes("ÖZET")   },
+      { key: "PRATIK", label: "Soru Pratiği",          match: t => tUpper(t).includes("PRAT")   },
+    ];
+
+    // Yazılım (yüklenme) rozeti
+    const YAZILIM_BADGE = v => {
+      switch (v) {
+        case "Yüklenmeye Hazır":  return `<span class="badge badge-ok">${v}</span>`;
+        case "Kontrol Ediliyor":  return `<span class="badge badge-info">${v}</span>`;
+        case "Kontrol Bekliyor":  return `<span class="badge badge-warn">${v}</span>`;
+        case "Teknik Düzeltmede": return `<span class="badge badge-danger">${v}</span>`;
+        case "Akademik İzlemede": return `<span class="badge badge-purple">${v}</span>`;
+        default: return v || "";
+      }
+    };
+    const CEKIM_BADGE = adet => adet > 0
+      ? `<span class="badge badge-ok">ÇEKİLDİ (${adet} ders)</span>`
+      : `<span class="badge badge-warn">Çekim yok</span>`;
+
     function dersListesiHTML(items){
-      // "Ders Adı (KOD)" olarak noktalı virgülle ayır
-      if (!items.length) return '';
-      return items.map(it => {
-        const ders = safe(it.ders) || 'Ders';
-        const kod  = safe(it.videoKodu);
-        return `<span class="inline-flex items-center gap-1 mr-2 mb-1">
-                  <span>${ders}</span>
-                  ${kod ? `<span class="mono text-xs text-gray-600">(${kod})</span>` : ''}
-                </span>`;
-      }).join('');
+      if (!items.length) return '<span class="text-gray-400">—</span>';
+      return items.map(it =>
+        `<span class="list-chip">
+           <span>${safe(it.ders) || 'Ders'}</span>
+           ${safe(it.kod) ? `<span class="mono text-xs text-gray-600">(${safe(it.kod)})</span>` : ''}
+         </span>`
+      ).join('');
     }
 
-    // === 4) Veri çek → ÜNİTE → BÖLÜM kırılımı ile tabloyu doldur ===
-    async function loadTable(brans){
-      document.getElementById('panelTitle').textContent = brans + " — Ünite/Bölüm istatistik";
-      document.getElementById('tblBody').innerHTML = '<tr><td class="px-3 py-6 text-gray-500" colspan="5">Yükleniyor…</td></tr>';
+    /* 4) Seçilen branşa göre veriyi çek → ÜNİTE → BÖLÜM kırılımında yaz */
+    async function loadTable(brans) {
+      document.getElementById('panelTitle').textContent = `${brans} — Ünite/Bölüm tablosu`;
+      const tbody = document.getElementById('tblBody');
+      tbody.innerHTML = `<tr><td class="px-3 py-6 text-gray-500" colspan="8">Yükleniyor…</td></tr>`;
 
-      // Genel Çekim Takip’teki listeden aynı alanlar: unite, bolum, ders, videoKodu, anlatimTuru
-      const { data, error } = await sb
+      // Genel Çekim Takipte listelediğin alanlar
+      const { data, error } = await supabaseClient
         .from('cekimler')
-        .select('id, unite, bolum, ders, videoKodu, anlatimTuru, brans')
+        .select('id, unite, bolum, ders, videoKodu, anlatimTuru, kurguDurumu, akademikIzlemeYapilabilirligi, yuklenmeDurumu, brans')
         .eq('brans', brans);
 
-      if (error){ console.error(error); document.getElementById('tblBody').innerHTML = ''; return; }
+      if (error) { console.error(error); tbody.innerHTML = ''; return; }
 
-      // Ünite -> Bölüm -> { dersler[], tabletAnlatimCount }
+      // Ünite -> Bölüm -> sütun başına ders listeleri, çekim sayısı ve son durumlar
       const byUnite = new Map();
       data.forEach(row => {
         const u = safe(row.unite);
         const b = safe(row.bolum);
+
         if (!byUnite.has(u)) byUnite.set(u, new Map());
         const byBolum = byUnite.get(u);
-        if (!byBolum.has(b)) byBolum.set(b, { dersler: [], tablet: 0 });
-        const rec = byBolum.get(b);
+        if (!byBolum.has(b)) byBolum.set(b, { groups: {}, cekimTop: 0, akd: null, yaz: null });
 
-        rec.dersler.push({ ders: safe(row.ders), videoKodu: safe(row.videoKodu) });
-        if (safe(row.anlatimTuru).toUpperCase().includes('TABLET')) rec.tablet += 1; // "TABLET ANLATIM" sayacı
+        const node = byBolum.get(b);
+        const t = row.anlatimTuru || '';
+
+        const col = COLS.find(c => c.match(t));
+        if (col) {
+          if (!node.groups[col.key]) node.groups[col.key] = [];
+          node.groups[col.key].push({ ders: row.ders, kod: row.videoKodu });
+          if (safe(row.videoKodu)) node.cekimTop += 1;
+        }
+        // En son görülen akademik & yazılım durumlarını yaz (istersen en "kötüsüne" öncelik verecek mantık ekleriz)
+        node.akd = row.akademikIzlemeYapilabilirligi ?? node.akd;
+        node.yaz = row.yuklenmeDurumu ?? node.yaz;
       });
 
-      // Tablonun gövdesini yaz
-      const tbody = document.getElementById('tblBody');
+      // Yaz
       tbody.innerHTML = '';
+      let satir = 0;
 
-      // Ünite başlığına birleştirme yapmak için rowSpan kullanacağız
       [...byUnite.entries()].forEach(([u, bolumMap]) => {
         const bolumEntries = [...bolumMap.entries()];
-        bolumEntries.forEach(([b, val], idx) => {
+        bolumEntries.forEach(([b, node], idx) => {
           const tr = document.createElement('tr');
           tr.className = 'hover:bg-gray-50';
 
-          // ÜNİTE hücresi: ilk bölümde yaz, diğerlerinde boş bırak (rowspan)
-          if (idx === 0){
-            const tdUnite = document.createElement('td');
-            tdUnite.className = 'px-3 py-2 align-top font-medium';
-            tdUnite.textContent = u || '-';
-            tdUnite.rowSpan = bolumEntries.length;
-            tr.appendChild(tdUnite);
+          // ÜNİTE (rowspan)
+          if (idx === 0) {
+            const tdU = document.createElement('td');
+            tdU.className = 'px-3 py-2 align-top font-medium';
+            tdU.rowSpan = bolumEntries.length;
+            tdU.textContent = u || '-';
+            tr.appendChild(tdU);
           }
 
           // BÖLÜM
-          const tdBolum = document.createElement('td');
-          tdBolum.className = 'px-3 py-2 align-top';
-          tdBolum.textContent = b || '-';
-          tr.appendChild(tdBolum);
+          tr.innerHTML += `<td class="px-3 py-2 align-top">${b || '-'}</td>`;
 
-          // DERS SAYISI
-          const tdCount = document.createElement('td');
-          tdCount.className = 'px-3 py-2 align-top';
-          tdCount.innerHTML = `<span class="badge badge-ok">${val.dersler.length}</span>`;
-          tr.appendChild(tdCount);
+          // 3 anlatım türü sütunu
+          COLS.forEach(col => {
+            const list = node.groups[col.key] || [];
+            tr.innerHTML += `<td class="px-3 py-2 align-top">${dersListesiHTML(list)}</td>`;
+          });
 
-          // DERSLER (Ad + Kod)
-          const tdList = document.createElement('td');
-          tdList.className = 'px-3 py-2 align-top';
-          tdList.innerHTML = dersListesiHTML(val.dersler);
-          tr.appendChild(tdList);
-
-          // TABLET ANLATIM adedi
-          const tdTablet = document.createElement('td');
-          tdTablet.className = 'px-3 py-2 align-top';
-          tdTablet.innerHTML = val.tablet ? `<span class="badge badge-ok">${val.tablet}</span>` : '—';
-          tr.appendChild(tdTablet);
+          // Çekim | Akademik | Yazılım
+          tr.innerHTML += `
+            <td class="px-3 py-2 align-top">${CEKIM_BADGE(node.cekimTop)}</td>
+            <td class="px-3 py-2 align-top">${safe(node.akd)}</td>
+            <td class="px-3 py-2 align-top">${YAZILIM_BADGE(safe(node.yaz))}</td>
+          `;
 
           tbody.appendChild(tr);
+          satir++;
         });
       });
 
-      document.getElementById('rowCount').textContent =
-        data.length ? `${data.length} kayıt` : 'Kayıt yok';
+      document.getElementById('rowCount').textContent = `${satir} satır`;
     }
 
-    // Başlangıç: ilk branş
+    // Başlangıç: ilk branş otomatik yüklensin
     loadTable(BRANSLAR[0]);
   </script>
 </body>
