@@ -105,7 +105,7 @@
     });
 
     /* 3) Yardımcılar */
-    
+    const up = s => (s ?? '').toString().toUpperCase('tr-TR').replaceAll('Ç','C');
     const SCOPE = {
   TABLETLI: { key:'TABLET', title:'TABLETLİ KONU ANLATIM', teacherSlots:2, match: t => up(t).includes('TABLET') },
   OZET:     { key:'OZET',   title:'ÖZET ANLATIM',          teacherSlots:1, match: t => up(t).includes('OZET')    },
