@@ -27,10 +27,19 @@
     .th-group{font-weight:700;text-align:center;border-bottom:1px solid #e5e7eb}
     .th-sub{font-size:.75rem;font-weight:700;text-align:center;white-space:nowrap}
     .teacher-cap{color:#7c2d12}
-    /* daha kompakt görünüm için hücre iç boşluklarını azalt */
-.tbl th, .tbl td { padding-left: .5rem; padding-right: .5rem; }
-/* başlık satırının yüksekliğini de kısaltalım */
-.sticky-head thead th { padding-top: .4rem; padding-bottom: .4rem; }
+   .tbl th, .tbl td { padding-left: .5rem; padding-right: .5rem; }  /* bırak */
+.sticky-head thead th { padding-top: .45rem; padding-bottom: .45rem; }  /* biraz kısalttık */
+    
+    /* tablo görünümü — net ızgara + zebra */
+.tbl{border-collapse:separate;border-spacing:0;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden}
+.tbl thead th, .tbl td{border-right:1px solid #e5e7eb}
+.tbl thead tr:last-child th, .tbl tbody td{border-bottom:1px solid #e5e7eb}
+.tbl thead th:first-child, .tbl td:first-child{border-left:1px solid #e5e7eb}
+.tbl tbody tr:nth-child(odd){background:#fafafa}
+.center-cell{text-align:center}
+.left-cell{text-align:left}
+.th-group,.th-sub{background:#f8fafc}
+.list-chip{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;margin:.15rem .35rem .15rem 0;padding:.15rem .4rem;border-radius:9999px;background:#f4f4f5}
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -57,7 +66,7 @@
       </div>
 
       <div class="mt-3 overflow-visible">
-  <table class="tbl sticky-head w-full text-[13px]">
+  <table class="tbl sticky-head w-full text-[12px]">
           <thead id="thead"></thead>
           <tbody id="tbody"></tbody>
         </table>
@@ -96,11 +105,13 @@
     });
 
     /* 3) Yardımcılar */
+    
     const SCOPE = {
       TABLETLI: { key: 'TABLET',  title: 'TABLETLİ KONU ANLATIM', teacherSlots: 2, match: t => t?.toUpperCase().includes('TABLET') },
       OZET:     { key: 'OZET',    title: 'ÖZET ANLATIM',         teacherSlots: 1, match: t => t?.toUpperCase().includes('ÖZET')   },
       PRATIK:   { key: 'PRATIK',  title: 'SORU PRATİĞİ',         teacherSlots: 1, match: t => t?.toUpperCase().includes('PRAT')   },
-      GCCK:     { key: 'GCCK',    title: 'GCÇK',                 teacherSlots: 1, match: t => t?.toUpperCase().includes('GCÇK')  },
+      const up = s => (s ?? '').toString().toUpperCase('tr-TR').replaceAll('Ç','C');
+      GCCK: { key: 'GCCK', title: 'GCÇK', teacherSlots: 1, match: t => up(t).includes('GCCK') },
     };
 
     const safe = s => (s ?? '').toString().trim();
@@ -199,6 +210,19 @@ function renderCekimList(rows, scKey){
       thead.appendChild(thSub);
       thead.appendChild(thSub2);
 
+      thTop.innerHTML  += `<th class="th-group px-3 py-2 center-cell" rowspan="3">ÜNİTE</th>`;
+thTop.innerHTML  += `<th class="th-group px-3 py-2 center-cell" rowspan="3">BÖLÜM</th>`;
+...
+thTop.innerHTML += `<th class="th-group px-3 py-2 center-cell" colspan="${teacherCount*3}">${sc.title}</th>`;
+...
+thSub.innerHTML += `<th class="th-sub px-3 py-1 teacher-cap center-cell" colspan="3">${idx+1}. Anlatıcı<br/>${t}</th>`;
+...
+thSub2.innerHTML+= `
+  <th class="th-sub px-3 py-1 center-cell">Çekim Durumu</th>
+  <th class="th-sub px-3 py-1 center-cell">Akademik İzleme Durumu</th>
+  <th class="th-sub px-3 py-1 center-cell">Yükleme Durumu</th>`;
+
+
       // 4.3 ÜNİTE→BÖLÜM gruplaması
       const byU = new Map();
       data.forEach(r=>{
@@ -227,10 +251,10 @@ function renderCekimList(rows, scKey){
   const yazHTML = YAZILIM_BADGE(yazRaw);
 
   return `
-    <td class="px-3 py-2">${cekimHTML}</td>
-    <td class="px-3 py-2">${akd}</td>
-    <td class="px-3 py-2">${yazHTML}</td>
-  `;
+  <td class="px-3 py-2 center-cell">${cekimHTML}</td>
+  <td class="px-3 py-2 center-cell">${akd}</td>
+  <td class="px-3 py-2 center-cell">${yazHTML}</td>
+`;
 }
 
       // 4.5 Satırları yaz
@@ -243,13 +267,13 @@ function renderCekimList(rows, scKey){
 
           if (i===0){
             const tdU = document.createElement('td');
-            tdU.className = 'px-3 py-2 align-top font-medium';
+            tdU.className = 'px-3 py-2 align-top left-cell';
             tdU.rowSpan = bolumEntries.length;
             tdU.textContent = u || '—';
             tr.appendChild(tdU);
           }
 
-          tr.innerHTML += `<td class="px-3 py-2 align-top">${b || '—'}</td>`;
+          tr.innerHTML += `<td class="px-3 py-2 align-top left-cell">${b || '—'}</td>`;
 
           // her grup için öğretmen listesine göre hücreler
           for (const key of Object.keys(SCOPE)){
