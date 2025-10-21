@@ -107,12 +107,11 @@
     /* 3) Yardımcılar */
     
     const SCOPE = {
-      TABLETLI: { key: 'TABLET',  title: 'TABLETLİ KONU ANLATIM', teacherSlots: 2, match: t => t?.toUpperCase().includes('TABLET') },
-      OZET:     { key: 'OZET',    title: 'ÖZET ANLATIM',         teacherSlots: 1, match: t => t?.toUpperCase().includes('ÖZET')   },
-      PRATIK:   { key: 'PRATIK',  title: 'SORU PRATİĞİ',         teacherSlots: 1, match: t => t?.toUpperCase().includes('PRAT')   },
-      const up = s => (s ?? '').toString().toUpperCase('tr-TR').replaceAll('Ç','C');
-      GCCK: { key: 'GCCK', title: 'GCÇK', teacherSlots: 1, match: t => up(t).includes('GCCK') },
-    };
+  TABLETLI: { key:'TABLET', title:'TABLETLİ KONU ANLATIM', teacherSlots:2, match: t => up(t).includes('TABLET') },
+  OZET:     { key:'OZET',   title:'ÖZET ANLATIM',          teacherSlots:1, match: t => up(t).includes('OZET')    },
+  PRATIK:   { key:'PRATIK', title:'SORU PRATİĞİ',          teacherSlots:1, match: t => up(t).includes('PRAT')    },
+  GCCK:     { key:'GCCK',   title:'GCÇK',                  teacherSlots:1, match: t => up(t).includes('GCCK')    },
+};
 
     const safe = s => (s ?? '').toString().trim();
     const YAZILIM_BADGE = v => {
@@ -185,8 +184,8 @@ function renderCekimList(rows, scKey){
       const thSub2= document.createElement('tr');   // alt sütunlar
 
       // ÜNİTE/BÖLÜM sabit
-      thTop.innerHTML  += `<th class="th-group px-3 py-2" rowspan="3">ÜNİTE</th>`;
-      thTop.innerHTML  += `<th class="th-group px-3 py-2" rowspan="3">BÖLÜM</th>`;
+      thTop.innerHTML  += `<th class="th-group px-3 py-2 center-cell" rowspan="3">ÜNİTE</th>`;
+      thTop.innerHTML  += `<th class="th-group px-3 py-2 center-cell" rowspan="3">BÖLÜM</th>`;
       thSub.innerHTML  += ``;  // boş
       thSub2.innerHTML += ``;
 
@@ -194,34 +193,21 @@ function renderCekimList(rows, scKey){
       for (const key of Object.keys(SCOPE)){
         const sc = SCOPE[key];
         const teacherCount = Math.max(teacherByScope[key].length, 1); // hiç yoksa 1 boş blok
-        thTop.innerHTML += `<th class="th-group px-3 py-2" colspan="${teacherCount*3}">${sc.title}</th>`;
+        thTop.innerHTML += `<th class="th-group px-3 py-2 center-cell" colspan="${teacherCount*3}">${sc.title}</th>`;
 
         teacherByScope[key] = teacherByScope[key].length ? teacherByScope[key] : ['—'];
         teacherByScope[key].forEach((t, idx)=>{
-          thSub.innerHTML += `<th class="th-sub px-3 py-1 teacher-cap" colspan="3">${idx+1}. Anlatıcı<br/>${t}</th>`;
+          thSub.innerHTML += `<th class="th-sub px-3 py-1 teacher-cap center-cell" colspan="3">${idx+1}. Anlatıcı<br/>${t}</th>`;
           thSub2.innerHTML+= `
-            <th class="th-sub px-3 py-1">Çekim Durumu</th>
-            <th class="th-sub px-3 py-1">Akademik İzleme Durumu</th>
-            <th class="th-sub px-3 py-1">Yükleme Durumu</th>`;
+  <th class="th-sub px-3 py-1 center-cell">Çekim Durumu</th>
+  <th class="th-sub px-3 py-1 center-cell">Akademik İzleme Durumu</th>
+  <th class="th-sub px-3 py-1 center-cell">Yükleme Durumu</th>`;
         });
       }
 
       thead.appendChild(thTop);
       thead.appendChild(thSub);
       thead.appendChild(thSub2);
-
-      thTop.innerHTML  += `<th class="th-group px-3 py-2 center-cell" rowspan="3">ÜNİTE</th>`;
-thTop.innerHTML  += `<th class="th-group px-3 py-2 center-cell" rowspan="3">BÖLÜM</th>`;
-...
-thTop.innerHTML += `<th class="th-group px-3 py-2 center-cell" colspan="${teacherCount*3}">${sc.title}</th>`;
-...
-thSub.innerHTML += `<th class="th-sub px-3 py-1 teacher-cap center-cell" colspan="3">${idx+1}. Anlatıcı<br/>${t}</th>`;
-...
-thSub2.innerHTML+= `
-  <th class="th-sub px-3 py-1 center-cell">Çekim Durumu</th>
-  <th class="th-sub px-3 py-1 center-cell">Akademik İzleme Durumu</th>
-  <th class="th-sub px-3 py-1 center-cell">Yükleme Durumu</th>`;
-
 
       // 4.3 ÜNİTE→BÖLÜM gruplaması
       const byU = new Map();
