@@ -92,6 +92,18 @@
 .cell-stack .badge      { line-height: 1; }
 .cell-stack .mono,
 .cell-stack .list-row-title { line-height: 1; }
+    /* === Sığdırma ayarları (yatay kaydırma olmasın) === */
+.tbl{ table-layout:fixed; font-size:12px; }     /* hücreleri eşit paylaştır, küçük yazı */
+.tbl th,.tbl td{ padding:.25rem .35rem; }       /* daraltılmış iç boşluk */
+.th-group,.th-sub{ font-size:.72rem; }          /* başlıkları küçült */
+.tbl td{ word-break:break-word; white-space:normal; } /* metinler sarılsın */
+
+.badge{ padding:.12rem .45rem; font-size:11px; } /* rozetler ufak */
+.mono{ font-size:11px; }                          /* video kodu ufak */
+.list-row{ gap:.3rem; }                           /* satır içi boşluk küçük */
+
+/* tek arka plan istendiği için zebra kapalı (olsa dahi) */
+.tbl tbody tr:nth-child(odd){ background:transparent !important; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -159,6 +171,16 @@
     /* 3) Yardımcılar */
     const up = s => (s ?? '').toString().toUpperCase('tr-TR').replaceAll('Ç','C');
     // TR karakterlerini düz İng'e çevir + harf dışını at (GCÇK/GCCK vb. farkları yakalamak için)
+    // Öğretmen listesini getirir; hiç öğretmen adı yoksa [''] döndürür ki yine de bir sütun açılsın
+function getTeachers(records, scKey){
+  const names = Array.from(new Set(
+    records
+      .filter(r => SCOPE[scKey].match(safe(r.anlatimTuru)))
+      .map(r => safe(r.anlaticiOgretmen))
+      .filter(Boolean)
+  ));
+  return names.length ? names : [''];
+}
 const normTR = s => (s ?? '')
   .toString()
   .toUpperCase('tr-TR')
@@ -167,7 +189,10 @@ const normTR = s => (s ?? '')
   .replace(/[^A-Z]/g,'');
     const SCOPE = {
   TABLETLI: { key:'TABLET', title:'TABLETLİ KONU ANLATIM', teacherSlots:2, match: t => up(t).includes('TABLET') },
-  OZET:     { key:'OZET',   title:'ÖZET ANLATIM',          teacherSlots:1, match: t => up(t).includes('OZET')    },
+  OZET: { 
+  key:'OZET', title:'ÖZET ANLATIM', teacherSlots:1,
+  match: t => /OZET/.test(normTR(t))   // ÖZET, ÖZET ANLATIM(I) vs. hepsi yakalanır
+},
   PRATIK:   { key:'PRATIK', title:'SORU PRATİĞİ',          teacherSlots:1, match: t => up(t).includes('PRAT')    },
   GCCK: {
   key:'GCCK', title:'GCÇK', teacherSlots:1,
@@ -178,6 +203,12 @@ const normTR = s => (s ?? '')
   }
 },
 };
+
+    const normTR = s => (s ?? '')
+  .toString().toUpperCase('tr-TR')
+  .replaceAll('Ç','C').replaceAll('Ğ','G').replaceAll('İ','I')
+  .replaceAll('Ö','O').replaceAll('Ş','S').replaceAll('Ü','U')
+  .replace(/[^A-Z]/g,'');
 
     const safe = s => (s ?? '').toString().trim();
     const YAZILIM_BADGE = v => {
@@ -241,7 +272,17 @@ function renderCekimList(rows, scKey){
     }).join('') || '<span class="text-gray-400">—</span>';
   return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
 }
-    
+    function getTeachers(records, scKey){
+  const names = Array.from(new Set(
+    records
+      .filter(r => SCOPE[scKey].match(safe(r.anlatimTuru)))
+      .map(r => safe(r.anlaticiOgretmen))
+      .filter(Boolean)
+  ));
+  // ÖZET vb. için isim hiç yoksa yine de bir sütun açabilmek için '' döndür
+  return names.length ? names : [''];
+}
+
     /* 4) Veri yükle + başlıkları (öğretmen adlarıyla) oluştur + tabloyu yaz */
     async function loadFor(brans){
       document.getElementById('panelTitle').textContent = `${brans} — Ünite/Bölüm tablosu`;
@@ -259,7 +300,7 @@ function renderCekimList(rows, scKey){
 
       // 4.1 Her anlatım türü için öğretmen listesi (branş genelinde) → başlıklara yazacağız
       const teacherByScope = {};
-      for (const key of Object.keys(SCOPE)){
+      const teachers = getTeachers(records, scKey);
         const sc = SCOPE[key];
         const uniq = [...new Set(
           data
@@ -288,8 +329,9 @@ function renderCekimList(rows, scKey){
         thTop.innerHTML += `<th class="th-group px-3 py-2 center-cell" colspan="${teacherCount*3}">${sc.title}</th>`;
 
         teacherByScope[key] = teacherByScope[key].length ? teacherByScope[key] : ['—'];
-        teacherByScope[key].forEach((t, idx)=>{
-          thSub.innerHTML += `<th class="th-sub px-3 py-1 teacher-cap center-cell" colspan="3">${idx+1}. Anlatıcı<br/>${t}</th>`;
+        teachers.forEach((t, idx) => {
+  const prettyName = t ? `<br/>${t}` : '';    // isim boşsa sadece "1. Anlatıcı" kalsın
+  thSub.innerHTML += `<th class="th-sub px-3 py-1 teacher-cap center-cell" colspan="3">${idx+1}. Anlatıcı${prettyName}</th>`;
           thSub2.innerHTML+= `
   <th class="th-sub px-3 py-1 center-cell">Çekim Durumu</th>
   <th class="th-sub px-3 py-1 center-cell">Akademik İzleme Durumu</th>
@@ -314,9 +356,9 @@ function renderCekimList(rows, scKey){
       // 4.4 Hücre üretici (tek öğretmen için 3 alt hücre)
       function cellsFor(records, scKey, teacherName){
   const rows = records.filter(x =>
-    SCOPE[scKey].match(safe(x.anlatimTuru)) &&
-    (teacherName ? safe(x.anlaticiOgretmen) === teacherName : true)
-  );
+  SCOPE[scKey].match(safe(x.anlatimTuru)) &&
+  (teacherName ? safe(x.anlaticiOgretmen) === teacherName : true)
+);
 
   // 1) Çekim: kodlu liste
 const cekimHTML = renderCekimList(rows, scKey);
