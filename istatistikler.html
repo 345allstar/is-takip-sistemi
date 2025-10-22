@@ -242,6 +242,7 @@ function renderYazList(rows){
   return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
 }
 
+    
     const CEKIM_BADGE = count => count>0 ? `<span class="badge badge-ok">ÇEKİLDİ (${count} ders)</span>` : `<span class="badge badge-warn">Çekim yok</span>`;
 // Çekim listesi: "İSİM  ÇEKİLDİ  KOD"  formatı
 // PRATIK ve GCCK'ta isim = testAdi, diğerlerinde ders adı.
@@ -268,6 +269,21 @@ function renderCekimList(rows, scKey){
   return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
 }
     
+// === Satır hücrelerini (3 td) üreten yardımcı ===
+function cellsFor(records, scKey, teacherName){
+  // Bu öğretmen ve bu anlatım türü için kayıtları al
+  const rows = records.filter(x =>
+    SCOPE[scKey].match(safe(x.anlatimTuru)) &&
+    (teacherName ? safe(x.anlaticiOgretmen) === teacherName : true)
+  );
+
+for (const key of Object.keys(SCOPE)) {
+  const teachers = teacherByScope[key];      // BAŞLIKTA KULLANDIĞIN LİSTE
+  teachers.forEach(t => {
+    tr.innerHTML += cellsFor(recordsUB, key, t); // her öğretmen için 3 <td>
+  });
+}
+}
 
     /* 4) Veri yükle + başlıkları (öğretmen adlarıyla) oluştur + tabloyu yaz */
     async function loadFor(brans){
@@ -326,66 +342,37 @@ thead.appendChild(thSub2);
 
 
       // 4.3 ÜNİTE→BÖLÜM gruplaması
-      const byU = new Map();
-      data.forEach(r=>{
-        const u = safe(r.unite), b = safe(r.bolum);
-        if (!byU.has(u)) byU.set(u,new Map());
-        const byB = byU.get(u);
-        if (!byB.has(b)) byB.set(b, []);
-        byB.get(b).push(r);
-      });
+const groupsMap = new Map();
+// unite||bolum anahtarıyla grupla
+data.forEach(r => {
+  const k = `${safe(r.unite)}||${safe(r.bolum)}`;
+  if (!groupsMap.has(k)) groupsMap.set(k, []);
+  groupsMap.get(k).push(r);
+});
 
-      // 4.4 Hücre üretici (tek öğretmen için 3 alt hücre)
-      function cellsFor(records, scKey, teacherName){
-  const rows = records.filter(x =>
-  SCOPE[scKey].match(safe(x.anlatimTuru)) &&
-  (teacherName ? safe(x.anlaticiOgretmen) === teacherName : true)
-);
+tbody.innerHTML = '';
 
-  // 1) Çekim: kodlu liste
-const cekimHTML = renderCekimList(rows, scKey);
+for (const [ubKey, recordsUB] of groupsMap.entries()) {
+  const [uniteName, bolumName] = ubKey.split('||');
+  const tr = document.createElement('tr');
 
-// 2) Akademik İzleme: LISTE (yapıldı/yapılmadı)
-const akdHTML = renderAkdList(rows);
+  // ÜNİTE/BÖLÜM hücreleri
+  tr.innerHTML = `
+    <td class="px-3 py-2 center-cell align-top">${uniteName || '—'}</td>
+    <td class="px-3 py-2 center-cell align-top">${bolumName || '—'}</td>
+  `;
 
-// 3) Yazılım: LISTE (rozetli)
-const yazHTML = renderYazList(rows);
+  // <<< EN ÖNEMLİ KISIM >>>
+  // Başlıkta kullandığımız öğretmen listelerini burada da AYNI sırayla ve aynı sayıda kullanıyoruz.
+  for (const key of Object.keys(SCOPE)) {
+    const teachers = teacherByScope[key];         // başlıktakiyle birebir aynı
+    teachers.forEach(t => {
+      tr.innerHTML += cellsFor(recordsUB, key, t); // 3 <td> döndürür (çekim/akd/yükleme)
+    });
+  }
 
-return `
-  <td class="px-3 py-2 center-cell">${cekimHTML}</td>
-  <td class="px-3 py-2 center-cell">${akdHTML}</td>
-  <td class="px-3 py-2 center-cell">${yazHTML}</td>
-`;
+  tbody.appendChild(tr);
 }
-
-      // 4.5 Satırları yaz
-      tbody.innerHTML = '';
-      let satir = 0;
-      [...byU.entries()].forEach(([u, byB])=>{
-        const bolumEntries = [...byB.entries()];
-        bolumEntries.forEach(([b, recs], i)=>{
-          const tr = document.createElement('tr');
-
-          if (i===0){
-            const tdU = document.createElement('td');
-            tdU.className = 'px-3 py-2 align-top center-cell';
-            tdU.rowSpan = bolumEntries.length;
-            tdU.textContent = u || '—';
-            tr.appendChild(tdU);
-          }
-
-          tr.innerHTML += `<td class="px-3 py-2 align-top center-cell">${b || '—'}</td>`;
-
-          // her grup için öğretmen listesine göre hücreler
-          for (const key of Object.keys(SCOPE)){
-            const teachers = teacherByScope[key];
-            teachers.forEach(t=>{
-              tr.innerHTML += cellsFor(recs, key, t==='—' ? '' : t);
-            });
-          }
-
-          tbody.appendChild(tr);
-          satir++;
         });
       });
 
