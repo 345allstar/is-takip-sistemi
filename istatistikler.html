@@ -66,23 +66,24 @@
 
 .cell-stack{display:flex;flex-direction:column;align-items:stretch}
 
+/* === cell-stack satırları: otomatik yükseklik + normal kırılma === */
+.cell-stack{display:flex;flex-direction:column;align-items:stretch}
 .cell-stack .list-row{
   display:flex;
   align-items:center;
-  justify-content:center;       /* üç kolonda da ortalı */
+  justify-content:center;   /* ortalı */
   gap:.45rem;
-  height:var(--row-h);          /* sabit yükseklik -> çizgiler aynı hizaya gelir */
-  line-height:var(--row-h);
-  padding:0 .25rem;
-  white-space:nowrap;           /* tek satır */
-  overflow:hidden;              /* taşanı gizle */
-  text-overflow:ellipsis;       /* … ile kes */
+  padding:.15rem .25rem;
+  line-height:1.2;
+  height:auto;              /* SABİT YÜKSEKLİK YOK */
+  white-space:normal;       /* içerik tamamen görünsün */
+  flex-wrap:wrap;
 }
-
 .cell-stack .list-row + .list-row{
-  border-top:1px solid #e5e7eb; /* aynı satırda çizgi birlikteliği */
+  border-top:1px solid #e5e7eb;
   margin-top:0;
 }
+.mono{ font-size:11px; word-break:break-all; }  /* kod uzun gelirse kırabilsin */
 
 .cell-stack .badge{line-height:1}
 .cell-stack .mono,.cell-stack .list-row-title{line-height:1}
@@ -308,6 +309,47 @@ function renderCekimList(rows, scKey){
   return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
 }
     
+/* === ÜÇLÜ KOLON SATIR SENKRONİZASYONU === */
+// Bir <tr> içindeki (BÖLÜM sütunundan sonraki) her 3 hücrelik grupta
+// .list-row yüksekliklerini index bazında eşitler.
+function syncTripletHeightsForRow(tr){
+  // İlk iki hücre: ÜNİTE ve BÖLÜM
+  const tds = Array.from(tr.querySelectorAll('td')).slice(2);
+  for (let g = 0; g < tds.length; g += 3){
+    const stacks = tds.slice(g, g+3).map(td => td.querySelector('.cell-stack'));
+    if (stacks.some(s => !s)) continue;
+
+    const rowsPerStack = stacks.map(s => Array.from(s.querySelectorAll('.list-row')));
+    const maxLen = Math.max(...rowsPerStack.map(r => r.length));
+
+    for (let i = 0; i < maxLen; i++){
+      // önce doğal yüksekliği ölçmek için resetle
+      let maxH = 0;
+      for (const rows of rowsPerStack){
+        const el = rows[i];
+        if (!el) continue;
+        el.style.height = 'auto';
+        el.style.lineHeight = '1.2';
+        const h = el.getBoundingClientRect().height;
+        if (h > maxH) maxH = h;
+      }
+      // sonra hepsine aynı yüksekliği uygula
+      if (maxH > 0){
+        for (const rows of rowsPerStack){
+          const el = rows[i];
+          if (!el) continue;
+          el.style.height = maxH + 'px';
+          el.style.lineHeight = maxH + 'px';
+        }
+      }
+    }
+  }
+}
+
+// Tüm satırlar için senkronizasyon
+function syncAllTriplets(){
+  document.querySelectorAll('#tbody tr').forEach(syncTripletHeightsForRow);
+}
 
     /* 4) Veri yükle + başlıkları (öğretmen adlarıyla) oluştur + tabloyu yaz */
     async function loadFor(brans){
@@ -432,6 +474,18 @@ return `
       document.getElementById('rowCount').textContent = `${satir} satır`;
       // satıra tıklayınca kırmızı çerçeve
 tbody.addEventListener('click', (e)=>{
+  // Satırlar yazıldıktan sonra 1 frame bekleyip yükseklikleri eşitle
+requestAnimationFrame(syncAllTriplets);
+
+// Pencere boyutu değişince yeniden hesapla
+window.addEventListener('resize', () => {
+  document.querySelectorAll('#tbody .list-row').forEach(el => {
+    el.style.height = 'auto';
+    el.style.lineHeight = '1.2';
+  });
+  requestAnimationFrame(syncAllTriplets);
+});
+
   const tr = e.target.closest('tr');
   if(!tr) return;
   [...tbody.querySelectorAll('tr.tr-focus')].forEach(x=>x.classList.remove('tr-focus'));
