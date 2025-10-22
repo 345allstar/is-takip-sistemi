@@ -61,37 +61,26 @@
 .center-cell { text-align:center; }
     /* Tıklanmış satır vurgusu */
 .tr-focus { outline: 2px solid #ef4444; outline-offset: -2px; }
-    /* === EŞİT SATIR YÜKSEKLİĞİ === */
-:root {
-  --stack-row-h: 28px;      /* istersen 26–30px arası deneyebilirsin */
+    /* === SATIR İÇİ YIĞIN – AUTO HEIGHT (KAYMA DÜZELTME) === */
+.cell-stack{display:flex;flex-direction:column;align-items:stretch}
+.cell-stack .list-row{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;   /* ortalama yerine sola hizala */
+  gap:.45rem;
+  padding:.15rem .25rem;
+  line-height:1.2;
+  min-height:22px;              /* rahat okuma, sabit yükseklik YOK */
+  white-space:normal;           /* kırılabilsin */
+  flex-wrap:wrap;               /* taşma olmasın */
 }
-
-.cell-stack { 
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;     /* her satır aynı genişlikte */
+.cell-stack .list-row + .list-row{
+  border-top:1px solid #e5e7eb;
+  margin-top:0;
 }
+.cell-stack .badge{line-height:1}
+.cell-stack .mono,.cell-stack .list-row-title{line-height:1.2}
 
-.cell-stack .list-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;  /* ortalı */
-  gap: .45rem;
-  padding: 0;               /* iç boşlukları sabitleyelim */
-  height: var(--stack-row-h);
-  line-height: var(--stack-row-h);
-  white-space: nowrap;      /* satır kırılmasın (kod/isim taşmasın) */
-}
-
-.cell-stack .list-row + .list-row {
-  border-top: 1px solid #e5e7eb;  /* araya çizgi */
-  margin-top: 0;
-}
-
-/* rozet/kodların satır içinde ortada kalması için */
-.cell-stack .badge      { line-height: 1; }
-.cell-stack .mono,
-.cell-stack .list-row-title { line-height: 1; }
     /* === Sığdırma ayarları (yatay kaydırma olmasın) === */
 .tbl{border-collapse:separate;border-spacing:0;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden; table-layout: fixed; width:100%;}     /* hücreleri eşit paylaştır, küçük yazı */
 .tbl th,.tbl td{ border-right:1px solid #e5e7eb; border-bottom:1px solid #e5e7eb; word-break: break-word; white-space: normal; padding:.25rem .35rem; vertical-align: top;}       /* daraltılmış iç boşluk */
@@ -104,6 +93,13 @@
 
 /* tek arka plan istendiği için zebra kapalı (olsa dahi) */
 .tbl tbody tr:nth-child(odd){ background:transparent !important; }
+    /* === TABLO HÜCRE DÜZELTMELERİ === */
+.tbl{table-layout:fixed;width:100%}                  /* genişlik sabit paylaşılsın */
+.tbl td{
+  vertical-align:top;                                /* içerik üste */
+  word-break:break-word;
+  white-space:normal;                                 /* metinler sarılsın */
+}
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
