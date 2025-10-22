@@ -271,7 +271,8 @@ function renderAkdList(rows){
   const html = rows.map(r => `
     <div class="list-row">${AKD_BADGE(r.akademikIzlemeDurumu)}</div>
   `).join('');
-  return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
+  // ESKİ: return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
+  return `<div class="cell-stack">${ html || '<div class="list-row"><span class="text-gray-400">—</span></div>' }</div>`;
 }
 
 // Yükleme (Yazılım) liste
@@ -280,7 +281,8 @@ function renderYazList(rows){
     const v = (r.yuklemeDurumu ?? r.yuklenmeDurumu) || '';
     return `<div class="list-row">${YAZILIM_BADGE(v)}</div>`;
   }).join('');
-  return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
+  // ESKİ: return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
+  return `<div class="cell-stack">${ html || '<div class="list-row"><span class="text-gray-400">—</span></div>' }</div>`;
 }
 
     const CEKIM_BADGE = count => count>0 ? `<span class="badge badge-ok">ÇEKİLDİ (${count} ders)</span>` : `<span class="badge badge-warn">Çekim yok</span>`;
@@ -288,7 +290,10 @@ function renderYazList(rows){
 // PRATIK ve GCCK'ta isim = testAdi, diğerlerinde ders adı.
 // Hiçbir yerde "1 ders" yazmıyoruz. (Tabletli/Özet'te 1.DERS vb. zaten isimde var.)
 function renderCekimList(rows, scKey){
-  if (!rows.length) return '<span class="text-gray-400">—</span>';
+  if (!rows.length) {
+    // ESKİ: return '<span class="text-gray-400">—</span>';
+    return `<div class="cell-stack"><div class="list-row"><span class="text-gray-400">—</span></div></div>`;
+  }
 
   const html = rows
     .filter(r => (r.videoKodu || '').toString().trim() !== '')
@@ -305,8 +310,9 @@ function renderCekimList(rows, scKey){
           <span class="badge badge-ok">ÇEKİLDİ</span>
           ${code}
         </div>`;
-    }).join('') || '<span class="text-gray-400">—</span>';
-  return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
+    }).join('') || `<div class="list-row"><span class="text-gray-400">—</span></div>`;
+
+  return `<div class="cell-stack">${html}</div>`;
 }
     
 /* === ÜÇLÜ KOLON SATIR SENKRONİZASYONU === */
