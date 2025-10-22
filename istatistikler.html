@@ -11,100 +11,135 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
   <style>
-    .badge{display:inline-block;padding:.22rem .55rem;border-radius:9999px;font-weight:700;font-size:.75rem;line-height:1}
-    .badge-ok{background:#bbf7d0;color:#166534}
-    .badge-warn{background:#bbf7d0;color:#166534} /* sarı yerine yeşil */
-    .badge-info{background:#dbeafe;color:#1d4ed8}
-    .badge-danger{background:#fee2e2;color:#991b1b}
-    .badge-purple{background:#ede9fe;color:#5b21b6}
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
-    .tbl th,.tbl td{border-bottom:1px solid #eef2f7}
-    .sticky-head thead th{position:sticky;top:0;background:#f8fafc;z-index:1}
-    .seg {display:inline-flex;gap:.25rem;padding:.25rem;background:#fff;border-radius:999px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 1px 1px rgba(16,24,40,.02)}
-    .seg button{padding:.5rem .9rem;border-radius:999px;font-weight:600}
-    .seg .on{background:#4f46e5;color:#fff;box-shadow:0 1px 2px rgba(16,24,40,.04)}
-    .seg .off{color:#334155}
-    .th-group{font-weight:700;text-align:center;border-bottom:1px solid #e5e7eb}
-    .th-sub{font-size:.75rem;font-weight:700;text-align:center;white-space:nowrap}
-    .teacher-cap{color:#7c2d12}
-   .tbl th, .tbl td { padding-left: .5rem; padding-right: .5rem; }  /* bırak */
-.sticky-head thead th { padding-top: .45rem; padding-bottom: .45rem; }  /* biraz kısalttık */
-    
-    /* tablo görünümü — net ızgara + zebra */
-.tbl{border-collapse:separate;border-spacing:0;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden}
-.tbl thead th, .tbl td{border-right:1px solid #e5e7eb}
-.tbl thead tr:last-child th, .tbl tbody td{border-bottom:1px solid #e5e7eb}
-.tbl thead th:first-child, .tbl td:first-child{border-left:1px solid #e5e7eb}
-.center-cell{text-align:center}
-.left-cell{text-align:left}
-.th-group,.th-sub{background:#f8fafc}
-.list-chip{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;margin:.15rem .35rem .15rem 0;padding:.15rem .4rem;border-radius:9999px;background:#f4f4f5}
-    /* daha okunaklı liste satırı */
-.list-row { display:flex; align-items:center; gap:.45rem; margin:.15rem 0; }
-.list-row-title { font-weight:600; color:#111827; }
-
-/* tablo ızgarası ve zebra zaten vardı; chip'leri sadeleştirelim */
-.list-chip { background:transparent; padding:0; margin:0; }
-
-/* başlıkları çok hafif küçült + sıkılaştır */
-.th-group,.th-sub { font-weight:700; }
-.th-sub { font-size: .72rem; }
-    /* Hücre içindeki çoklu satırları ortala ve aralarına çizgi koy */
-.cell-stack { display:flex; flex-direction:column; align-items:center; }
-.cell-stack .list-row { display:flex; align-items:center; gap:.45rem; padding:.2rem 0; }
-.cell-stack .list-row + .list-row {             /* birden fazla kayıt varsa araya çizgi */
-  border-top: 1px solid #e5e7eb;                /* #e5e7eb -> Tailwind gray-200 */
-  margin-top: .2rem;
+/* === GENEL === */
+body {
+  background:#f9fafb;
+  color:#111827;
+  font-family: "Inter", sans-serif;
+  font-size:13px;
 }
 
-/* Hücreleri netçe ortalamak için yardımcı sınıf */
-.center-cell { text-align:center; }
-    /* Tıklanmış satır vurgusu */
-.tr-focus { outline: 2px solid #ef4444; outline-offset: -2px; }
-    /* === EŞİT SATIR YÜKSEKLİĞİ === */
-:root {
-  --stack-row-h: 28px;      /* istersen 26–30px arası deneyebilirsin */
+.tbl {
+  width:100%;
+  border-collapse:collapse;
+  table-layout:auto;
+  border:1px solid #e5e7eb;
+  border-radius:8px;
+  overflow:hidden;
 }
 
-.cell-stack { 
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;     /* her satır aynı genişlikte */
+/* === TABLO BAŞLIKLARI === */
+.tbl thead th {
+  background:#f3f4f6;
+  font-weight:600;
+  text-align:center;
+  border:1px solid #e5e7eb;
+  padding:.45rem .4rem;
+  white-space:nowrap;
+  font-size:12px;
 }
 
-.cell-stack .list-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;  /* ortalı */
-  gap: .45rem;
-  padding: 0;               /* iç boşlukları sabitleyelim */
-  height: var(--stack-row-h);
-  line-height: var(--stack-row-h);
-  white-space: nowrap;      /* satır kırılmasın (kod/isim taşmasın) */
+.tbl tbody td {
+  border:1px solid #e5e7eb;
+  padding:.4rem .4rem;
+  vertical-align:middle;
+  text-align:center;
 }
 
-.cell-stack .list-row + .list-row {
-  border-top: 1px solid #e5e7eb;  /* araya çizgi */
-  margin-top: 0;
+/* === ZEBRA VE HOVER === */
+.tbl tbody tr:nth-child(odd){
+  background:#ffffff;
+}
+.tbl tbody tr:nth-child(even){
+  background:#f9fafb;
+}
+.tbl tbody tr:hover{
+  background:#eef2ff;
 }
 
-/* rozet/kodların satır içinde ortada kalması için */
-.cell-stack .badge      { line-height: 1; }
-.cell-stack .mono,
-.cell-stack .list-row-title { line-height: 1; }
-    /* === Sığdırma ayarları (yatay kaydırma olmasın) === */
-.tbl{ table-layout:fixed; font-size:12px; }     /* hücreleri eşit paylaştır, küçük yazı */
-.tbl th,.tbl td{ padding:.25rem .35rem; }       /* daraltılmış iç boşluk */
-.th-group,.th-sub{ font-size:.72rem; }          /* başlıkları küçült */
-.tbl td{ word-break:break-word; white-space:normal; } /* metinler sarılsın */
+/* === BADGELER === */
+.badge{
+  display:inline-block;
+  padding:.22rem .5rem;
+  border-radius:4px;
+  font-weight:500;
+  font-size:11.5px;
+  border:1px solid transparent;
+  letter-spacing:0.1px;
+}
 
-.badge{ padding:.12rem .45rem; font-size:11px; } /* rozetler ufak */
-.mono{ font-size:11px; }                          /* video kodu ufak */
-.list-row{ gap:.3rem; }                           /* satır içi boşluk küçük */
+/* Yeşil (tamamen aktif olanlar) */
+.badge-ok{
+  background:#dcfce7;
+  color:#166534;
+  border-color:#86efac;
+}
 
-/* tek arka plan istendiği için zebra kapalı (olsa dahi) */
-.tbl tbody tr:nth-child(odd){ background:transparent !important; }
-  </style>
+/* Sarı yerine yeşil (yükleme durumu da aynı tonda) */
+.badge-warn{
+  background:#dcfce7;
+  color:#166534;
+  border-color:#86efac;
+}
+
+/* Bilgi (mavi ton) */
+.badge-info{
+  background:#dbeafe;
+  color:#1d4ed8;
+  border-color:#93c5fd;
+}
+
+/* Hata (kırmızı ton) */
+.badge-danger{
+  background:#fee2e2;
+  color:#b91c1c;
+  border-color:#fca5a5;
+}
+
+/* Mor (özel durum) */
+.badge-purple{
+  background:#ede9fe;
+  color:#5b21b6;
+  border-color:#c4b5fd;
+}
+
+/* === METİN === */
+.mono{
+  font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size:11.5px;
+  color:#374151;
+}
+
+.list-row-title {
+  font-weight:600;
+  color:#111827;
+  font-size:12px;
+}
+
+.cell-stack{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+}
+
+/* === TABLO GENİŞLİĞİ === */
+main .tbl{
+  width:100%;
+  min-width:100%;
+  max-width:none;
+}
+
+/* === BAŞLIK KISMI === */
+.th-group{ background:#f3f4f6; font-weight:700; text-align:center; }
+.th-sub{ background:#f9fafb; font-weight:600; font-size:12px; text-align:center; }
+
+/* === SATIR SEÇİMİ === */
+.tr-focus{
+  outline:2px solid #6366f1;
+  outline-offset:-2px;
+}
+</style>
 </head>
 <body class="bg-gray-50 text-gray-800">
   <!-- HEADER -->
