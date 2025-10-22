@@ -125,6 +125,19 @@
 
 /* tek arka plan istendiği için zebra kapalı (olsa dahi) */
 .tbl tbody tr:nth-child(odd){ background:transparent !important; }
+    /* Öğretmen adını inline tut, taşarsa sar */
+th .teacher-name{
+  display:inline;
+  white-space:nowrap;
+  font-weight:600;          /* istersen */
+  font-size: .95em;         /* istersen */
+}
+    .teacher-cap {
+  white-space: nowrap;
+  display: inline-block;
+  text-align: center;
+  font-size: 0.9em;
+}
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -358,9 +371,13 @@ function cellsFor(records, scKey, teacherName){
     thTop.innerHTML += `<th class="th-group px-3 py-2 center-cell" colspan="${colSpan}">${sc.title}</th>`;
 
     (teachers.length ? teachers : ['']).forEach((t, idx) => {
-      const pretty = t ? `<br/>${t}` : '';
-      thSub.innerHTML  += `<th class="th-sub px-3 py-1 teacher-cap center-cell" colspan="3">${idx+1}. Anlatıcı${pretty}</th>`;
-      thSub2.innerHTML += `
+      const pretty = t ? `${t}` : '';  // <br/> KALDIRILDI, artık tek satırda
+thSub.innerHTML  += `
+  <th class="th-sub px-3 py-1 teacher-cap center-cell" colspan="3">
+    ${idx + 1}. Anlatıcı ${pretty}
+  </th>
+`;
+thSub2.innerHTML += `
   <th class="th-sub px-3 py-1 center-cell">Çekim</th>
   <th class="th-sub px-3 py-1 center-cell">Akad.</th>
   <th class="th-sub px-3 py-1 center-cell">Yükleme</th>`;
