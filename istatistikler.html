@@ -61,25 +61,42 @@
 .center-cell { text-align:center; }
     /* Tıklanmış satır vurgusu */
 .tr-focus { outline: 2px solid #ef4444; outline-offset: -2px; }
-    /* === SATIR İÇİ YIĞIN — AUTO-HEIGHT + ORTALI (KAYMAYI DÜZELTİR) === */
+   /* === 3'lü kolonda satır hizası: eşit yükseklik + ellipsis === */
+:root { --row-h: 26px; }   /* istersen 24–30px oynatabilirsin */
+
 .cell-stack{display:flex;flex-direction:column;align-items:stretch}
+
 .cell-stack .list-row{
   display:flex;
   align-items:center;
-  justify-content:center;     /* istek: ortalı */
+  justify-content:center;       /* üç kolonda da ortalı */
   gap:.45rem;
-  padding:.15rem .25rem;
-  line-height:1.2;
-  min-height:22px;            /* sabit yükseklik YOK */
-  white-space:normal;         /* metin kırılabilsin */
-  flex-wrap:wrap;             /* taşma olmasın */
+  height:var(--row-h);          /* sabit yükseklik -> çizgiler aynı hizaya gelir */
+  line-height:var(--row-h);
+  padding:0 .25rem;
+  white-space:nowrap;           /* tek satır */
+  overflow:hidden;              /* taşanı gizle */
+  text-overflow:ellipsis;       /* … ile kes */
 }
+
 .cell-stack .list-row + .list-row{
-  border-top:1px solid #e5e7eb;
+  border-top:1px solid #e5e7eb; /* aynı satırda çizgi birlikteliği */
   margin-top:0;
 }
+
 .cell-stack .badge{line-height:1}
-.cell-stack .mono,.cell-stack .list-row-title{line-height:1.2}
+.cell-stack .mono,.cell-stack .list-row-title{line-height:1}
+
+/* "1. DERS" vb. soldaki başlık çok uzarsa ellipsis uygula */
+.list-row-title{
+  max-width:140px;              /* istersen genişlet */
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* video kodları biraz ufak kalsın, tek satıra sığması kolaylaşır */
+.mono{ font-size:10.5px; }
     
     /* === Sığdırma ayarları (yatay kaydırma olmasın) === */
 .tbl{border-collapse:separate;border-spacing:0;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden; table-layout: fixed; width:100%;}     /* hücreleri eşit paylaştır, küçük yazı */
