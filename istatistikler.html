@@ -61,26 +61,37 @@
 .center-cell { text-align:center; }
     /* Tıklanmış satır vurgusu */
 .tr-focus { outline: 2px solid #ef4444; outline-offset: -2px; }
-    /* === SATIR İÇİ YIĞIN – AUTO HEIGHT (KAYMA DÜZELTME) === */
-.cell-stack{display:flex;flex-direction:column;align-items:stretch}
-.cell-stack .list-row{
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;   /* ortalama yerine sola hizala */
-  gap:.45rem;
-  padding:.15rem .25rem;
-  line-height:1.2;
-  min-height:22px;              /* rahat okuma, sabit yükseklik YOK */
-  white-space:normal;           /* kırılabilsin */
-  flex-wrap:wrap;               /* taşma olmasın */
+    /* === EŞİT SATIR YÜKSEKLİĞİ === */
+:root {
+  --stack-row-h: 28px;      /* istersen 26–30px arası deneyebilirsin */
 }
-.cell-stack .list-row + .list-row{
-  border-top:1px solid #e5e7eb;
-  margin-top:0;
-}
-.cell-stack .badge{line-height:1}
-.cell-stack .mono,.cell-stack .list-row-title{line-height:1.2}
 
+.cell-stack { 
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;     /* her satır aynı genişlikte */
+}
+
+.cell-stack .list-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;  /* ortalı */
+  gap: .45rem;
+  padding: 0;               /* iç boşlukları sabitleyelim */
+  height: var(--stack-row-h);
+  line-height: var(--stack-row-h);
+  white-space: nowrap;      /* satır kırılmasın (kod/isim taşmasın) */
+}
+
+.cell-stack .list-row + .list-row {
+  border-top: 1px solid #e5e7eb;  /* araya çizgi */
+  margin-top: 0;
+}
+
+/* rozet/kodların satır içinde ortada kalması için */
+.cell-stack .badge      { line-height: 1; }
+.cell-stack .mono,
+.cell-stack .list-row-title { line-height: 1; }
     /* === Sığdırma ayarları (yatay kaydırma olmasın) === */
 .tbl{border-collapse:separate;border-spacing:0;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden; table-layout: fixed; width:100%;}     /* hücreleri eşit paylaştır, küçük yazı */
 .tbl th,.tbl td{ border-right:1px solid #e5e7eb; border-bottom:1px solid #e5e7eb; word-break: break-word; white-space: normal; padding:.25rem .35rem; vertical-align: top;}       /* daraltılmış iç boşluk */
@@ -93,14 +104,31 @@
 
 /* tek arka plan istendiği için zebra kapalı (olsa dahi) */
 .tbl tbody tr:nth-child(odd){ background:transparent !important; }
-    /* === TABLO HÜCRE DÜZELTMELERİ === */
-.tbl{table-layout:fixed;width:100%}                  /* genişlik sabit paylaşılsın */
-.tbl td{
-  vertical-align:top;                                /* içerik üste */
-  word-break:break-word;
-  white-space:normal;                                 /* metinler sarılsın */
+  
+/* === BÖLÜM'DEN SAĞA HER ŞEY ORTALI === */
+.tbl tbody tr > td:not(:nth-child(-n+2)){ text-align:center; }
+
+/* 3'lü alt sütunların ayırıcı çizgilerini belirginleştir */
+.tbl thead tr:last-child th,
+.tbl tbody td{ border-right:1px solid #e5e7eb; }
+.tbl thead tr:last-child th:nth-child(3n),
+.tbl tbody td:nth-child(3n){ border-right:1px solid #d1d5db; } /* üçlü bitişine vurgu */
+
+/* Branş butonları (seg) daha estetik */
+.seg{ gap:.35rem; padding:.35rem; background:#fff; border-radius:9999px;
+      box-shadow:0 8px 20px rgba(17,24,39,.05), 0 2px 6px rgba(17,24,39,.04); }
+.seg button{
+  padding:.55rem 1rem; border-radius:9999px; font-weight:600; letter-spacing:.2px;
+  transition:all .2s ease; border:1px solid transparent; background:#f3f4f6; color:#111827;
 }
-  </style>
+.seg button.off:hover{ transform:translateY(-1px); background:#e5e7eb; }
+.seg .on{
+  background:linear-gradient(180deg,#4f46e5,#4338ca);
+  color:#fff; border-color:#4338ca; box-shadow:0 6px 14px rgba(67,56,202,.25);
+}
+.seg .on:hover{ filter:brightness(1.05); }
+
+</style>
 </head>
 <body class="bg-gray-50 text-gray-800">
   <!-- HEADER -->
