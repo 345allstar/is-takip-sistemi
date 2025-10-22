@@ -61,37 +61,26 @@
 .center-cell { text-align:center; }
     /* Tıklanmış satır vurgusu */
 .tr-focus { outline: 2px solid #ef4444; outline-offset: -2px; }
-    /* === EŞİT SATIR YÜKSEKLİĞİ === */
-:root {
-  --stack-row-h: 28px;      /* istersen 26–30px arası deneyebilirsin */
+    /* === SATIR İÇİ YIĞIN — AUTO-HEIGHT + ORTALI (KAYMAYI DÜZELTİR) === */
+.cell-stack{display:flex;flex-direction:column;align-items:stretch}
+.cell-stack .list-row{
+  display:flex;
+  align-items:center;
+  justify-content:center;     /* istek: ortalı */
+  gap:.45rem;
+  padding:.15rem .25rem;
+  line-height:1.2;
+  min-height:22px;            /* sabit yükseklik YOK */
+  white-space:normal;         /* metin kırılabilsin */
+  flex-wrap:wrap;             /* taşma olmasın */
 }
-
-.cell-stack { 
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;     /* her satır aynı genişlikte */
+.cell-stack .list-row + .list-row{
+  border-top:1px solid #e5e7eb;
+  margin-top:0;
 }
-
-.cell-stack .list-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;  /* ortalı */
-  gap: .45rem;
-  padding: 0;               /* iç boşlukları sabitleyelim */
-  height: var(--stack-row-h);
-  line-height: var(--stack-row-h);
-  white-space: nowrap;      /* satır kırılmasın (kod/isim taşmasın) */
-}
-
-.cell-stack .list-row + .list-row {
-  border-top: 1px solid #e5e7eb;  /* araya çizgi */
-  margin-top: 0;
-}
-
-/* rozet/kodların satır içinde ortada kalması için */
-.cell-stack .badge      { line-height: 1; }
-.cell-stack .mono,
-.cell-stack .list-row-title { line-height: 1; }
+.cell-stack .badge{line-height:1}
+.cell-stack .mono,.cell-stack .list-row-title{line-height:1.2}
+    
     /* === Sığdırma ayarları (yatay kaydırma olmasın) === */
 .tbl{border-collapse:separate;border-spacing:0;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden; table-layout: fixed; width:100%;}     /* hücreleri eşit paylaştır, küçük yazı */
 .tbl th,.tbl td{ border-right:1px solid #e5e7eb; border-bottom:1px solid #e5e7eb; word-break: break-word; white-space: normal; padding:.25rem .35rem; vertical-align: top;}       /* daraltılmış iç boşluk */
@@ -109,10 +98,18 @@
 .tbl tbody tr > td:not(:nth-child(-n+2)){ text-align:center; }
 
 /* 3'lü alt sütunların ayırıcı çizgilerini belirginleştir */
-.tbl thead tr:last-child th,
+/* THEAD: alt başlıkta her 3. th sonunda ayrım */
+.tbl thead tr:last-child th{ border-right:1px solid #e5e7eb; }
+.tbl thead tr:last-child th:nth-child(3n){
+  border-right:1px solid #d1d5db;
+}
+
+/* TBODY: 1=ÜNİTE, 2=BÖLÜM; üçlüler 3–5, 6–8, 9–11...
+   Bu yüzden bitiş çizgisi 5,8,11... => 3n+5 */
 .tbl tbody td{ border-right:1px solid #e5e7eb; }
-.tbl thead tr:last-child th:nth-child(3n),
-.tbl tbody td:nth-child(3n){ border-right:1px solid #d1d5db; } /* üçlü bitişine vurgu */
+.tbl tbody td:nth-child(3n+5){
+  border-right:1px solid #d1d5db;  /* üçlü bitişi */
+}
 
 /* Branş butonları (seg) daha estetik */
 .seg{ gap:.35rem; padding:.35rem; background:#fff; border-radius:9999px;
@@ -127,7 +124,9 @@
   color:#fff; border-color:#4338ca; box-shadow:0 6px 14px rgba(67,56,202,.25);
 }
 .seg .on:hover{ filter:brightness(1.05); }
-
+    
+/* BÖLÜM'den (2. sütun) sonrası ortalı */
+.tbl tbody tr > td:nth-child(n+3){ text-align:center; }
 </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
