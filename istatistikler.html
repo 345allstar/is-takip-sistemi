@@ -356,5 +356,133 @@
     buildTbody(grouped);
   }
   </script>
+  <style>
+  /* 1) Tabloda sıkı tipografi: daha fazla sütun tek ekrana sığsın */
+  table.tight-layout { table-layout: fixed; width:100%; border-collapse: separate; border-spacing:0; }
+  table.tight-layout th, table.tight-layout td{
+    padding: 6px 6px !important;
+    font-size: 12px !important;
+    line-height: 1.1 !important;
+    vertical-align: top;
+    border-right: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+    word-break: break-word;
+  }
+  table.tight-layout th{ background:#f8fafc; color:#334155; font-weight:600; text-align:center; }
+  /* Rozet stilleri */
+  .badge{ display:inline-block; padding:2px 6px; border-radius:999px; font-size:11px; font-weight:600; border:1px solid transparent; }
+  .badge-green{ background:#eaffee; color:#0a7a2a; border-color:#b6e9c2; }
+  .badge-amber{ background:#fff5db; color:#924400; border-color:#f2d49b; }
+  .badge-slate{ background:#f1f5f9; color:#334155; border-color:#e2e8f0; }
+  /* Ölçeklenmiş tablonun ebeveyn yüksekliğini koru */
+  .fit-wrap{ position:relative; overflow:visible; }
+  .fit-wrap > .scaled-table{
+    transform-origin: top left;
+    will-change: transform;
+    display: inline-block;
+  }
+</style>
+
+<script>
+(function(){
+  /** Yardımcılar **/
+  const q  = (sel,root=document)=>root.querySelector(sel);
+  const qa = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
+  const text = (el)=> (el?.textContent || '').trim().toLowerCase();
+  const isDurumBaslik = (el)=> text(el) === 'durum başlıkları';
+
+  /** 0) Tablo hazır olduğunda çalıştır (ilk render + olası yeniden yükleme) */
+  function whenTableReady(run){
+    // Mevcut tablo varsa hemen
+    const first = document.querySelector('table');
+    if(first){ run(); }
+    // Sonradan gelen olursa da yakala
+    const obs = new MutationObserver(()=>{
+      const t = document.querySelector('table');
+      if(t){ run(); obs.disconnect(); }
+    });
+    obs.observe(document.body, {childList:true, subtree:true});
+  }
+
+  /** 1) Tablonun yatay taşmasını kaldır: ekrana sığacak şekilde otomatik ölçekle */
+  function fitToWidth(){
+    const table = document.querySelector('table');
+    if(!table) return;
+
+    // Bir kez sınıfları uygula
+    table.classList.add('tight-layout');
+
+    // Tablonun üstüne bir sarmalayıcı koy (yükseklik korunsun)
+    let wrap = table.closest('.fit-wrap');
+    if(!wrap){
+      wrap = document.createElement('div');
+      wrap.className = 'fit-wrap';
+      table.parentNode.insertBefore(wrap, table);
+      wrap.appendChild(table);
+    }
+    table.classList.add('scaled-table');
+
+    // Ölçek hesapla
+    requestAnimationFrame(()=> {
+      // önce ölçeği sıfırla, gerçek genişliği ölç
+      table.style.transform = 'scale(1)';
+      const cw = wrap.clientWidth || document.documentElement.clientWidth;
+      const sw = table.scrollWidth;
+      let scale = cw / sw;
+      if (scale > 1) scale = 1;           // büyütmeyelim
+      if (scale < 0.55) scale = 0.55;     // okunabilirlik için alt sınır
+
+      table.style.transform = `scale(${scale})`;
+      // ölçek sonrası yüksekliği sabitle
+      const rect = table.getBoundingClientRect();
+      wrap.style.height = (rect.height) + 'px';
+    });
+  }
+
+  /** 2) “Yüklendi” metinlerini yeşil rozete çevir */
+  function colorizeYuklendi(){
+    const cells = qa('td, th');
+    for(const td of cells){
+      const t = (td.textContent || '').trim();
+      if(t === 'Yüklendi' || t === 'Yüklendi'.toLocaleLowerCase('tr')){
+        td.innerHTML = '<span class="badge badge-green">Yüklendi</span>';
+      }
+    }
+  }
+
+  /** 3) Soru Pratiği / GGÇK altındaki “Durum Başlıkları” th’lerini kaldır */
+  function removeDurumBasliklari(){
+    const thead = document.querySelector('thead');
+    if(!thead) return;
+    // İkinci başlık satırında olurlar; metni “Durum Başlıkları” olan th’leri sil
+    qa('thead th').forEach(th=>{
+      if(isDurumBaslik(th)) th.remove();
+    });
+  }
+
+  /** 4) Yeniden boyutla */
+  function handleResize(){ fitToWidth(); }
+
+  /** Çalıştır */
+  whenTableReady(function(){
+    // İlk düzenlemeler
+    removeDurumBasliklari();
+    colorizeYuklendi();
+    fitToWidth();
+
+    // Render sonrasında hücre içerikleri değişirse tekrar uygula
+    const table = document.querySelector('table');
+    const obs = new MutationObserver(()=>{
+      removeDurumBasliklari();
+      colorizeYuklendi();
+      fitToWidth();
+    });
+    obs.observe(table, {subtree:true, childList:true, characterData:true});
+
+    // Pencere boyutu değişirse yeniden ölçekle
+    window.addEventListener('resize', handleResize, {passive:true});
+  });
+})();
+</script>
 </body>
 </html>
