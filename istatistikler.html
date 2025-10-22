@@ -474,10 +474,16 @@ return `
       document.getElementById('rowCount').textContent = `${satir} satır`;
       // satıra tıklayınca kırmızı çerçeve
 tbody.addEventListener('click', (e)=>{
-  // Satırlar yazıldıktan sonra 1 frame bekleyip yükseklikleri eşitle
+  const tr = e.target.closest('tr');
+  if(!tr) return;
+  [...tbody.querySelectorAll('tr.tr-focus')].forEach(x=>x.classList.remove('tr-focus'));
+  tr.classList.add('tr-focus');
+});
+    }
+// 4.6 Üçlü kolon satırlarını hizala (ilk yüklemede)
 requestAnimationFrame(syncAllTriplets);
 
-// Pencere boyutu değişince yeniden hesapla
+// Ekran boyutu değişince tekrar hizala
 window.addEventListener('resize', () => {
   document.querySelectorAll('#tbody .list-row').forEach(el => {
     el.style.height = 'auto';
@@ -485,13 +491,6 @@ window.addEventListener('resize', () => {
   });
   requestAnimationFrame(syncAllTriplets);
 });
-
-  const tr = e.target.closest('tr');
-  if(!tr) return;
-  [...tbody.querySelectorAll('tr.tr-focus')].forEach(x=>x.classList.remove('tr-focus'));
-  tr.classList.add('tr-focus');
-});
-    }
 
     // Başlangıç
     loadFor(BRANSLAR[0]);
