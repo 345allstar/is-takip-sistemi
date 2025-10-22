@@ -81,32 +81,34 @@
 .center-cell { text-align:center; }
     /* Tıklanmış satır vurgusu */
 .tr-focus { outline: 2px solid #ef4444; outline-offset: -2px; }
-    /* === EŞİT SATIR YÜKSEKLİĞİ === */
-:root {
-  --stack-row-h: 28px;      /* istersen 26–30px arası deneyebilirsin */
+    /* === Serbest yükseklik, sarma açık (taşma yok) === */
+.cell-stack{
+  display:flex;
+  flex-direction:column;
+  gap:.25rem;                /* alt alta öğeler arası boşluk */
 }
 
-.cell-stack { 
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;     /* her satır aynı genişlikte */
+.cell-stack .list-row{
+  display:flex;
+  flex-wrap:wrap;            /* sığmayan altta devam etsin */
+  align-items:center;
+  justify-content:center;
+  gap:.25rem;
+  padding:0;                 /* gereksiz yükseklik olmasın */
+  line-height:1.15;          /* okunaklı ama sıkı */
+  white-space:normal;        /* satır kırılmasına izin ver */
 }
 
-.cell-stack .list-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;  /* ortalı */
-  gap: .45rem;
-  padding: 0;               /* iç boşlukları sabitleyelim */
-  height: var(--stack-row-h);
-  line-height: var(--stack-row-h);
-  white-space: nowrap;      /* satır kırılmasın (kod/isim taşmasın) */
+.cell-stack .list-row + .list-row{
+  border-top:1px dashed #e5e7eb;  /* satırlar arası ayraç */
+  padding-top:.2rem;
+  margin-top:.2rem;
 }
 
-.cell-stack .list-row + .list-row {
-  border-top: 1px solid #e5e7eb;  /* araya çizgi */
-  margin-top: 0;
-}
+/* Kompakt görünüm için ufak dokunuşlar */
+.tbl{font-size:10px;}
+.badge{font-size:10px;padding:.08rem .36rem;}
+.mono{font-size:10px;}
 
 /* rozet/kodların satır içinde ortada kalması için */
 .cell-stack .badge      { line-height: 1; }
@@ -284,25 +286,46 @@ function renderYazList(rows){
 // Çekim listesi: "İSİM  ÇEKİLDİ  KOD"  formatı
 // PRATIK ve GCCK'ta isim = testAdi, diğerlerinde ders adı.
 // Hiçbir yerde "1 ders" yazmıyoruz. (Tabletli/Özet'te 1.DERS vb. zaten isimde var.)
+function uniqBy(arr, keyFn){
+  const seen = new Set();
+  return arr.filter(o => {
+    const k = keyFn(o);
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+}
+
 function renderCekimList(rows, scKey){
   if (!rows.length) return '<span class="text-gray-400">—</span>';
 
-  const html = rows
-    .filter(r => (r.videoKodu || '').toString().trim() !== '')
-    .map(r => {
-      const name = (scKey === 'PRATIK' || scKey === 'GCCK')
-        ? (r.testAdi || '').toString().trim()
-        : (r.ders || '').toString().trim();
+  // boş video kodlarını tamamen ele
+  let base = rows.filter(r => (r.videoKodu || '').toString().trim() !== '');
 
-      const left = name ? `<span class="list-row-title">${name}</span>` : '';
-      const code = `<span class="mono text-xs text-gray-700">${r.videoKodu}</span>`;
-      return `
-        <div class="list-row">
-          ${left}
-          <span class="badge badge-ok">ÇEKİLDİ</span>
-          ${code}
-        </div>`;
-    }).join('') || '<span class="text-gray-400">—</span>';
+  // PRATIK ve GCCK: anlatıcıdan bağımsız, test adına göre tekilleştir
+  if (scKey === 'PRATIK' || scKey === 'GCCK'){
+    base = uniqBy(base, r => `${(r.testAdi||'').trim().toUpperCase('tr-TR')}|${r.videoKodu}`);
+  } else {
+    // İstersen ders + videoKodu bazında da tekilleştir (aynı kayıt iki kere gelmişse)
+    base = uniqBy(base, r => `${(r.ders||'').trim().toUpperCase('tr-TR')}|${r.videoKodu}`);
+  }
+
+  const html = base.map(r => {
+    const name = (scKey === 'PRATIK' || scKey === 'GCCK')
+      ? (r.testAdi || '').toString().trim()
+      : (r.ders    || '').toString().trim();
+
+    const left = name ? `<span class="list-row-title">${name}</span>` : '';
+    const code = `<span class="mono text-xs text-gray-700">${r.videoKodu}</span>`;
+
+    return `
+      <div class="list-row">
+        ${left}
+        <span class="badge badge-ok">ÇEKİLDİ</span>
+        ${code}
+      </div>`;
+  }).join('');
+
   return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
 }
     
