@@ -140,6 +140,8 @@ th .teacher-name{
   text-align: center;
   font-size: 0.9em;
 }
+    .teacher-cap{ white-space:nowrap; }
+.teacher-name{ margin-left:.25rem; font-weight:600; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -394,12 +396,14 @@ function cellsFor(records, scKey, teacherName){
     thTop.innerHTML += `<th class="th-group px-3 py-2 center-cell" colspan="${colSpan}">${sc.title}</th>`;
 
     (teachers.length ? teachers : ['']).forEach((t, idx) => {
-      const pretty = t ? `${t}` : '';  // <br/> KALDIRILDI, artık tek satırda
-thSub.innerHTML  += `
+     // 1) Öğretmen adını yatay yaz (br kaldırıldı)
+const pretty = t ? ` <span class="teacher-name">${t}</span>` : '';
+thSub.innerHTML += `
   <th class="th-sub px-3 py-1 teacher-cap center-cell" colspan="3">
-    ${idx + 1}. Anlatıcı ${pretty}
-  </th>
-`;
+    ${idx + 1}. Anlatıcı${pretty}
+  </th>`;
+
+// 2) Her öğretmen için üç alt-hücre (Çekim / Akad. / Yükleme)
 thSub2.innerHTML += `
   <th class="th-sub px-3 py-1 center-cell">Çekim</th>
   <th class="th-sub px-3 py-1 center-cell">Akad.</th>
