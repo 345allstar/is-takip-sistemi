@@ -204,11 +204,6 @@ const normTR = s => (s ?? '')
 },
 };
 
-    const normTR = s => (s ?? '')
-  .toString().toUpperCase('tr-TR')
-  .replaceAll('Ç','C').replaceAll('Ğ','G').replaceAll('İ','I')
-  .replaceAll('Ö','O').replaceAll('Ş','S').replaceAll('Ü','U')
-  .replace(/[^A-Z]/g,'');
 
     const safe = s => (s ?? '').toString().trim();
     const YAZILIM_BADGE = v => {
@@ -272,16 +267,7 @@ function renderCekimList(rows, scKey){
     }).join('') || '<span class="text-gray-400">—</span>';
   return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
 }
-    function getTeachers(records, scKey){
-  const names = Array.from(new Set(
-    records
-      .filter(r => SCOPE[scKey].match(safe(r.anlatimTuru)))
-      .map(r => safe(r.anlaticiOgretmen))
-      .filter(Boolean)
-  ));
-  // ÖZET vb. için isim hiç yoksa yine de bir sütun açabilmek için '' döndür
-  return names.length ? names : [''];
-}
+    
 
     /* 4) Veri yükle + başlıkları (öğretmen adlarıyla) oluştur + tabloyu yaz */
     async function loadFor(brans){
@@ -298,50 +284,46 @@ function renderCekimList(rows, scKey){
 
       if (error){ console.error(error); tbody.innerHTML=''; return; }
 
-      // 4.1 Her anlatım türü için öğretmen listesi (branş genelinde) → başlıklara yazacağız
-      const teacherByScope = {};
-      const teachers = getTeachers(records, scKey);
-        const sc = SCOPE[key];
-        const uniq = [...new Set(
-          data
-            .filter(r => sc.match(safe(r.anlatimTuru)))
-            .map(r => safe(r.anlaticiOgretmen))
-            .filter(Boolean)
-        )].slice(0, sc.teacherSlots);
-        teacherByScope[key] = uniq;
-      }
+      // 4.1 Her anlatım türü için öğretmen listesi (branş genelinde)
+const teacherByScope = {};
+for (const key of Object.keys(SCOPE)) {
+  teacherByScope[key] = getTeachers(data, key); // isim yoksa [''] döner
+}
 
-      // 4.2 Çok seviyeli THEAD kur
-      const thTop = document.createElement('tr');   // grup başlıkları
-      const thSub = document.createElement('tr');   // öğretmen isimleri
-      const thSub2= document.createElement('tr');   // alt sütunlar
+// 4.2 Çok seviyeli THEAD kur
+const thTop  = document.createElement('tr');   // grup başlıkları
+const thSub  = document.createElement('tr');   // öğretmen isimleri
+const thSub2 = document.createElement('tr');   // alt sütunlar
 
-      // ÜNİTE/BÖLÜM sabit
-      thTop.innerHTML  += `<th class="th-group px-3 py-2 center-cell" rowspan="3">ÜNİTE</th>`;
-      thTop.innerHTML  += `<th class="th-group px-3 py-2 center-cell" rowspan="3">BÖLÜM</th>`;
-      thSub.innerHTML  += ``;  // boş
-      thSub2.innerHTML += ``;
+// ÜNİTE/BÖLÜM sabit
+thTop.innerHTML  += `<th class="th-group px-3 py-2 center-cell" rowspan="3">ÜNİTE</th>`;
+thTop.innerHTML  += `<th class="th-group px-3 py-2 center-cell" rowspan="3">BÖLÜM</th>`;
+thSub.innerHTML  += ``;
+thSub2.innerHTML += ``;
 
-      // Her scope için grup başlık + öğretmen + 3 alt başlık
-      for (const key of Object.keys(SCOPE)){
-        const sc = SCOPE[key];
-        const teacherCount = Math.max(teacherByScope[key].length, 1); // hiç yoksa 1 boş blok
-        thTop.innerHTML += `<th class="th-group px-3 py-2 center-cell" colspan="${teacherCount*3}">${sc.title}</th>`;
+// Her scope için grup başlık + öğretmen + 3 alt başlık
+for (const key of Object.keys(SCOPE)) {
+  const sc        = SCOPE[key];
+  const teachers  = teacherByScope[key];            // [''] de olabilir
+  const colSpan   = Math.max(teachers.length, 1) * 3;
 
-        teacherByScope[key] = teacherByScope[key].length ? teacherByScope[key] : ['—'];
-        teachers.forEach((t, idx) => {
-  const prettyName = t ? `<br/>${t}` : '';    // isim boşsa sadece "1. Anlatıcı" kalsın
-  thSub.innerHTML += `<th class="th-sub px-3 py-1 teacher-cap center-cell" colspan="3">${idx+1}. Anlatıcı${prettyName}</th>`;
-          thSub2.innerHTML+= `
-  <th class="th-sub px-3 py-1 center-cell">Çekim Durumu</th>
-  <th class="th-sub px-3 py-1 center-cell">Akademik İzleme Durumu</th>
-  <th class="th-sub px-3 py-1 center-cell">Yükleme Durumu</th>`;
-        });
-      }
+  thTop.innerHTML += `<th class="th-group px-3 py-2 center-cell" colspan="${colSpan}">${sc.title}</th>`;
 
-      thead.appendChild(thTop);
-      thead.appendChild(thSub);
-      thead.appendChild(thSub2);
+  // Öğretmen adları
+  (teachers.length ? teachers : ['']).forEach((t, idx) => {
+    const prettyName = t ? `<br/>${t}` : '';        // boşsa sadece “1. Anlatıcı”
+    thSub.innerHTML  += `<th class="th-sub px-3 py-1 teacher-cap center-cell" colspan="3">${idx+1}. Anlatıcı${prettyName}</th>`;
+    thSub2.innerHTML += `
+      <th class="th-sub px-3 py-1 center-cell">Çekim Durumu</th>
+      <th class="th-sub px-3 py-1 center-cell">Akademik İzleme Durumu</th>
+      <th class="th-sub px-3 py-1 center-cell">Yükleme Durumu</th>`;
+  });
+}
+
+thead.appendChild(thTop);
+thead.appendChild(thSub);
+thead.appendChild(thSub2);
+
 
       // 4.3 ÜNİTE→BÖLÜM gruplaması
       const byU = new Map();
