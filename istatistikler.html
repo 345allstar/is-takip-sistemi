@@ -27,89 +27,42 @@
     .th-group{font-weight:700;text-align:center;border-bottom:1px solid #e5e7eb}
     .th-sub{font-size:.75rem;font-weight:700;text-align:center;white-space:nowrap}
     .teacher-cap{color:#7c2d12}
-   .tbl th, .tbl td { padding-left: .5rem; padding-right: .5rem; }  /* bırak */
-.sticky-head thead th { padding-top: .45rem; padding-bottom: .45rem; }  /* biraz kısalttık */
-    
-    /* tablo görünümü — net ızgara + zebra */
-.tbl{border-collapse:separate;border-spacing:0;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden}
-.tbl thead th, .tbl td{border-right:1px solid #e5e7eb}
-.tbl thead tr:last-child th, .tbl tbody td{border-bottom:1px solid #e5e7eb}
-.tbl thead th:first-child, .tbl td:first-child{border-left:1px solid #e5e7eb}
-.center-cell{text-align:center}
-.left-cell{text-align:left}
-.th-group,.th-sub{background:#f8fafc}
-.list-chip{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;margin:.15rem .35rem .15rem 0;padding:.15rem .4rem;border-radius:9999px;background:#f4f4f5}
-    /* daha okunaklı liste satırı */
-.list-row { display:flex; align-items:center; gap:.45rem; margin:.15rem 0; }
-.list-row-title { font-weight:600; color:#111827; }
 
-/* tablo ızgarası ve zebra zaten vardı; chip'leri sadeleştirelim */
-.list-chip { background:transparent; padding:0; margin:0; }
+    .tbl th,.tbl td{ padding-left:.5rem; padding-right:.5rem; }
+    .sticky-head thead th{ padding-top:.45rem; padding-bottom:.45rem; }
 
-/* başlıkları çok hafif küçült + sıkılaştır */
-.th-group,.th-sub { font-weight:700; }
-.th-sub { font-size: .72rem; }
-    /* Hücre içindeki çoklu satırları ortala ve aralarına çizgi koy */
-.cell-stack { display:flex; flex-direction:column; align-items:center; }
-.cell-stack .list-row { display:flex; align-items:center; gap:.45rem; padding:.2rem 0; }
-.cell-stack .list-row + .list-row {             /* birden fazla kayıt varsa araya çizgi */
-  border-top: 1px solid #e5e7eb;                /* #e5e7eb -> Tailwind gray-200 */
-  margin-top: .2rem;
-}
+    /* tablo görünümü — net ızgara + tek arka plan */
+    .tbl{border-collapse:separate;border-spacing:0;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden}
+    .tbl thead th, .tbl td{border-right:1px solid #e5e7eb}
+    .tbl thead tr:last-child th, .tbl tbody td{border-bottom:1px solid #e5e7eb}
+    .tbl thead th:first-child, .tbl td:first-child{border-left:1px solid #e5e7eb}
+    .center-cell{text-align:center}
+    .left-cell{text-align:left}
+    .th-group,.th-sub{background:#f8fafc}
 
-/* Hücreleri netçe ortalamak için yardımcı sınıf */
-.center-cell { text-align:center; }
-    /* Tıklanmış satır vurgusu */
-.tr-focus { outline: 2px solid #ef4444; outline-offset: -2px; }
-    /* === EŞİT SATIR YÜKSEKLİĞİ === */
-:root {
-  --stack-row-h: 28px;      /* istersen 26–30px arası deneyebilirsin */
-}
+    /* hücrede çok satırlı liste */
+    .cell-stack{ display:flex; flex-direction:column; align-items:stretch; }
+    .cell-stack .list-row{ display:flex; align-items:center; justify-content:center; gap:.45rem; height:28px; line-height:28px; white-space:nowrap; }
+    .cell-stack .list-row + .list-row{ border-top:1px solid #e5e7eb; }
 
-.cell-stack { 
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;     /* her satır aynı genişlikte */
-}
+    .list-row-title{ font-weight:600; color:#111827; }
 
-.cell-stack .list-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;  /* ortalı */
-  gap: .45rem;
-  padding: 0;               /* iç boşlukları sabitleyelim */
-  height: var(--stack-row-h);
-  line-height: var(--stack-row-h);
-  white-space: nowrap;      /* satır kırılmasın (kod/isim taşmasın) */
-}
+    /* fit-to-width: kaydırma olmasın */
+    .tbl{ table-layout:fixed; font-size:12px; }
+    .tbl th,.tbl td{ padding:.25rem .35rem; }
+    .th-group,.th-sub{ font-size:.72rem; }
+    .tbl td{ word-break:break-word; white-space:normal; }
+    .badge{ padding:.12rem .45rem; font-size:11px; }
+    .mono{ font-size:11px; }
 
-.cell-stack .list-row + .list-row {
-  border-top: 1px solid #e5e7eb;  /* araya çizgi */
-  margin-top: 0;
-}
-
-/* rozet/kodların satır içinde ortada kalması için */
-.cell-stack .badge      { line-height: 1; }
-.cell-stack .mono,
-.cell-stack .list-row-title { line-height: 1; }
-    /* === Sığdırma ayarları (yatay kaydırma olmasın) === */
-.tbl{ table-layout:fixed; font-size:12px; }     /* hücreleri eşit paylaştır, küçük yazı */
-.tbl th,.tbl td{ padding:.25rem .35rem; }       /* daraltılmış iç boşluk */
-.th-group,.th-sub{ font-size:.72rem; }          /* başlıkları küçült */
-.tbl td{ word-break:break-word; white-space:normal; } /* metinler sarılsın */
-
-.badge{ padding:.12rem .45rem; font-size:11px; } /* rozetler ufak */
-.mono{ font-size:11px; }                          /* video kodu ufak */
-.list-row{ gap:.3rem; }                           /* satır içi boşluk küçük */
-
-/* tek arka plan istendiği için zebra kapalı (olsa dahi) */
-.tbl tbody tr:nth-child(odd){ background:transparent !important; }
+    /* Satır tıklama vurgusu */
+    .tr-focus{ outline:2px solid #ef4444; outline-offset:-2px; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
   <!-- HEADER -->
   <header class="bg-white shadow-sm">
-  <div class="mx-auto max-w-none w-full px-4 lg:px-8 py-3 flex items-center gap-3">
+    <div class="mx-auto max-w-none w-full px-4 lg:px-8 py-3 flex items-center gap-3">
       <a href="index.html" class="flex items-center gap-2">
         <img src="logo.png" alt="ÜçDörtBeş All Star" class="h-10 w-auto"/>
         <span class="text-xl font-semibold">İstatistikler</span>
@@ -130,7 +83,7 @@
       </div>
 
       <div class="mt-3 overflow-visible">
-  <table class="tbl sticky-head w-full text-[12px]">
+        <table class="tbl sticky-head w-full text-[12px]">
           <thead id="thead"></thead>
           <tbody id="tbody"></tbody>
         </table>
@@ -141,7 +94,7 @@
   <!-- Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
-    /* 1) Supabase init — BURAYI DOLDUR */
+    /* 1) Supabase init */
     const SUPABASE_URL = 'https://nwxgigtsadesqjgflblr.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4';
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -170,42 +123,41 @@
 
     /* 3) Yardımcılar */
     const up = s => (s ?? '').toString().toUpperCase('tr-TR').replaceAll('Ç','C');
-    // TR karakterlerini düz İng'e çevir + harf dışını at (GCÇK/GCCK vb. farkları yakalamak için)
-    // Öğretmen listesini getirir; hiç öğretmen adı yoksa [''] döndürür ki yine de bir sütun açılsın
-function getTeachers(records, scKey){
-  const names = Array.from(new Set(
-    records
-      .filter(r => SCOPE[scKey].match(safe(r.anlatimTuru)))
-      .map(r => safe(r.anlaticiOgretmen))
-      .filter(Boolean)
-  ));
-  return names.length ? names : [''];
-}
-const normTR = s => (s ?? '')
-  .toString()
-  .toUpperCase('tr-TR')
-  .replaceAll('Ç','C').replaceAll('Ğ','G').replaceAll('İ','I')
-  .replaceAll('Ö','O').replaceAll('Ş','S').replaceAll('Ü','U')
-  .replace(/[^A-Z]/g,'');
-    const SCOPE = {
-  TABLETLI: { key:'TABLET', title:'TABLETLİ KONU ANLATIM', teacherSlots:2, match: t => up(t).includes('TABLET') },
-  OZET: { 
-  key:'OZET', title:'ÖZET ANLATIM', teacherSlots:1,
-  match: t => /OZET/.test(normTR(t))   // ÖZET, ÖZET ANLATIM(I) vs. hepsi yakalanır
-},
-  PRATIK:   { key:'PRATIK', title:'SORU PRATİĞİ',          teacherSlots:1, match: t => up(t).includes('PRAT')    },
-  GCCK: {
-  key:'GCCK', title:'GCÇK', teacherSlots:1,
-  match: t => {
-    const n = normTR(t);
-    // "GCÇK", "GCCK", "G C Ç K", "GÇÇK" vb. tüm varyantları yakala
-    return n.includes('GCCK') || n.includes('GCC') || /G+C+K/.test(n);
-  }
-},
-};
-
+    const normTR = s => (s ?? '')
+      .toString()
+      .toUpperCase('tr-TR')
+      .replaceAll('Ç','C').replaceAll('Ğ','G').replaceAll('İ','I')
+      .replaceAll('Ö','O').replaceAll('Ş','S').replaceAll('Ü','U')
+      .replace(/[^A-Z]/g,'');
 
     const safe = s => (s ?? '').toString().trim();
+
+    const SCOPE = {
+      TABLETLI: { key:'TABLET', title:'TABLETLİ KONU ANLATIM', teacherSlots:2, match: t => up(t).includes('TABLET') },
+      OZET: {
+        key:'OZET', title:'ÖZET ANLATIM', teacherSlots:1,
+        match: t => /OZET/.test(normTR(t))                 // ÖZET, ÖZET ANLATIM(I) vb.
+      },
+      PRATIK: { key:'PRATIK', title:'SORU PRATİĞİ', teacherSlots:1, match: t => up(t).includes('PRAT') },
+      GCCK: {
+        key:'GCCK', title:'GCÇK', teacherSlots:1,
+        match: t => {
+          const n = normTR(t);
+          return n.includes('GCCK') || n.includes('GCC') || /G+C+K/.test(n); // GCCK/GCÇK tüm varyantlar
+        }
+      },
+    };
+
+    function getTeachers(records, scKey){
+      const names = Array.from(new Set(
+        records
+          .filter(r => SCOPE[scKey].match(safe(r.anlatimTuru)))
+          .map(r => safe(r.anlaticiOgretmen))
+          .filter(Boolean)
+      ));
+      return names.length ? names : ['']; // boş isim için de bir sütun aç
+    }
+
     const YAZILIM_BADGE = v => {
       switch (v) {
         case "Yüklenmeye Hazır":  return `<span class="badge badge-ok">${v}</span>`;
@@ -217,178 +169,151 @@ const normTR = s => (s ?? '')
         default: return v || "—";
       }
     };
-    // Akademik İzleme rozeti (Yapıldı / Yapılmadı / boş)
-const AKD_BADGE = v => {
-  const s = (v ?? '').toString().trim().toUpperCase('tr-TR');
-  if (s === 'YAPILDI')   return `<span class="badge badge-ok">Yapıldı</span>`;
-  if (s === 'YAPILMADI') return `<span class="badge badge-danger">Yapılmadı</span>`;
-  return v || '—';
-};
 
-// Akademik liste (çekimdeki yapının aynısı, çokluysa çizgiyle ayır)
-function renderAkdList(rows){
-  const html = rows.map(r => `
-    <div class="list-row">${AKD_BADGE(r.akademikIzlemeDurumu)}</div>
-  `).join('');
-  return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
-}
+    const AKD_BADGE = v => {
+      const s = (v ?? '').toString().trim().toUpperCase('tr-TR');
+      if (s === 'YAPILDI')   return `<span class="badge badge-ok">Yapıldı</span>`;
+      if (s === 'YAPILMADI') return `<span class="badge badge-danger">Yapılmadı</span>`;
+      return v || '—';
+    };
 
-// Yükleme (Yazılım) liste
-function renderYazList(rows){
-  const html = rows.map(r => {
-    const v = (r.yuklemeDurumu ?? r.yuklenmeDurumu) || '';
-    return `<div class="list-row">${YAZILIM_BADGE(v)}</div>`;
-  }).join('');
-  return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
-}
-
-    
-    const CEKIM_BADGE = count => count>0 ? `<span class="badge badge-ok">ÇEKİLDİ (${count} ders)</span>` : `<span class="badge badge-warn">Çekim yok</span>`;
-// Çekim listesi: "İSİM  ÇEKİLDİ  KOD"  formatı
-// PRATIK ve GCCK'ta isim = testAdi, diğerlerinde ders adı.
-// Hiçbir yerde "1 ders" yazmıyoruz. (Tabletli/Özet'te 1.DERS vb. zaten isimde var.)
-function renderCekimList(rows, scKey){
-  if (!rows.length) return '<span class="text-gray-400">—</span>';
-
-  const html = rows
-    .filter(r => (r.videoKodu || '').toString().trim() !== '')
-    .map(r => {
-      const name = (scKey === 'PRATIK' || scKey === 'GCCK')
-        ? (r.testAdi || '').toString().trim()
-        : (r.ders || '').toString().trim();
-
-      const left = name ? `<span class="list-row-title">${name}</span>` : '';
-      const code = `<span class="mono text-xs text-gray-700">${r.videoKodu}</span>`;
-      return `
-        <div class="list-row">
-          ${left}
-          <span class="badge badge-ok">ÇEKİLDİ</span>
-          ${code}
-        </div>`;
-    }).join('') || '<span class="text-gray-400">—</span>';
-  return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
-}
-    
-// === Satır hücrelerini (3 td) üreten yardımcı ===
-function cellsFor(records, scKey, teacherName){
-  // Bu anlatım türü + (varsa) bu öğretmen için kayıtları al
-  const rows = records.filter(x =>
-    SCOPE[scKey].match(safe(x.anlatimTuru)) &&
-    (teacherName ? safe(x.anlaticiOgretmen) === teacherName : true)
-  );
-
-  // 1) Çekim / 2) Akademik / 3) Yükleme -> HER ZAMAN 3 <td> döndür
-  const cekimHTML = renderCekimList(rows, scKey);
-  const akdHTML   = renderAkdList(rows);     // Akademik İzleme DURUMU (Yapıldı/Yapılmadı)
-  const yazHTML   = renderYazList(rows);     // Yükleme (Yazılım) Durumu
-
-  return `
-    <td class="px-3 py-2 center-cell">${cekimHTML}</td>
-    <td class="px-3 py-2 center-cell">${akdHTML}</td>
-    <td class="px-3 py-2 center-cell">${yazHTML}</td>
-  `;
-}
-
-    /* 4) Veri yükle + başlıkları (öğretmen adlarıyla) oluştur + tabloyu yaz */
-    async function loadFor(brans){
-  const thead = document.getElementById('thead');
-  const tbody = document.getElementById('tbody');
-  const title = document.getElementById('panelTitle');
-  const rowCount = document.getElementById('rowCount');
-
-  title.textContent = `${brans} — Ünite/Bölüm tablosu`;
-  thead.innerHTML = '';
-  tbody.innerHTML = `<tr><td class="px-3 py-6 text-gray-500">Yükleniyor…</td></tr>`;
-  rowCount.textContent = '';
-
-  // Gerekli alanları çek
-  const { data, error } = await db
-    .from('cekimler')
-    .select('id, unite, bolum, ders, testAdi, videoKodu, anlatimTuru, anlaticiOgretmen, akademikIzlemeDurumu, yuklemeDurumu, yuklenmeDurumu, brans')
-    .eq('brans', brans);
-
-  if (error){ console.error(error); tbody.innerHTML=''; return; }
-
-  /* 1) Branş genelinde her scope için öğretmen listesi (THEAD ve TBODY aynı kaynaktan beslenecek) */
-  const teacherByScope = {};
-  for (const key of Object.keys(SCOPE)) {
-    teacherByScope[key] = getTeachers(data, key);     // hiç yoksa [''] döner
-  }
-
-  /* 2) THEAD (3 satır) */
-  const thTop  = document.createElement('tr');   // grup başlıkları
-  const thSub  = document.createElement('tr');   // öğretmen başlıkları
-  const thSub2 = document.createElement('tr');   // alt başlıklar
-
-  // ÜNİTE / BÖLÜM sabit
-  thTop.innerHTML  += `<th class="th-group px-3 py-2 center-cell" rowspan="3">ÜNİTE</th>`;
-  thTop.innerHTML  += `<th class="th-group px-3 py-2 center-cell" rowspan="3">BÖLÜM</th>`;
-  thSub.innerHTML  += ``;
-  thSub2.innerHTML += ``;
-
-  for (const key of Object.keys(SCOPE)) {
-    const sc       = SCOPE[key];
-    const teachers = teacherByScope[key];                 // [''] olabilir
-    const colSpan  = Math.max(teachers.length, 1) * 3;    // her öğretmen 3 sütun
-
-    thTop.innerHTML += `<th class="th-group px-3 py-2 center-cell" colspan="${colSpan}">${sc.title}</th>`;
-
-    (teachers.length ? teachers : ['']).forEach((t, idx) => {
-      const pretty = t ? `<br/>${t}` : '';
-      thSub.innerHTML  += `<th class="th-sub px-3 py-1 teacher-cap center-cell" colspan="3">${idx+1}. Anlatıcı${pretty}</th>`;
-      thSub2.innerHTML += `
-        <th class="th-sub px-3 py-1 center-cell">Çekim Durumu</th>
-        <th class="th-sub px-3 py-1 center-cell">Akademik İzleme Durumu</th>
-        <th class="th-sub px-3 py-1 center-cell">Yükleme Durumu</th>`;
-    });
-  }
-
-  thead.appendChild(thTop);
-  thead.appendChild(thSub);
-  thead.appendChild(thSub2);
-
-  /* 3) TBODY — ÜNİTE || BÖLÜM gruplama */
-  const groupsMap = new Map();
-  data.forEach(r => {
-    const k = `${safe(r.unite)}||${safe(r.bolum)}`;
-    if (!groupsMap.has(k)) groupsMap.set(k, []);
-    groupsMap.get(k).push(r);
-  });
-
-  tbody.innerHTML = '';
-
-  for (const [ubKey, recordsUB] of groupsMap.entries()) {
-    const [uniteName, bolumName] = ubKey.split('||');
-    const tr = document.createElement('tr');
-
-    // ÜNİTE / BÖLÜM hücreleri
-    tr.innerHTML = `
-      <td class="px-3 py-2 center-cell align-top">${uniteName || '—'}</td>
-      <td class="px-3 py-2 center-cell align-top">${bolumName || '—'}</td>
-    `;
-
-    // Başlıkta açtığımız kadar öğretmen * 3 sütun ekle
-    for (const key of Object.keys(SCOPE)) {
-      const teachers = teacherByScope[key];
-      (teachers.length ? teachers : ['']).forEach(t => {
-        tr.innerHTML += cellsFor(recordsUB, key, t);   // 3 <td>
-      });
+    function renderAkdList(rows){
+      const html = rows.map(r => `<div class="list-row">${AKD_BADGE(r.akademikIzlemeDurumu)}</div>`).join('');
+      return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
     }
 
-    tbody.appendChild(tr);
-  }
+    function renderYazList(rows){
+      const html = rows.map(r => {
+        const v = (r.yuklemeDurumu ?? r.yuklenmeDurumu) || '';
+        return `<div class="list-row">${YAZILIM_BADGE(v)}</div>`;
+      }).join('');
+      return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
+    }
 
-  // Satır sayısı bilgisi
-  rowCount.textContent = `${groupsMap.size} satır`;
+    function renderCekimList(rows, scKey){
+      if (!rows.length) return '<span class="text-gray-400">—</span>';
+      const html = rows
+        .filter(r => (r.videoKodu || '').toString().trim() !== '')
+        .map(r => {
+          const name = (scKey === 'PRATIK' || scKey === 'GCCK')
+            ? (r.testAdi || '').toString().trim()
+            : (r.ders || '').toString().trim();
+          const left = name ? `<span class="list-row-title">${name}</span>` : '';
+          const code = `<span class="mono text-xs text-gray-700">${r.videoKodu}</span>`;
+          return `<div class="list-row">${left}<span class="badge badge-ok">ÇEKİLDİ</span>${code}</div>`;
+        }).join('') || '<span class="text-gray-400">—</span>';
+      return `<div class="cell-stack">${html}</div>`;
+    }
 
-  // Satıra tıklamada kırmızı çerçeve
-  tbody.addEventListener('click', (e)=>{
-    const tr = e.target.closest('tr');
-    if(!tr) return;
-    [...tbody.querySelectorAll('tr.tr-focus')].forEach(x=>x.classList.remove('tr-focus'));
-    tr.classList.add('tr-focus');
-  });
-}
+    // Her öğretmen için 3 hücre (çekim / akademik / yükleme) üret
+    function cellsFor(records, scKey, teacherName){
+      const rows = records.filter(x =>
+        SCOPE[scKey].match(safe(x.anlatimTuru)) &&
+        (teacherName ? safe(x.anlaticiOgretmen) === teacherName : true)
+      );
+      const cekimHTML = renderCekimList(rows, scKey);
+      const akdHTML   = renderAkdList(rows);
+      const yazHTML   = renderYazList(rows);
+      return `
+        <td class="px-3 py-2 center-cell">${cekimHTML}</td>
+        <td class="px-3 py-2 center-cell">${akdHTML}</td>
+        <td class="px-3 py-2 center-cell">${yazHTML}</td>
+      `;
+    }
+
+    /* 4) Veri yükle + THEAD & TBODY oluştur */
+    async function loadFor(brans){
+      const thead = document.getElementById('thead');
+      const tbody = document.getElementById('tbody');
+      const title = document.getElementById('panelTitle');
+      const rowCount = document.getElementById('rowCount');
+
+      title.textContent = `${brans} — Ünite/Bölüm tablosu`;
+      thead.innerHTML = '';
+      tbody.innerHTML = `<tr><td class="px-3 py-6 text-gray-500">Yükleniyor…</td></tr>`;
+      rowCount.textContent = '';
+
+      const { data, error } = await db
+        .from('cekimler')
+        .select('id, unite, bolum, ders, testAdi, videoKodu, anlatimTuru, anlaticiOgretmen, akademikIzlemeDurumu, yuklemeDurumu, yuklenmeDurumu, brans')
+        .eq('brans', brans);
+
+      if (error){ console.error(error); tbody.innerHTML=''; return; }
+
+      // 1) scope -> öğretmen listeleri (thead ve tbody aynı kaynak)
+      const teacherByScope = {};
+      for (const key of Object.keys(SCOPE)) {
+        teacherByScope[key] = getTeachers(data, key);
+      }
+
+      // 2) THEAD (3 satır)
+      const thTop  = document.createElement('tr');
+      const thSub  = document.createElement('tr');
+      const thSub2 = document.createElement('tr');
+
+      thTop.innerHTML  += `<th class="th-group px-3 py-2 center-cell" rowspan="3">ÜNİTE</th>`;
+      thTop.innerHTML  += `<th class="th-group px-3 py-2 center-cell" rowspan="3">BÖLÜM</th>`;
+
+      for (const key of Object.keys(SCOPE)) {
+        const sc       = SCOPE[key];
+        const teachers = teacherByScope[key];
+        const colSpan  = Math.max(teachers.length, 1) * 3;
+
+        thTop.innerHTML += `<th class="th-group px-3 py-2 center-cell" colspan="${colSpan}">${sc.title}</th>`;
+
+        (teachers.length ? teachers : ['']).forEach((t, idx) => {
+          const pretty = t ? `<br/>${t}` : '';
+          thSub.innerHTML  += `<th class="th-sub px-3 py-1 teacher-cap center-cell" colspan="3">${idx+1}. Anlatıcı${pretty}</th>`;
+          thSub2.innerHTML += `
+            <th class="th-sub px-3 py-1 center-cell">Çekim Durumu</th>
+            <th class="th-sub px-3 py-1 center-cell">Akademik İzleme Durumu</th>
+            <th class="th-sub px-3 py-1 center-cell">Yükleme Durumu</th>`;
+        });
+      }
+
+      thead.appendChild(thTop);
+      thead.appendChild(thSub);
+      thead.appendChild(thSub2);
+
+      // 3) TBODY — ÜNİTE || BÖLÜM gruplama
+      const groupsMap = new Map();
+      data.forEach(r => {
+        const k = `${safe(r.unite)}||${safe(r.bolum)}`;
+        if (!groupsMap.has(k)) groupsMap.set(k, []);
+        groupsMap.get(k).push(r);
+      });
+
+      tbody.innerHTML = '';
+
+      for (const [ubKey, recordsUB] of groupsMap.entries()) {
+        const [uniteName, bolumName] = ubKey.split('||');
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+          <td class="px-3 py-2 center-cell align-top">${uniteName || '—'}</td>
+          <td class="px-3 py-2 center-cell align-top">${bolumName || '—'}</td>
+        `;
+
+        for (const key of Object.keys(SCOPE)) {
+          const teachers = teacherByScope[key];
+          (teachers.length ? teachers : ['']).forEach(t => {
+            tr.innerHTML += cellsFor(recordsUB, key, t);
+          });
+        }
+
+        tbody.appendChild(tr);
+      }
+
+      rowCount.textContent = `${groupsMap.size} satır`;
+
+      // satır tıklama vurgusu
+      tbody.addEventListener('click', (e)=>{
+        const tr = e.target.closest('tr');
+        if(!tr) return;
+        [...tbody.querySelectorAll('tr.tr-focus')].forEach(x=>x.classList.remove('tr-focus'));
+        tr.classList.add('tr-focus');
+      });
+    }
 
     // Başlangıç
     loadFor(BRANSLAR[0]);
