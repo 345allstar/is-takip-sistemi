@@ -202,52 +202,6 @@
       seg.appendChild(btn);
     });
 
-    // ÜNİTE bazında BÖLÜM numarasına göre satırları sıralar
-function sortBolumWithinUnits() {
-  const tbody = document.querySelector('#tbody');
-  if (!tbody) return;
-
-  const allRows = Array.from(tbody.querySelectorAll('tr'));
-  if (!allRows.length) return;
-
-  // ÜNİTE gruplarını sırayla yakala (1. hücre boş olmayan satır yeni ünite başlatır)
-  let groups = [];
-  let currentGroup = [];
-
-  const getUnitText = (tr) => (tr.cells[0]?.textContent || '').trim();
-  const getBolumNo = (tr) => {
-    const txt = (tr.cells[1]?.textContent || '').trim();
-    const m = txt.match(/(\d+)\.? ?BÖLÜM/i);
-    return m ? parseInt(m[1], 10) : Number.POSITIVE_INFINITY;
-  };
-
-  for (const tr of allRows) {
-    const unit = getUnitText(tr);
-    if (unit) {
-      // yeni ünite başlayacaksa, bir önceki grubu kapat
-      if (currentGroup.length) {
-        groups.push(currentGroup);
-        currentGroup = [];
-      }
-    }
-    currentGroup.push(tr);
-  }
-  if (currentGroup.length) groups.push(currentGroup);
-
-  // Her ünite grubunu kendi içinde BÖLÜM numarasına göre sırala
-  const frag = document.createDocumentFragment();
-  for (const group of groups) {
-    // Ünite başlığı olan ilk satır sabit; geri kalanları bölüm numarasına göre sırala
-    const [first, ...rest] = group;
-    rest.sort((a, b) => getBolumNo(a) - getBolumNo(b));
-    frag.appendChild(first);
-    rest.forEach(r => frag.appendChild(r));
-  }
-
-  tbody.innerHTML = '';
-  tbody.appendChild(frag);
-}
-
     /* 3) Yardımcılar */
     const up = s => (s ?? '').toString().toUpperCase('tr-TR').replaceAll('Ç','C');
     // TR karakterlerini düz İng'e çevir + harf dışını at (GCÇK/GCCK vb. farkları yakalamak için)
@@ -328,6 +282,23 @@ function renderYazList(rows){
 // PRATIK ve GCCK'ta isim = testAdi, diğerlerinde ders adı.
 // Hiçbir yerde "1 ders" yazmıyoruz. (Tabletli/Özet'te 1.DERS vb. zaten isimde var.)
 function renderCekimList(rows, scKey){
+  /* // === ESKİ FİLTRELİ KOD ===
+    // HATA: Buradaki filtreleme, satır sayısını diğer
+    // renderAkdList ve renderYazList ile senkron olmayan hale getiriyordu.
+    if (!rows.length) {
+      return `<div class="cell-stack"><div class="list-row"><span class="text-gray-400">—</span></div></div>`;
+    }
+
+    const html = rows
+      .filter(r => (r.videoKodu || '').toString().trim() !== '') // <-- HATA BURADA
+      .map(r => {
+        // ... (eski map içeriği)
+      }).join('') || `<div class="list-row"><span class="text-gray-400">—</span></div>`;
+
+    return `<div class="cell-stack">${html}</div>`;
+    // === ESKİ FİLTRELİ KOD BİTİŞİ ===
+  */
+
   // === YENİ FİLTRESİZ KOD ===
   // Diğer renderAkdList/renderYazList ile tam senkron olması için
   // her 'row' için bir '.list-row' üretmeli.
@@ -344,6 +315,42 @@ function renderCekimList(rows, scKey){
       ? (r.testAdi || '').toString().trim()
       : (r.ders || '').toString().trim();
 
+    // "2-A" vb. yerlerde tireden kırılmayı engelle (U+2011: non-breaking hyphen)
+    name = name.replace(/(\d+)\s*-\s*([A-ZÇĞİÖŞÜ0-9]+)/g, (_, n, suf) => `${n}\u2011${suf}`);
+
+    const left = name ? `<span class="list-row-title">${name}</span>` : '';
+    const code = `<span class="mono text-xs text-gray-700">${videoKodu}</span>`;
+    return `
+      <div class="list-row">
+        ${left}
+        <span class="badge badge-ok">ÇEKİLDİ</span>
+        ${code}
+      </div>`;
+  }).join('');
+
+  // Diğer fonksiyonlarla (renderAkdList, renderYazList) aynı boş liste mantığını kullan
+  return `<div class="cell-stack">${ html || '<div class="list-row pad">&nbsp;</div>' }</div>`;
+}
+    // === ESKİ FİLTRELİ KOD BİTİŞİ ===
+  */
+
+  // === YENİ FİLTRESİZ KOD ===
+  // Diğer renderAkdList/renderYazList ile tam senkron olması için
+  // her 'row' için bir '.list-row' üretmeli.
+  const html = rows.map(r => {
+    const videoKodu = (r.videoKodu || '').toString().trim();
+
+    // Video kodu yoksa, '—' içeren bir satır oluştur
+    if (videoKodu === '') {
+      return '<div class="list-row"><span class="text-gray-400">—</span></div>';
+    }
+
+    // Video kodu varsa, dolu satırı oluştur
+    let name = (scKey === 'PRATIK' || scKey === 'GCCK')
+      ? (r.testAdi || '').toString().trim()
+      : (r.ders || '').toString().trim();
+
+    
     // "2-A" vb. yerlerde tireden kırılmayı engelle (U+2011: non-breaking hyphen)
     name = name.replace(/(\d+)\s*-\s*([A-ZÇĞİÖŞÜ0-9]+)/g, (_, n, suf) => `${n}\u2011${suf}`);
 
@@ -545,8 +552,6 @@ return `
           satir++;
         });
       });
-// --- BÖLÜM SIRALAMA: her ünite içinde 1,2,3... ---
-sortBolumWithinUnits();
 
       document.getElementById('rowCount').textContent = `${satir} satır`;
     // 4.6 Üçlü kolon satırlarını hizala — ROBUST TETİK
