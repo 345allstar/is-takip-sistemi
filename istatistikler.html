@@ -256,15 +256,6 @@ function sortBolumWithinUnits() {
   }
 }
 
-    group.forEach(tr => frag.appendChild(tr));
-  }
-
-  // 3) TBody'yi yeni sırayla yaz
-  tbody.innerHTML = '';
-  tbody.appendChild(frag);
-}
-
-
     /* 3) Yardımcılar */
     const up = s => (s ?? '').toString().toUpperCase('tr-TR').replaceAll('Ç','C');
     // TR karakterlerini düz İng'e çevir + harf dışını at (GCÇK/GCCK vb. farkları yakalamak için)
