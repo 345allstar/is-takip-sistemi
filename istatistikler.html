@@ -48,9 +48,6 @@
 /* başlıkları çok hafif küçült + sıkılaştır */
 .th-group,.th-sub { font-weight:700; }
 .th-sub { font-size: .72rem; }
-    /* Hücre içindeki çoklu satırları ortala ve aralarına çizgi koy */
-.cell-stack { display:flex; flex-direction:column; align-items:center; }
-.cell-stack .list-row { display:flex; align-items:center; gap:.45rem; padding:.2rem 0; }
 
 /* Hücreleri netçe ortalamak için yardımcı sınıf */
 .center-cell { text-align:center; }
@@ -346,6 +343,8 @@ for (let i = 0; i < maxLen; i++){
     el.style.lineHeight = '1.2';
     el.style.marginTop = '0';
     el.style.marginBottom = '0';
+    el.style.paddingTop = '';      // <— ekle
+    el.style.paddingBottom = '';   // <— ekle
   }
 
   // 2) Doğal yükseklikleri ölç (SUB-PIXEL'i yukarı yuvarla)
