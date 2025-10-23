@@ -74,6 +74,7 @@
   overflow:visible;
   text-overflow:clip;
 }
+.list-row{ box-sizing: border-box; }
 
 /* video kodları biraz ufak kalsın, tek satıra sığması kolaylaşır */
 .mono{ font-size:10.5px; }
@@ -331,34 +332,34 @@ function syncTripletHeightsForRow(tr){
       }
     }
 
-    // Eşitleme: sadece min-height kullan, line-height'e dokunma
-    for (let i = 0; i < maxLen; i++){
-      let maxH = 0;
+    // --- EŞİTLE ---
+for (let i = 0; i < maxLen; i++){
+  let maxH = 0;
 
-      // 1) Ölçmeden önce sıfırla (önceki ölçülerin etkisini temizle)
-      for (const rows of rowsPerStack){
-  const el = rows[i];
-  el.style.height = '';
-  el.style.minHeight = '';
-  el.style.lineHeight = '1.2';
-  el.style.marginTop = '0';     // kritik
-  el.style.marginBottom = '0';  // kritik
-  // padding ölçüme dahil; yukarıda CSS'te sabitledik
+  // 1) Ölçmeden önce tamamen sıfırla
+  for (const rows of rowsPerStack){
+    const el = rows[i];
+    el.style.height    = '';   // clear
+    el.style.minHeight = '';   // clear
+    el.style.lineHeight = '1.2';
+    el.style.marginTop = '0';
+    el.style.marginBottom = '0';
+  }
+
+      // 2) Doğal yüksekliği ölç (tam sayıya yuvarla)
+  for (const rows of rowsPerStack){
+    const el = rows[i];
+    const h = Math.ceil(el.getBoundingClientRect().height);  // <— kritik
+    if (h > maxH) maxH = h;
+  }
+
+      // 3) Eşit yükseklik uygula (ikisini de ata)
+  for (const rows of rowsPerStack){
+    const el = rows[i];
+    el.style.minHeight = maxH + 'px';
+    el.style.height    = maxH + 'px';   // <— kritik
+  }
 }
-
-      // 2) Doğal yüksekliği ölç
-      for (const rows of rowsPerStack){
-        const el = rows[i];
-        const h = el.getBoundingClientRect().height;
-        if (h > maxH) maxH = h;
-      }
-
-      // 3) Eşit min-height ver
-      for (const rows of rowsPerStack){
-        const el = rows[i];
-        el.style.minHeight = maxH + 'px';
-      }
-    }
   }
 }
     
