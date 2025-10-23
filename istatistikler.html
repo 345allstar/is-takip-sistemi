@@ -202,9 +202,8 @@
       seg.appendChild(btn);
     });
 
-// Ünite grubu içinde BÖLÜM numarasına göre sırala.
-// Rowspan'lı 1. sütuna DOKUNMADAN, sadece 2. sütun ve sonrası içerikleri
-// sıralı kaynaktan hedef satıra kopyalar.
+// Ünite grubunda, 1. sütuna (ÜNİTE) hiç dokunmadan
+// 2. sütundan itibaren TÜM içerikleri "sıralı KAYNAK SNAPSHOT"tan yazar.
 function sortBolumWithinUnits() {
   const tbody = document.getElementById('tbody');
   if (!tbody) return;
@@ -219,7 +218,7 @@ function sortBolumWithinUnits() {
     return m ? parseInt(m[1], 10) : Number.POSITIVE_INFINITY;
   };
 
-  // 1) Ünite gruplarını çıkar (ardışık satırlar)
+  // 1) ÜNİTE gruplarını çıkar (ardışık satırlar)
   const groups = [];
   let cur = [];
   for (const tr of rows) {
@@ -228,33 +227,34 @@ function sortBolumWithinUnits() {
   }
   if (cur.length) groups.push(cur);
 
-  // 2) Her grubu kendi içinde sırala ama sadece 2. sütundan itibaren içerikleri yer değiştir
+  // 2) Her grup için: önce KAYNAK SNAPSHOT al, sonra hedeflere yaz
   for (const group of groups) {
+    // Sıralı kaynak satırlar
     const sorted = [...group].sort((a, b) => getBolumNo(a) - getBolumNo(b));
 
-    // Hedef görsel sırayı: group[0], group[1], ...
-    // Kaynak veriyi:        sorted[0], sorted[1], ...
+    // --- SNAPSHOT: [i][c] = innerHTML (c>=1)
+    const snap = sorted.map(fromRow => {
+      const arr = [];
+      for (let c = 1; c < fromRow.cells.length; c++) {
+        arr[c] = fromRow.cells[c].innerHTML;
+      }
+      return arr;
+    });
+
+    // --- YAZ: group[i] hedef, snap[i][c] içerik
     for (let i = 0; i < group.length; i++) {
-      const toRow   = group[i];
-      const fromRow = sorted[i];
+      const toRow = group[i];
+      const toCellCount = toRow.cells.length;
 
-      // Sütun sayılarını eşitleyip 1. sütunu (ÜNİTE) PAS GEÇ
-      const maxCells = Math.max(toRow.cells.length, fromRow.cells.length);
-      for (let c = 1; c < maxCells; c++) {
-        const toCell   = toRow.cells[c];
-        const fromCell = fromRow.cells[c];
-
-        if (!toCell || !fromCell) continue;
-
-        // Hücre içeriğini klonlayarak kopyala (event'leri taşımayız, markup yeterli)
-        while (toCell.firstChild) toCell.removeChild(toCell.firstChild);
-        for (const node of Array.from(fromCell.childNodes)) {
-          toCell.appendChild(node.cloneNode(true));
-        }
+      for (let c = 1; c < toCellCount; c++) {
+        if (!toRow.cells[c]) continue;
+        const html = snap[i]?.[c] ?? toRow.cells[c].innerHTML; // kaynak yoksa dokunma
+        toRow.cells[c].innerHTML = html;
       }
     }
   }
 }
+
 
     /* 3) Yardımcılar */
     const up = s => (s ?? '').toString().toUpperCase('tr-TR').replaceAll('Ç','C');
