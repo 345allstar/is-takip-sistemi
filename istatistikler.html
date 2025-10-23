@@ -490,14 +490,6 @@ return `
       // 4.6 Üçlü kolon satırlarını hizala (ilk yüklemede)
 requestAnimationFrame(syncAllTriplets);
 
-// Ekran boyutu değişince tekrar hizala
-window.addEventListener('resize', () => {
-  document.querySelectorAll('#tbody .list-row').forEach(el => {
-    el.style.height = 'auto';
-    el.style.lineHeight = '1.2';
-  });
-  requestAnimationFrame(syncAllTriplets);
-});
       // satıra tıklayınca kırmızı çerçeve
 tbody.addEventListener('click', (e)=>{
   const tr = e.target.closest('tr');
@@ -506,7 +498,14 @@ tbody.addEventListener('click', (e)=>{
   tr.classList.add('tr-focus');
 });
     }
-
+// Ekran boyutu değişince tekrar hizala (GLOBAL)
+window.addEventListener('resize', () => {
+  document.querySelectorAll('#tbody .list-row').forEach(el => {
+    el.style.height = 'auto';
+    el.style.lineHeight = '1.2';
+  });
+  requestAnimationFrame(syncAllTriplets);
+});
     // Başlangıç
     loadFor(BRANSLAR[0]);
   </script>
