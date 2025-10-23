@@ -202,8 +202,9 @@
       seg.appendChild(btn);
     });
 
-// ÜNİTE grubu içindeki tüm satırları BÖLÜM numarasına göre sırala.
-// Ardından rowspan'lı ÜNİTE hücresini sıralanmış grubun ilk satırına yeniden yerleştirir.
+// Ünite grubu içinde BÖLÜM numarasına göre sırala.
+// Rowspan'lı 1. sütuna DOKUNMADAN, sadece 2. sütun ve sonrası içerikleri
+// sıralı kaynaktan hedef satıra kopyalar.
 function sortBolumWithinUnits() {
   const tbody = document.getElementById('tbody');
   if (!tbody) return;
@@ -214,11 +215,11 @@ function sortBolumWithinUnits() {
   const startsUnit = tr => (tr.cells[0]?.textContent || '').trim() !== '';
   const getBolumNo = tr => {
     const t = (tr.cells[1]?.textContent || '').toUpperCase('tr-TR');
-    const m = t.match(/(\d+)\.? ?BÖLÜM/);          // "1.BÖLÜM", "1. BÖLÜM" vb.
+    const m = t.match(/(\d+)\.? ?BÖLÜM/);  // 1.BÖLÜM / 1. BÖLÜM ...
     return m ? parseInt(m[1], 10) : Number.POSITIVE_INFINITY;
   };
 
-  // 1) ÜNİTE gruplarını çıkar
+  // 1) Ünite gruplarını çıkar (ardışık satırlar)
   const groups = [];
   let cur = [];
   for (const tr of rows) {
@@ -227,28 +228,33 @@ function sortBolumWithinUnits() {
   }
   if (cur.length) groups.push(cur);
 
-  // 2) Her grubu sırala ve ÜNİTE hücresini doğru yere tak
-  const frag = document.createDocumentFragment();
+  // 2) Her grubu kendi içinde sırala ama sadece 2. sütundan itibaren içerikleri yer değiştir
   for (const group of groups) {
-    // a) ÜNİTE hücresini (varsa) bulunduğu satırdan sök
-    let unitRow = group.find(startsUnit);
-    let unitCell = null;
-    if (unitRow && unitRow.cells.length) {
-      unitCell = unitRow.removeChild(unitRow.cells[0]); // td'yi komple al
-    }
+    const sorted = [...group].sort((a, b) => getBolumNo(a) - getBolumNo(b));
 
-    // b) Grubu BÖLÜM numarasına göre sırala (tüm satırlar dahil)
-    group.sort((a, b) => getBolumNo(a) - getBolumNo(b));
+    // Hedef görsel sırayı: group[0], group[1], ...
+    // Kaynak veriyi:        sorted[0], sorted[1], ...
+    for (let i = 0; i < group.length; i++) {
+      const toRow   = group[i];
+      const fromRow = sorted[i];
 
-    // c) ÜNİTE hücresini yeni ilk satıra yerleştir, rowspan’ı güncelle
-    if (unitCell) {
-      unitCell.rowSpan = group.length;
-      group[0].insertBefore(unitCell, group[0].firstChild);
-      // güvenlik: diğer satırlarda yanlışlıkla kalan 1. hücre olmasın
-      for (let i = 1; i < group.length; i++) {
-        if (startsUnit(group[i])) group[i].deleteCell(0);
+      // Sütun sayılarını eşitleyip 1. sütunu (ÜNİTE) PAS GEÇ
+      const maxCells = Math.max(toRow.cells.length, fromRow.cells.length);
+      for (let c = 1; c < maxCells; c++) {
+        const toCell   = toRow.cells[c];
+        const fromCell = fromRow.cells[c];
+
+        if (!toCell || !fromCell) continue;
+
+        // Hücre içeriğini klonlayarak kopyala (event'leri taşımayız, markup yeterli)
+        while (toCell.firstChild) toCell.removeChild(toCell.firstChild);
+        for (const node of Array.from(fromCell.childNodes)) {
+          toCell.appendChild(node.cloneNode(true));
+        }
       }
     }
+  }
+}
 
     group.forEach(tr => frag.appendChild(tr));
   }
