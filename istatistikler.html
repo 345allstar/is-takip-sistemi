@@ -123,16 +123,19 @@
     
     /* Satırlar arası boşluk için sadece padding kullan; margin kullanma */
 .cell-stack .list-row{ justify-content:center; flex-wrap:wrap; line-height:1.2; }
-/* SATIR KUTUSU SABİT: yükseklik/padding sınırı şaşmasın */
+/* SATIR KUTUSU SABİT: aynı kutu modeli */
 .list-row{
   display:flex; align-items:center; justify-content:center;
   gap:.45rem;
   margin:0;                 /* margin YOK */
   padding:.24rem 0;         /* boşluk sadece padding */
   line-height:1.2;
-  box-sizing:border-box;    /* kritik */
+  box-sizing:border-box;    /* yükseklik/padding sürprizi olmasın */
 }
-.cell-stack{ display:flex; flex-direction:column; align-items:stretch; }
+    .cell-stack{ display:flex; flex-direction:column; align-items:stretch; }
+.cell-stack .list-row + .list-row{ border-top:1px solid #e5e7eb; }
+/* pad satırı: çizgiyi saklama */
+.list-row.pad{ color:transparent; height:auto; line-height:1.2; }
 .cell-stack .list-row + .list-row{ border-top:1px solid #e5e7eb; }
 .list-row.pad{ color:transparent; height:auto; line-height:1.2; }  /* pad satırı: çizgi kalsın */
 </style>
