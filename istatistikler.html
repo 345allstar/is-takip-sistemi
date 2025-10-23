@@ -315,65 +315,69 @@ function renderCekimList(rows, scKey){
   return `<div class="cell-stack">${ html || '<div class="list-row pad">&nbsp;</div>' }</div>`;
 }
     
-/* === ÜÇLÜ KOLON SATIR SENKRONİZASYONU === */
-// Bir <tr> içindeki (BÖLÜM sütunundan sonraki) her 3 hücrelik grupta
-// .list-row yüksekliklerini index bazında eşitler.
-function syncTripletHeightsForRow(tr){
-  const tds = Array.from(tr.querySelectorAll('td')).slice(2); // ÜNİTE/BÖLÜM'ü atla
-  for (let g = 0; g < tds.length; g += 3){
-    const stacks = tds.slice(g, g+3).map(td => td.querySelector('.cell-stack'));
-    if (stacks.some(s => !s)) continue;
+// ESKİ: her 3'lü grubu ayrı ayrı eşitliyordu
+// function syncTripletHeightsForRow(tr){ ... }
 
-    const rowsPerStack = stacks.map(s => Array.from(s.querySelectorAll('.list-row')));
-    const maxLen = Math.max(...rowsPerStack.map(r => r.length));
+// YENİ: satırdaki TÜM cell-stack'leri aynı indekslere göre eşitler
+function syncRowHeights(tr){
+  // ÜNİTE ve BÖLÜM’ü atla, geride kalan tüm hücrelerdeki .cell-stack’leri al
+  const stacks = Array
+    .from(tr.querySelectorAll('td:nth-child(n+3) .cell-stack'))
+    .filter(Boolean);
 
-    // Eksik olan hücreye görünmez pad satırlar ekle
-    for (let s = 0; s < stacks.length; s++){
-      const deficit = maxLen - rowsPerStack[s].length;
-      for (let k = 0; k < deficit; k++){
-        const pad = document.createElement('div');
-        pad.className = 'list-row pad';
-        pad.innerHTML = '&nbsp;';
-        stacks[s].appendChild(pad);
-        rowsPerStack[s].push(pad);
-      }
+  if (!stacks.length) return;
+
+  // Her stack’teki .list-row’ları al
+  const rowsPerStack = stacks.map(s => Array.from(s.querySelectorAll('.list-row')));
+
+  // En uzun stack uzunluğunu bul
+  const maxLen = Math.max(...rowsPerStack.map(r => r.length));
+
+  // Eksik olanlara pad satır ekle ki hepsi aynı uzunlukta olsun
+  for (let s = 0; s < stacks.length; s++){
+    const deficit = maxLen - rowsPerStack[s].length;
+    for (let k = 0; k < deficit; k++){
+      const pad = document.createElement('div');
+      pad.className = 'list-row pad';
+      pad.innerHTML = '&nbsp;';
+      stacks[s].appendChild(pad);
+      rowsPerStack[s].push(pad);
+    }
+  }
+
+  // Her indeks için TÜM stack’ler arasında maksimum yüksekliği bulup uygula
+  for (let i = 0; i < maxLen; i++){
+    let maxH = 0;
+
+    // önce sıfırla
+    for (const rows of rowsPerStack){
+      const el = rows[i];
+      el.style.height = '';
+      el.style.minHeight = '';
+      el.style.lineHeight = '1.2';
+      el.style.marginTop = '0';
+      el.style.marginBottom = '0';
+      el.style.paddingTop = '';
+      el.style.paddingBottom = '';
     }
 
-// --- EŞİTLE ---
-for (let i = 0; i < maxLen; i++){
-  let maxH = 0;
+    // ölç
+    for (const rows of rowsPerStack){
+      const h = Math.ceil(rows[i].getBoundingClientRect().height);
+      if (h > maxH) maxH = h;
+    }
 
-  // 1) Ölçmeden önce sıfırla
-  for (const rows of rowsPerStack){
-    const el = rows[i];
-    el.style.height    = '';
-    el.style.minHeight = '';
-    el.style.lineHeight = '1.2';
-    el.style.marginTop = '0';
-    el.style.marginBottom = '0';
-    el.style.paddingTop = '';      // <— ekle
-    el.style.paddingBottom = '';   // <— ekle
-  }
-
-  // 2) Doğal yükseklikleri ölç (SUB-PIXEL'i yukarı yuvarla)
-  for (const rows of rowsPerStack){
-    const el = rows[i];
-    const h = Math.ceil(el.getBoundingClientRect().height);  // kritik
-    if (h > maxH) maxH = h;
-  }
-
-  // 3) Aynı yüksekliği uygula (ikisini birden ata)
-  for (const rows of rowsPerStack){
-    const el = rows[i];
-    el.style.minHeight = maxH + 'px';
-    el.style.height    = maxH + 'px';
+    // uygula
+    for (const rows of rowsPerStack){
+      rows[i].style.minHeight = maxH + 'px';
+      rows[i].style.height    = maxH + 'px';
+    }
   }
 }
-  }
-}
-    
+
+// Bu fonksiyonu çağıran yerleri güncelle:
 function syncAllTriplets(){
-  document.querySelectorAll('#tbody tr').forEach(syncTripletHeightsForRow);
+  document.querySelectorAll('#tbody tr').forEach(syncRowHeights);
 }
 
     /* 4) Veri yükle + başlıkları (öğretmen adlarıyla) oluştur + tabloyu yaz */
