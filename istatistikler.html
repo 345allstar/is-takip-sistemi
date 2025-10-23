@@ -144,7 +144,11 @@
 /* BÖLÜM'den (2. sütun) sonrası ortalı */
 .tbl tbody tr > td:nth-child(n+3){ text-align:center; }
     /* görünmez dolgu satırı: yer tutsun ama görünmesin */
-.list-row.pad{ visibility:hidden; height:auto; line-height:1.2; }
+.list-row.pad{
+  color: transparent;      /* metin/boşluk görünmesin */
+  height: auto;
+  line-height: 1.2;
+}
 </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
