@@ -202,6 +202,52 @@
       seg.appendChild(btn);
     });
 
+    // ÜNİTE bazında BÖLÜM numarasına göre satırları sıralar
+function sortBolumWithinUnits() {
+  const tbody = document.querySelector('#tbody');
+  if (!tbody) return;
+
+  const allRows = Array.from(tbody.querySelectorAll('tr'));
+  if (!allRows.length) return;
+
+  // ÜNİTE gruplarını sırayla yakala (1. hücre boş olmayan satır yeni ünite başlatır)
+  let groups = [];
+  let currentGroup = [];
+
+  const getUnitText = (tr) => (tr.cells[0]?.textContent || '').trim();
+  const getBolumNo = (tr) => {
+    const txt = (tr.cells[1]?.textContent || '').trim();
+    const m = txt.match(/(\d+)\.? ?BÖLÜM/i);
+    return m ? parseInt(m[1], 10) : Number.POSITIVE_INFINITY;
+  };
+
+  for (const tr of allRows) {
+    const unit = getUnitText(tr);
+    if (unit) {
+      // yeni ünite başlayacaksa, bir önceki grubu kapat
+      if (currentGroup.length) {
+        groups.push(currentGroup);
+        currentGroup = [];
+      }
+    }
+    currentGroup.push(tr);
+  }
+  if (currentGroup.length) groups.push(currentGroup);
+
+  // Her ünite grubunu kendi içinde BÖLÜM numarasına göre sırala
+  const frag = document.createDocumentFragment();
+  for (const group of groups) {
+    // Ünite başlığı olan ilk satır sabit; geri kalanları bölüm numarasına göre sırala
+    const [first, ...rest] = group;
+    rest.sort((a, b) => getBolumNo(a) - getBolumNo(b));
+    frag.appendChild(first);
+    rest.forEach(r => frag.appendChild(r));
+  }
+
+  tbody.innerHTML = '';
+  tbody.appendChild(frag);
+}
+
     /* 3) Yardımcılar */
     const up = s => (s ?? '').toString().toUpperCase('tr-TR').replaceAll('Ç','C');
     // TR karakterlerini düz İng'e çevir + harf dışını at (GCÇK/GCCK vb. farkları yakalamak için)
