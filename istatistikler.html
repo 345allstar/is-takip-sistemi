@@ -57,8 +57,6 @@
     /* Tıklanmış satır vurgusu */
 .tr-focus { outline: 2px solid #ef4444; outline-offset: -2px; }
 
-.cell-stack{display:flex;flex-direction:column;align-items:stretch}
-
 /* === cell-stack satırları: otomatik yükseklik + normal kırılma === */
 .cell-stack{display:flex;flex-direction:column;align-items:stretch}
 
@@ -125,17 +123,21 @@
     
 /* BÖLÜM'den (2. sütun) sonrası ortalı */
 .tbl tbody tr > td:nth-child(n+3){ text-align:center; }
-    /* görünmez dolgu satırı: yer tutsun ama görünmesin */
-.list-row.pad{
-  color: transparent;      /* metin/boşluk görünmesin */
-  height: auto;
-  line-height: 1.2;
-}
+    
     /* Satırlar arası boşluk için sadece padding kullan; margin kullanma */
-.list-row{ display:flex; align-items:center; gap:.45rem; margin:0; padding:.24rem 0; }
 .cell-stack .list-row{ justify-content:center; flex-wrap:wrap; line-height:1.2; }
-.cell-stack .list-row + .list-row{ border-top:1px solid #e5e7eb; } /* margin-top yok */
-
+/* SATIR KUTUSU SABİT: yükseklik/padding sınırı şaşmasın */
+.list-row{
+  display:flex; align-items:center; justify-content:center;
+  gap:.45rem;
+  margin:0;                 /* margin YOK */
+  padding:.24rem 0;         /* boşluk sadece padding */
+  line-height:1.2;
+  box-sizing:border-box;    /* kritik */
+}
+.cell-stack{ display:flex; flex-direction:column; align-items:stretch; }
+.cell-stack .list-row + .list-row{ border-top:1px solid #e5e7eb; }
+.list-row.pad{ color:transparent; height:auto; line-height:1.2; }  /* pad satırı: çizgi kalsın */
 </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -332,32 +334,32 @@ function syncTripletHeightsForRow(tr){
       }
     }
 
-    // --- EŞİTLE ---
+// --- EŞİTLE ---
 for (let i = 0; i < maxLen; i++){
   let maxH = 0;
 
-  // 1) Ölçmeden önce tamamen sıfırla
+  // 1) Ölçmeden önce sıfırla
   for (const rows of rowsPerStack){
     const el = rows[i];
-    el.style.height    = '';   // clear
-    el.style.minHeight = '';   // clear
+    el.style.height    = '';
+    el.style.minHeight = '';
     el.style.lineHeight = '1.2';
     el.style.marginTop = '0';
     el.style.marginBottom = '0';
   }
 
-      // 2) Doğal yüksekliği ölç (tam sayıya yuvarla)
+  // 2) Doğal yükseklikleri ölç (SUB-PIXEL'i yukarı yuvarla)
   for (const rows of rowsPerStack){
     const el = rows[i];
-    const h = Math.ceil(el.getBoundingClientRect().height);  // <— kritik
+    const h = Math.ceil(el.getBoundingClientRect().height);  // kritik
     if (h > maxH) maxH = h;
   }
 
-      // 3) Eşit yükseklik uygula (ikisini de ata)
+  // 3) Aynı yüksekliği uygula (ikisini birden ata)
   for (const rows of rowsPerStack){
     const el = rows[i];
     el.style.minHeight = maxH + 'px';
-    el.style.height    = maxH + 'px';   // <— kritik
+    el.style.height    = maxH + 'px';
   }
 }
   }
@@ -488,8 +490,21 @@ return `
       });
 
       document.getElementById('rowCount').textContent = `${satir} satır`;
-      // 4.6 Üçlü kolon satırlarını hizala (ilk yüklemede)
-requestAnimationFrame(() => requestAnimationFrame(syncAllTriplets));
+    // 4.6 Üçlü kolon satırlarını hizala — ROBUST TETİK
+requestAnimationFrame(() => {
+  requestAnimationFrame(() => {
+    syncAllTriplets();             // 1. geç
+    setTimeout(syncAllTriplets, 0);  // microtask sonrası
+    setTimeout(syncAllTriplets, 50); // font/render tamam garanti
+  });
+});
+
+// fontlar hazır olduğunda tekrar
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => {
+    requestAnimationFrame(() => requestAnimationFrame(syncAllTriplets));
+  });
+}
 
       // satıra tıklayınca kırmızı çerçeve
 tbody.addEventListener('click', (e)=>{
