@@ -138,29 +138,6 @@
 .list-row.pad{ color:transparent; height:auto; line-height:1.2; }
 .cell-stack .list-row + .list-row{ border-top:1px solid #e5e7eb; }
 .list-row.pad{ color:transparent; height:auto; line-height:1.2; }  /* pad satırı: çizgi kalsın */
-    /* ÜNİTE ve BÖLÜM kolonları daha belirgin dikey çizgi */
-.tbl tbody td:nth-child(1),
-.tbl thead th:nth-child(1),
-.tbl tbody td:nth-child(2),
-.tbl thead th:nth-child(2){
-  border-right:2px solid #9ca3af; /* gri-500 */
-}
-
-/* Yeni ünite ilk satırı: kalın üst çizgi */
-tr.unit-start > td{
-  border-top:2px solid #9ca3af !important;
-}
-
-/* Ünite hücresindeki başlık ve buton */
-.unit-cell{
-  display:flex; align-items:center; justify-content:center; gap:.5rem;
-}
-.unit-toggle{
-  border:1px solid #c7c7c7; border-radius:999px; padding:.15rem .5rem;
-  font-size:.75rem; line-height:1; background:#f3f4f6; cursor:pointer;
-}
-.unit-toggle[aria-expanded="false"]::after{ content:" Göster"; }
-.unit-toggle[aria-expanded="true"]::after{ content:" Gizle"; }
 </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
