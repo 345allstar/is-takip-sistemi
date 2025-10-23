@@ -256,13 +256,11 @@ const AKD_BADGE = v => {
   return v || '—';
 };
 
-// Akademik liste (çekimdeki yapının aynısı, çokluysa çizgiyle ayır)
+// Akademik liste
 function renderAkdList(rows){
-  const html = rows.map(r => `
-    <div class="list-row">${AKD_BADGE(r.akademikIzlemeDurumu)}</div>
-  `).join('');
-  // ESKİ: return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
-  return `<div class="cell-stack">${ html || '<div class="list-row"><span class="text-gray-400">—</span></div>' }</div>`;
+  const html = rows.map(r => `<div class="list-row">${AKD_BADGE(r.akademikIzlemeDurumu)}</div>`).join('');
+  // Boşsa görünmez tek satır koy (— değil)
+  return `<div class="cell-stack">${ html || '<div class="list-row pad">&nbsp;</div>' }</div>`;
 }
 
 // Yükleme (Yazılım) liste
@@ -271,9 +269,10 @@ function renderYazList(rows){
     const v = (r.yuklemeDurumu ?? r.yuklenmeDurumu) || '';
     return `<div class="list-row">${YAZILIM_BADGE(v)}</div>`;
   }).join('');
-  // ESKİ: return html ? `<div class="cell-stack">${html}</div>` : '<span class="text-gray-400">—</span>';
-  return `<div class="cell-stack">${ html || '<div class="list-row"><span class="text-gray-400">—</span></div>' }</div>`;
+  // Boşsa görünmez tek satır koy (— değil)
+  return `<div class="cell-stack">${ html || '<div class="list-row pad">&nbsp;</div>' }</div>`;
 }
+
 
     const CEKIM_BADGE = count => count>0 ? `<span class="badge badge-ok">ÇEKİLDİ (${count} ders)</span>` : `<span class="badge badge-warn">Çekim yok</span>`;
 // Çekim listesi: "İSİM  ÇEKİLDİ  KOD"  formatı
