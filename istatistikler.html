@@ -202,51 +202,62 @@
       seg.appendChild(btn);
     });
 
-    // ÜNİTE bazında BÖLÜM numarasına göre satırları sıralar
+// ÜNİTE grubu içindeki tüm satırları BÖLÜM numarasına göre sırala.
+// Ardından rowspan'lı ÜNİTE hücresini sıralanmış grubun ilk satırına yeniden yerleştirir.
 function sortBolumWithinUnits() {
-  const tbody = document.querySelector('#tbody');
+  const tbody = document.getElementById('tbody');
   if (!tbody) return;
 
-  const allRows = Array.from(tbody.querySelectorAll('tr'));
-  if (!allRows.length) return;
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  if (!rows.length) return;
 
-  // ÜNİTE gruplarını sırayla yakala (1. hücre boş olmayan satır yeni ünite başlatır)
-  let groups = [];
-  let currentGroup = [];
-
-  const getUnitText = (tr) => (tr.cells[0]?.textContent || '').trim();
-  const getBolumNo = (tr) => {
-    const txt = (tr.cells[1]?.textContent || '').trim();
-    const m = txt.match(/(\d+)\.? ?BÖLÜM/i);
+  const startsUnit = tr => (tr.cells[0]?.textContent || '').trim() !== '';
+  const getBolumNo = tr => {
+    const t = (tr.cells[1]?.textContent || '').toUpperCase('tr-TR');
+    const m = t.match(/(\d+)\.? ?BÖLÜM/);          // "1.BÖLÜM", "1. BÖLÜM" vb.
     return m ? parseInt(m[1], 10) : Number.POSITIVE_INFINITY;
   };
 
-  for (const tr of allRows) {
-    const unit = getUnitText(tr);
-    if (unit) {
-      // yeni ünite başlayacaksa, bir önceki grubu kapat
-      if (currentGroup.length) {
-        groups.push(currentGroup);
-        currentGroup = [];
-      }
-    }
-    currentGroup.push(tr);
+  // 1) ÜNİTE gruplarını çıkar
+  const groups = [];
+  let cur = [];
+  for (const tr of rows) {
+    if (startsUnit(tr) && cur.length) { groups.push(cur); cur = []; }
+    cur.push(tr);
   }
-  if (currentGroup.length) groups.push(currentGroup);
+  if (cur.length) groups.push(cur);
 
-  // Her ünite grubunu kendi içinde BÖLÜM numarasına göre sırala
+  // 2) Her grubu sırala ve ÜNİTE hücresini doğru yere tak
   const frag = document.createDocumentFragment();
   for (const group of groups) {
-    // Ünite başlığı olan ilk satır sabit; geri kalanları bölüm numarasına göre sırala
-    const [first, ...rest] = group;
-    rest.sort((a, b) => getBolumNo(a) - getBolumNo(b));
-    frag.appendChild(first);
-    rest.forEach(r => frag.appendChild(r));
+    // a) ÜNİTE hücresini (varsa) bulunduğu satırdan sök
+    let unitRow = group.find(startsUnit);
+    let unitCell = null;
+    if (unitRow && unitRow.cells.length) {
+      unitCell = unitRow.removeChild(unitRow.cells[0]); // td'yi komple al
+    }
+
+    // b) Grubu BÖLÜM numarasına göre sırala (tüm satırlar dahil)
+    group.sort((a, b) => getBolumNo(a) - getBolumNo(b));
+
+    // c) ÜNİTE hücresini yeni ilk satıra yerleştir, rowspan’ı güncelle
+    if (unitCell) {
+      unitCell.rowSpan = group.length;
+      group[0].insertBefore(unitCell, group[0].firstChild);
+      // güvenlik: diğer satırlarda yanlışlıkla kalan 1. hücre olmasın
+      for (let i = 1; i < group.length; i++) {
+        if (startsUnit(group[i])) group[i].deleteCell(0);
+      }
+    }
+
+    group.forEach(tr => frag.appendChild(tr));
   }
 
+  // 3) TBody'yi yeni sırayla yaz
   tbody.innerHTML = '';
   tbody.appendChild(frag);
 }
+
 
     /* 3) Yardımcılar */
     const up = s => (s ?? '').toString().toUpperCase('tr-TR').replaceAll('Ç','C');
