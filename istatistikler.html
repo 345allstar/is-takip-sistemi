@@ -1,16 +1,15 @@
 <!DOCTYPE html>
+
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>İstatistikler | All Star İş Takip Programı</title>
-
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>İstatistikler | All Star İş Takip Programı</title>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<style>
     .badge{display:inline-block;padding:.22rem .55rem;border-radius:9999px;font-weight:700;font-size:.75rem;line-height:1}
     .badge-ok{background:#bbf7d0;color:#166534}
     .badge-warn{background:#bbf7d0;color:#166534}
@@ -139,42 +138,68 @@
 .cell-stack .list-row + .list-row{ border-top:1px solid #e5e7eb; }
 .list-row.pad{ color:transparent; height:auto; line-height:1.2; }  /* pad satırı: çizgi kalsın */
 </style>
-</head>
+<style>
+/* === Collapsible Units & Section Styling === */
+.table-collapsible .unit-header {
+  background: #f6f9ff;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  cursor: pointer;
+}
+.table-collapsible .unit-header:hover { background: #eaf1ff; }
+.table-collapsible .unit-header .toggle {
+  font-weight: 700;
+  margin-right: .5rem;
+}
+.table-collapsible .section-start td {
+  border-top: 2px solid #222 !important;
+}
+.table-collapsible .unit-start td {
+  border-top: 3px solid #000 !important;
+}
+.table-collapsible td, .table-collapsible th {
+  border: 1px solid #d0d7e2 !important;
+}
+.table-collapsible .unit-header td {
+  border-top: 4px solid #000 !important;
+  border-bottom: 2px solid #000 !important;
+}
+/* subtle zebra to help scan rows */
+.table-collapsible tr:nth-child(even) { background: #fbfdff; }
+.table-collapsible tr:nth-child(odd) { background: #fff; }
+</style></head>
 <body class="bg-gray-50 text-gray-800">
-  <!-- HEADER -->
-  <header class="bg-white shadow-sm">
-  <div class="mx-auto max-w-none w-full px-4 lg:px-8 py-3 flex items-center gap-3">
-      <a href="index.html" class="flex items-center gap-2">
-        <img src="logo.png" alt="ÜçDörtBeş All Star" class="h-10 w-auto"/>
-        <span class="text-xl font-semibold">İstatistikler</span>
-      </a>
-      <a href="index.html" class="ml-auto text-indigo-600 hover:text-indigo-800"><i class="fa-solid fa-house"></i> Ana sayfa</a>
-    </div>
-  </header>
-
-  <main class="mx-auto max-w-none w-full px-3 lg:px-6 py-6">
-    <!-- 6 sabit branş butonu -->
-    <div id="branButtons" class="seg"></div>
-
-    <!-- Kart + Tablo -->
-    <div class="mt-4 bg-white rounded-2xl shadow p-4">
-      <div class="flex items-center justify-between gap-4 flex-wrap">
-        <h2 id="panelTitle" class="text-lg font-semibold">Branş seçiniz</h2>
-        <div id="rowCount" class="text-sm text-gray-500"></div>
-      </div>
-
-      <div class="mt-3 overflow-visible">
-  <table class="tbl sticky-head w-full text-[12px]">
-          <thead id="thead"></thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </main>
-
-  <!-- Supabase -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script>
+<!-- HEADER -->
+<header class="bg-white shadow-sm">
+<div class="mx-auto max-w-none w-full px-4 lg:px-8 py-3 flex items-center gap-3">
+<a class="flex items-center gap-2" href="index.html">
+<img alt="ÜçDörtBeş All Star" class="h-10 w-auto" src="logo.png"/>
+<span class="text-xl font-semibold">İstatistikler</span>
+</a>
+<a class="ml-auto text-indigo-600 hover:text-indigo-800" href="index.html"><i class="fa-solid fa-house"></i> Ana sayfa</a>
+</div>
+</header>
+<main class="mx-auto max-w-none w-full px-3 lg:px-6 py-6">
+<!-- 6 sabit branş butonu -->
+<div class="seg" id="branButtons"></div>
+<!-- Kart + Tablo -->
+<div class="mt-4 bg-white rounded-2xl shadow p-4">
+<div class="flex items-center justify-between gap-4 flex-wrap">
+<h2 class="text-lg font-semibold" id="panelTitle">Branş seçiniz</h2>
+<div class="text-sm text-gray-500" id="rowCount"></div>
+</div>
+<div class="mt-3 overflow-visible">
+<table class="tbl sticky-head w-full text-[12px] table-collapsible">
+<thead id="thead"></thead>
+<tbody id="tbody"></tbody>
+</table>
+</div>
+</div>
+</main>
+<!-- Supabase -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
     /* 1) Supabase init — BURAYI DOLDUR */
     const SUPABASE_URL = 'https://nwxgigtsadesqjgflblr.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4';
@@ -201,52 +226,6 @@
       });
       seg.appendChild(btn);
     });
-
-    // ÜNİTE bazında BÖLÜM numarasına göre satırları sıralar
-function sortBolumWithinUnits() {
-  const tbody = document.querySelector('#tbody');
-  if (!tbody) return;
-
-  const allRows = Array.from(tbody.querySelectorAll('tr'));
-  if (!allRows.length) return;
-
-  // ÜNİTE gruplarını sırayla yakala (1. hücre boş olmayan satır yeni ünite başlatır)
-  let groups = [];
-  let currentGroup = [];
-
-  const getUnitText = (tr) => (tr.cells[0]?.textContent || '').trim();
-  const getBolumNo = (tr) => {
-    const txt = (tr.cells[1]?.textContent || '').trim();
-    const m = txt.match(/(\d+)\.? ?BÖLÜM/i);
-    return m ? parseInt(m[1], 10) : Number.POSITIVE_INFINITY;
-  };
-
-  for (const tr of allRows) {
-    const unit = getUnitText(tr);
-    if (unit) {
-      // yeni ünite başlayacaksa, bir önceki grubu kapat
-      if (currentGroup.length) {
-        groups.push(currentGroup);
-        currentGroup = [];
-      }
-    }
-    currentGroup.push(tr);
-  }
-  if (currentGroup.length) groups.push(currentGroup);
-
-  // Her ünite grubunu kendi içinde BÖLÜM numarasına göre sırala
-  const frag = document.createDocumentFragment();
-  for (const group of groups) {
-    // Ünite başlığı olan ilk satır sabit; geri kalanları bölüm numarasına göre sırala
-    const [first, ...rest] = group;
-    rest.sort((a, b) => getBolumNo(a) - getBolumNo(b));
-    frag.appendChild(first);
-    rest.forEach(r => frag.appendChild(r));
-  }
-
-  tbody.innerHTML = '';
-  tbody.appendChild(frag);
-}
 
     /* 3) Yardımcılar */
     const up = s => (s ?? '').toString().toUpperCase('tr-TR').replaceAll('Ç','C');
@@ -328,6 +307,23 @@ function renderYazList(rows){
 // PRATIK ve GCCK'ta isim = testAdi, diğerlerinde ders adı.
 // Hiçbir yerde "1 ders" yazmıyoruz. (Tabletli/Özet'te 1.DERS vb. zaten isimde var.)
 function renderCekimList(rows, scKey){
+  /* // === ESKİ FİLTRELİ KOD ===
+    // HATA: Buradaki filtreleme, satır sayısını diğer
+    // renderAkdList ve renderYazList ile senkron olmayan hale getiriyordu.
+    if (!rows.length) {
+      return `<div class="cell-stack"><div class="list-row"><span class="text-gray-400">—</span></div></div>`;
+    }
+
+    const html = rows
+      .filter(r => (r.videoKodu || '').toString().trim() !== '') // <-- HATA BURADA
+      .map(r => {
+        // ... (eski map içeriği)
+      }).join('') || `<div class="list-row"><span class="text-gray-400">—</span></div>`;
+
+    return `<div class="cell-stack">${html}</div>`;
+    // === ESKİ FİLTRELİ KOD BİTİŞİ ===
+  */
+
   // === YENİ FİLTRESİZ KOD ===
   // Diğer renderAkdList/renderYazList ile tam senkron olması için
   // her 'row' için bir '.list-row' üretmeli.
@@ -344,6 +340,42 @@ function renderCekimList(rows, scKey){
       ? (r.testAdi || '').toString().trim()
       : (r.ders || '').toString().trim();
 
+    // "2-A" vb. yerlerde tireden kırılmayı engelle (U+2011: non-breaking hyphen)
+    name = name.replace(/(\d+)\s*-\s*([A-ZÇĞİÖŞÜ0-9]+)/g, (_, n, suf) => `${n}\u2011${suf}`);
+
+    const left = name ? `<span class="list-row-title">${name}</span>` : '';
+    const code = `<span class="mono text-xs text-gray-700">${videoKodu}</span>`;
+    return `
+      <div class="list-row">
+        ${left}
+        <span class="badge badge-ok">ÇEKİLDİ</span>
+        ${code}
+      </div>`;
+  }).join('');
+
+  // Diğer fonksiyonlarla (renderAkdList, renderYazList) aynı boş liste mantığını kullan
+  return `<div class="cell-stack">${ html || '<div class="list-row pad">&nbsp;</div>' }</div>`;
+}
+    // === ESKİ FİLTRELİ KOD BİTİŞİ ===
+  */
+
+  // === YENİ FİLTRESİZ KOD ===
+  // Diğer renderAkdList/renderYazList ile tam senkron olması için
+  // her 'row' için bir '.list-row' üretmeli.
+  const html = rows.map(r => {
+    const videoKodu = (r.videoKodu || '').toString().trim();
+
+    // Video kodu yoksa, '—' içeren bir satır oluştur
+    if (videoKodu === '') {
+      return '<div class="list-row"><span class="text-gray-400">—</span></div>';
+    }
+
+    // Video kodu varsa, dolu satırı oluştur
+    let name = (scKey === 'PRATIK' || scKey === 'GCCK')
+      ? (r.testAdi || '').toString().trim()
+      : (r.ders || '').toString().trim();
+
+    
     // "2-A" vb. yerlerde tireden kırılmayı engelle (U+2011: non-breaking hyphen)
     name = name.replace(/(\d+)\s*-\s*([A-ZÇĞİÖŞÜ0-9]+)/g, (_, n, suf) => `${n}\u2011${suf}`);
 
@@ -545,8 +577,6 @@ return `
           satir++;
         });
       });
-// --- BÖLÜM SIRALAMA: her ünite içinde 1,2,3... ---
-sortBolumWithinUnits();
 
       document.getElementById('rowCount').textContent = `${satir} satır`;
     // 4.6 Üçlü kolon satırlarını hizala — ROBUST TETİK
@@ -585,5 +615,124 @@ window.addEventListener('resize', () => {
     // Başlangıç
     loadFor(BRANSLAR[0]);
   </script>
-</body>
+<script>
+// === Collapsible Units, Section Sorting, and Border Markers ===
+(function() {
+  const table = document.querySelector('table.table-collapsible');
+  if (!table) return;
+
+  const rows = Array.from(table.querySelectorAll('tr'));
+
+  // Helper: get text of cell in a given column index safely
+  function cellText(tr, idx) {
+    const td = tr.children[idx];
+    if (!td) return '';
+    return (td.innerText || td.textContent || '').trim();
+  }
+
+  // Guess the column indices for "ÜNİTE" and "BÖLÜM" by header names if possible
+  const headerRow = rows.find(r => r.querySelector('th'));
+  let unitCol = 0, bolumCol = 1;
+  if (headerRow) {
+    const headers = Array.from(headerRow.children).map(th => (th.innerText || th.textContent || '').trim().toUpperCase());
+    unitCol = Math.max(0, headers.findIndex(h => h.includes('ÜNİTE')));
+    bolumCol = Math.max(0, headers.findIndex(h => h.includes('BÖLÜM')));
+    if (unitCol === -1) unitCol = 0;
+    if (bolumCol === -1) bolumCol = 1;
+  }
+
+  // Build unit groups and section groups
+  const bodyRows = rows.filter(r => !r.querySelector('th'));
+  const unitGroups = [];
+  let currentUnit = null;
+  let currentUnitName = null;
+  let lastUnitName = null;
+
+  bodyRows.forEach((tr, i) => {
+    const thisUnitName = cellText(tr, unitCol) || null;
+    // We treat a row as starting a new unit if its first column has text AND it differs from the last unit name.
+    const startsNewUnit = thisUnitName && thisUnitName !== lastUnitName;
+    if (startsNewUnit || !currentUnit) {
+      currentUnit = { name: thisUnitName || lastUnitName || ('Ünite ' + (unitGroups.length+1)), rows: [] };
+      unitGroups.push(currentUnit);
+      lastUnitName = thisUnitName || lastUnitName;
+      // mark as unit start for thicker border
+      tr.classList.add('unit-start');
+    }
+    currentUnit.rows.push(tr);
+  });
+
+  // Within each unit, group contiguous rows by bölüm value
+  function parseBolumNumber(text) {
+    // Expect formats like "1. BÖLÜM", "5. BÖLÜM", "BÖLÜM 3", etc.
+    if (!text) return Number.MAX_SAFE_INTEGER;
+    const m = text.match(/(\d+)/);
+    return m ? parseInt(m[1], 10) : Number.MAX_SAFE_INTEGER;
+  }
+
+  unitGroups.forEach(unit => {
+    const sectionGroups = [];
+    let currentSec = null;
+    let lastSec = null;
+    unit.rows.forEach(tr => {
+      const secText = cellText(tr, bolumCol);
+      const secNum = parseBolumNumber(secText);
+      const secKey = isFinite(secNum) ? secNum : secText;
+      if (!currentSec || secKey !== lastSec) {
+        currentSec = { key: secKey, num: secNum, rows: [] };
+        sectionGroups.push(currentSec);
+        // mark section start for clearer border
+        tr.classList.add('section-start');
+        lastSec = secKey;
+      }
+      currentSec.rows.push(tr);
+    });
+
+    // Sort section groups by num ascending; stable on non-numeric
+    sectionGroups.sort((a, b) => (a.num - b.num));
+
+    // Re-append in sorted order to enforce 1-2-3-4-5
+    const parent = unit.rows[0].parentElement;
+    sectionGroups.forEach(sec => sec.rows.forEach(r => parent.appendChild(r)));
+    // Refresh unit.rows after DOM reordering
+    unit.rows = sectionGroups.flatMap(sec => sec.rows);
+  });
+
+  // Create clickable unit headers that toggle visibility
+  unitGroups.forEach(unit => {
+    const firstRow = unit.rows[0];
+    if (!firstRow) return;
+    firstRow.classList.add('unit-header');
+    // Add a toggle glyph into the first cell
+    const firstCell = firstRow.children[unitCol] || firstRow.children[0];
+    if (firstCell) {
+      const span = document.createElement('span');
+      span.className = 'toggle';
+      span.textContent = '▼';
+      firstCell.prepend(span);
+      // Make the entire first cell act like a button
+      firstCell.style.userSelect = 'none';
+    }
+
+    // Start expanded by default
+    let expanded = true;
+    function setExpanded(open) {
+      expanded = open;
+      unit.rows.forEach((row, idx) => {
+        if (idx === 0) return; // keep header visible
+        row.style.display = open ? '' : 'none';
+      });
+      const t = firstRow.querySelector('.toggle');
+      if (t) t.textContent = open ? '▼' : '►';
+    }
+    setExpanded(true);
+
+    firstRow.addEventListener('click', (ev) => {
+      // Only toggle when clicking within the unit header row (any cell)
+      setExpanded(!expanded);
+    });
+  });
+
+})();
+</script></body>
 </html>
