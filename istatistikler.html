@@ -212,11 +212,17 @@ function sortBolumWithinUnits() {
   if (!rows.length) return;
 
   const startsUnit = tr => (tr.cells[0]?.textContent || '').trim() !== '';
-  const getBolumNo = tr => {
-    const t = (tr.cells[1]?.textContent || '').toUpperCase('tr-TR');
-    const m = t.match(/(\d+)\.? ?BÖLÜM/);  // 1.BÖLÜM / 1. BÖLÜM ...
-    return m ? parseInt(m[1], 10) : Number.POSITIVE_INFINITY;
-  };
+const getBolumNo = tr => {
+  // 2. hücrenin ekranda görünen metniyle çalış (NBSP vb. temizle)
+  const raw = (tr.cells[1]?.innerText || '')
+    .normalize('NFKD')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Hücredeki ilk sayıyı yakala (1, 2, 3, 10 ...)
+  const m = raw.match(/(\d+)/);
+  return m ? parseInt(m[1], 10) : Number.POSITIVE_INFINITY;
+};
 
   // 1) ÜNİTE gruplarını çıkar (ardışık satırlar)
   const groups = [];
