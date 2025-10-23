@@ -315,6 +315,7 @@ function renderCekimList(rows, scKey){
       ? (r.testAdi || '').toString().trim()
       : (r.ders || '').toString().trim();
 
+    
     // "2-A" vb. yerlerde tireden kırılmayı engelle (U+2011: non-breaking hyphen)
     name = name.replace(/(\d+)\s*-\s*([A-ZÇĞİÖŞÜ0-9]+)/g, (_, n, suf) => `${n}\u2011${suf}`);
 
