@@ -282,31 +282,54 @@ function renderYazList(rows){
 // PRATIK ve GCCK'ta isim = testAdi, diğerlerinde ders adı.
 // Hiçbir yerde "1 ders" yazmıyoruz. (Tabletli/Özet'te 1.DERS vb. zaten isimde var.)
 function renderCekimList(rows, scKey){
-  if (!rows.length) {
-    return `<div class="cell-stack"><div class="list-row"><span class="text-gray-400">—</span></div></div>`;
-  }
+  /* // === ESKİ FİLTRELİ KOD ===
+    // HATA: Buradaki filtreleme, satır sayısını diğer
+    // renderAkdList ve renderYazList ile senkron olmayan hale getiriyordu.
+    if (!rows.length) {
+      return `<div class="cell-stack"><div class="list-row"><span class="text-gray-400">—</span></div></div>`;
+    }
 
-  const html = rows
-    .filter(r => (r.videoKodu || '').toString().trim() !== '')
-    .map(r => {
-      let name = (scKey === 'PRATIK' || scKey === 'GCCK')
-        ? (r.testAdi || '').toString().trim()
-        : (r.ders || '').toString().trim();
+    const html = rows
+      .filter(r => (r.videoKodu || '').toString().trim() !== '') // <-- HATA BURADA
+      .map(r => {
+        // ... (eski map içeriği)
+      }).join('') || `<div class="list-row"><span class="text-gray-400">—</span></div>`;
 
-      // "2-A" vb. yerlerde tireden kırılmayı engelle (U+2011: non-breaking hyphen)
-      name = name.replace(/(\d+)\s*-\s*([A-ZÇĞİÖŞÜ0-9]+)/g, (_, n, suf) => `${n}\u2011${suf}`);
+    return `<div class="cell-stack">${html}</div>`;
+    // === ESKİ FİLTRELİ KOD BİTİŞİ ===
+  */
 
-      const left = name ? `<span class="list-row-title">${name}</span>` : '';
-      const code = `<span class="mono text-xs text-gray-700">${r.videoKodu}</span>`;
-      return `
-        <div class="list-row">
-          ${left}
-          <span class="badge badge-ok">ÇEKİLDİ</span>
-          ${code}
-        </div>`;
-    }).join('') || `<div class="list-row"><span class="text-gray-400">—</span></div>`;
+  // === YENİ FİLTRESİZ KOD ===
+  // Diğer renderAkdList/renderYazList ile tam senkron olması için
+  // her 'row' için bir '.list-row' üretmeli.
+  const html = rows.map(r => {
+    const videoKodu = (r.videoKodu || '').toString().trim();
 
-  return `<div class="cell-stack">${html}</div>`;
+    // Video kodu yoksa, '—' içeren bir satır oluştur
+    if (videoKodu === '') {
+      return '<div class="list-row"><span class="text-gray-400">—</span></div>';
+    }
+
+    // Video kodu varsa, dolu satırı oluştur
+    let name = (scKey === 'PRATIK' || scKey === 'GCCK')
+      ? (r.testAdi || '').toString().trim()
+      : (r.ders || '').toString().trim();
+
+    // "2-A" vb. yerlerde tireden kırılmayı engelle (U+2011: non-breaking hyphen)
+    name = name.replace(/(\d+)\s*-\s*([A-ZÇĞİÖŞÜ0-9]+)/g, (_, n, suf) => `${n}\u2011${suf}`);
+
+    const left = name ? `<span class="list-row-title">${name}</span>` : '';
+    const code = `<span class="mono text-xs text-gray-700">${videoKodu}</span>`;
+    return `
+      <div class="list-row">
+        ${left}
+        <span class="badge badge-ok">ÇEKİLDİ</span>
+        ${code}
+      </div>`;
+  }).join('');
+
+  // Diğer fonksiyonlarla (renderAkdList, renderYazList) aynı boş liste mantığını kullan
+  return `<div class="cell-stack">${ html || '<div class="list-row pad">&nbsp;</div>' }</div>`;
 }
     
 /* === ÜÇLÜ KOLON SATIR SENKRONİZASYONU === */
