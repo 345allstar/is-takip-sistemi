@@ -40,7 +40,6 @@
 .th-group,.th-sub{background:#f8fafc}
 .list-chip{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;margin:.15rem .35rem .15rem 0;padding:.15rem .4rem;border-radius:9999px;background:#f4f4f5}
     /* daha okunaklı liste satırı */
-.list-row { display:flex; align-items:center; gap:.45rem; margin:.15rem 0; }
 .list-row-title { font-weight:600; color:#111827; }
 
 /* tablo ızgarası ve zebra zaten vardı; chip'leri sadeleştirelim */
@@ -52,10 +51,6 @@
     /* Hücre içindeki çoklu satırları ortala ve aralarına çizgi koy */
 .cell-stack { display:flex; flex-direction:column; align-items:center; }
 .cell-stack .list-row { display:flex; align-items:center; gap:.45rem; padding:.2rem 0; }
-.cell-stack .list-row + .list-row {             /* birden fazla kayıt varsa araya çizgi */
-  border-top: 1px solid #e5e7eb;                /* #e5e7eb -> Tailwind gray-200 */
-  margin-top: .2rem;
-}
 
 /* Hücreleri netçe ortalamak için yardımcı sınıf */
 .center-cell { text-align:center; }
@@ -66,21 +61,7 @@
 
 /* === cell-stack satırları: otomatik yükseklik + normal kırılma === */
 .cell-stack{display:flex;flex-direction:column;align-items:stretch}
-.cell-stack .list-row{
-  display:flex;
-  align-items:center;
-  justify-content:center;   /* ortalı */
-  gap:.45rem;
-  padding:.15rem .25rem;
-  line-height:1.2;
-  height:auto;              /* SABİT YÜKSEKLİK YOK */
-  white-space:normal;       /* içerik tamamen görünsün */
-  flex-wrap:wrap;
-}
-.cell-stack .list-row + .list-row{
-  border-top:1px solid #e5e7eb;
-  margin-top:0;
-}
+
 .mono{ font-size:11px; word-break:break-all; }  /* kod uzun gelirse kırabilsin */
 
 .cell-stack .badge{line-height:1}
@@ -149,6 +130,11 @@
   height: auto;
   line-height: 1.2;
 }
+    /* Satırlar arası boşluk için sadece padding kullan; margin kullanma */
+.list-row{ display:flex; align-items:center; gap:.45rem; margin:0; padding:.24rem 0; }
+.cell-stack .list-row{ justify-content:center; flex-wrap:wrap; line-height:1.2; }
+.cell-stack .list-row + .list-row{ border-top:1px solid #e5e7eb; } /* margin-top yok */
+
 </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -351,11 +337,14 @@ function syncTripletHeightsForRow(tr){
 
       // 1) Ölçmeden önce sıfırla (önceki ölçülerin etkisini temizle)
       for (const rows of rowsPerStack){
-        const el = rows[i];
-        el.style.height = '';        // clear
-        el.style.minHeight = '';     // clear
-        el.style.lineHeight = '1.2'; // doğal satır aralığı
-      }
+  const el = rows[i];
+  el.style.height = '';
+  el.style.minHeight = '';
+  el.style.lineHeight = '1.2';
+  el.style.marginTop = '0';     // kritik
+  el.style.marginBottom = '0';  // kritik
+  // padding ölçüme dahil; yukarıda CSS'te sabitledik
+}
 
       // 2) Doğal yüksekliği ölç
       for (const rows of rowsPerStack){
