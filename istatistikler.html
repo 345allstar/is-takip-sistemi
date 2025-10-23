@@ -145,6 +145,8 @@
     
 /* BÖLÜM'den (2. sütun) sonrası ortalı */
 .tbl tbody tr > td:nth-child(n+3){ text-align:center; }
+    /* görünmez dolgu satırı: yer tutsun ama görünmesin */
+.list-row.pad{ visibility:hidden; height:auto; line-height:1.2; }
 </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -291,16 +293,18 @@ function renderYazList(rows){
 // Hiçbir yerde "1 ders" yazmıyoruz. (Tabletli/Özet'te 1.DERS vb. zaten isimde var.)
 function renderCekimList(rows, scKey){
   if (!rows.length) {
-    // ESKİ: return '<span class="text-gray-400">—</span>';
     return `<div class="cell-stack"><div class="list-row"><span class="text-gray-400">—</span></div></div>`;
   }
 
   const html = rows
     .filter(r => (r.videoKodu || '').toString().trim() !== '')
     .map(r => {
-      const name = (scKey === 'PRATIK' || scKey === 'GCCK')
+      let name = (scKey === 'PRATIK' || scKey === 'GCCK')
         ? (r.testAdi || '').toString().trim()
         : (r.ders || '').toString().trim();
+
+      // "2-A" vb. yerlerde tireden kırılmayı engelle (U+2011: non-breaking hyphen)
+      name = name.replace(/(\d+)\s*-\s*([A-ZÇĞİÖŞÜ0-9]+)/g, (_, n, suf) => `${n}\u2011${suf}`);
 
       const left = name ? `<span class="list-row-title">${name}</span>` : '';
       const code = `<span class="mono text-xs text-gray-700">${r.videoKodu}</span>`;
@@ -319,8 +323,7 @@ function renderCekimList(rows, scKey){
 // Bir <tr> içindeki (BÖLÜM sütunundan sonraki) her 3 hücrelik grupta
 // .list-row yüksekliklerini index bazında eşitler.
 function syncTripletHeightsForRow(tr){
-  // İlk iki hücre: ÜNİTE ve BÖLÜM
-  const tds = Array.from(tr.querySelectorAll('td')).slice(2);
+  const tds = Array.from(tr.querySelectorAll('td')).slice(2); // ÜNİTE/BÖLÜM'ü atla
   for (let g = 0; g < tds.length; g += 3){
     const stacks = tds.slice(g, g+3).map(td => td.querySelector('.cell-stack'));
     if (stacks.some(s => !s)) continue;
@@ -328,31 +331,37 @@ function syncTripletHeightsForRow(tr){
     const rowsPerStack = stacks.map(s => Array.from(s.querySelectorAll('.list-row')));
     const maxLen = Math.max(...rowsPerStack.map(r => r.length));
 
+    // --- PAD EKSİK SATIRLAR (görünmez) ---
+    for (let s = 0; s < stacks.length; s++){
+      const deficit = maxLen - rowsPerStack[s].length;
+      for (let k = 0; k < deficit; k++){
+        const pad = document.createElement('div');
+        pad.className = 'list-row pad';      // CSS'te görünmez kılacağız
+        pad.innerHTML = '&nbsp;';
+        stacks[s].appendChild(pad);
+        rowsPerStack[s].push(pad);
+      }
+    }
+
+    // --- EŞİTLE ---
     for (let i = 0; i < maxLen; i++){
-      // önce doğal yüksekliği ölçmek için resetle
       let maxH = 0;
       for (const rows of rowsPerStack){
         const el = rows[i];
-        if (!el) continue;
         el.style.height = 'auto';
         el.style.lineHeight = '1.2';
         const h = el.getBoundingClientRect().height;
         if (h > maxH) maxH = h;
       }
-      // sonra hepsine aynı yüksekliği uygula
-      if (maxH > 0){
-        for (const rows of rowsPerStack){
-          const el = rows[i];
-          if (!el) continue;
-          el.style.height = maxH + 'px';
-          el.style.lineHeight = maxH + 'px';
-        }
+      for (const rows of rowsPerStack){
+        const el = rows[i];
+        el.style.height = maxH + 'px';
+        el.style.lineHeight = maxH + 'px';
       }
     }
   }
 }
 
-// Tüm satırlar için senkronizasyon
 function syncAllTriplets(){
   document.querySelectorAll('#tbody tr').forEach(syncTripletHeightsForRow);
 }
