@@ -90,10 +90,10 @@
 
 /* "1. DERS" vb. soldaki başlık çok uzarsa ellipsis uygula */
 .list-row-title{
-  max-width:140px;              /* istersen genişlet */
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
+  max-width:220px;          /* istersen 200–260 arası oynat */
+  white-space:normal;       /* kırılarak tam görünsün */
+  overflow:visible;
+  text-overflow:clip;
 }
 
 /* video kodları biraz ufak kalsın, tek satıra sığması kolaylaşır */
@@ -478,15 +478,7 @@ return `
       });
 
       document.getElementById('rowCount').textContent = `${satir} satır`;
-      // satıra tıklayınca kırmızı çerçeve
-tbody.addEventListener('click', (e)=>{
-  const tr = e.target.closest('tr');
-  if(!tr) return;
-  [...tbody.querySelectorAll('tr.tr-focus')].forEach(x=>x.classList.remove('tr-focus'));
-  tr.classList.add('tr-focus');
-});
-    }
-// 4.6 Üçlü kolon satırlarını hizala (ilk yüklemede)
+      // 4.6 Üçlü kolon satırlarını hizala (ilk yüklemede)
 requestAnimationFrame(syncAllTriplets);
 
 // Ekran boyutu değişince tekrar hizala
@@ -497,6 +489,14 @@ window.addEventListener('resize', () => {
   });
   requestAnimationFrame(syncAllTriplets);
 });
+      // satıra tıklayınca kırmızı çerçeve
+tbody.addEventListener('click', (e)=>{
+  const tr = e.target.closest('tr');
+  if(!tr) return;
+  [...tbody.querySelectorAll('tr.tr-focus')].forEach(x=>x.classList.remove('tr-focus'));
+  tr.classList.add('tr-focus');
+});
+    }
 
     // Başlangıç
     loadFor(BRANSLAR[0]);
