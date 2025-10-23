@@ -202,8 +202,8 @@
       seg.appendChild(btn);
     });
 
-// Ünite grubunda, 1. sütuna (ÜNİTE) hiç dokunmadan
-// 2. sütundan itibaren TÜM içerikleri "sıralı KAYNAK SNAPSHOT"tan yazar.
+// ÜNİTE grubu içindeki tüm satırları BÖLÜM numarasına göre sırala.
+// Ardından rowspan'lı ÜNİTE hücresini sıralanmış grubun ilk satırına yeniden yerleştirir.
 function sortBolumWithinUnits() {
   const tbody = document.getElementById('tbody');
   if (!tbody) return;
@@ -212,19 +212,13 @@ function sortBolumWithinUnits() {
   if (!rows.length) return;
 
   const startsUnit = tr => (tr.cells[0]?.textContent || '').trim() !== '';
-const getBolumNo = tr => {
-  // 2. hücrenin ekranda görünen metniyle çalış (NBSP vb. temizle)
-  const raw = (tr.cells[1]?.innerText || '')
-    .normalize('NFKD')
-    .replace(/\s+/g, ' ')
-    .trim();
+  const getBolumNo = tr => {
+    const t = (tr.cells[1]?.textContent || '').toUpperCase('tr-TR');
+    const m = t.match(/(\d+)\.? ?BÖLÜM/);          // "1.BÖLÜM", "1. BÖLÜM" vb.
+    return m ? parseInt(m[1], 10) : Number.POSITIVE_INFINITY;
+  };
 
-  // Hücredeki ilk sayıyı yakala (1, 2, 3, 10 ...)
-  const m = raw.match(/(\d+)/);
-  return m ? parseInt(m[1], 10) : Number.POSITIVE_INFINITY;
-};
-
-  // 1) ÜNİTE gruplarını çıkar (ardışık satırlar)
+  // 1) ÜNİTE gruplarını çıkar
   const groups = [];
   let cur = [];
   for (const tr of rows) {
@@ -233,32 +227,35 @@ const getBolumNo = tr => {
   }
   if (cur.length) groups.push(cur);
 
-  // 2) Her grup için: önce KAYNAK SNAPSHOT al, sonra hedeflere yaz
+  // 2) Her grubu sırala ve ÜNİTE hücresini doğru yere tak
+  const frag = document.createDocumentFragment();
   for (const group of groups) {
-    // Sıralı kaynak satırlar
-    const sorted = [...group].sort((a, b) => getBolumNo(a) - getBolumNo(b));
+    // a) ÜNİTE hücresini (varsa) bulunduğu satırdan sök
+    let unitRow = group.find(startsUnit);
+    let unitCell = null;
+    if (unitRow && unitRow.cells.length) {
+      unitCell = unitRow.removeChild(unitRow.cells[0]); // td'yi komple al
+    }
 
-    // --- SNAPSHOT: [i][c] = innerHTML (c>=1)
-    const snap = sorted.map(fromRow => {
-      const arr = [];
-      for (let c = 1; c < fromRow.cells.length; c++) {
-        arr[c] = fromRow.cells[c].innerHTML;
-      }
-      return arr;
-    });
+    // b) Grubu BÖLÜM numarasına göre sırala (tüm satırlar dahil)
+    group.sort((a, b) => getBolumNo(a) - getBolumNo(b));
 
-    // --- YAZ: group[i] hedef, snap[i][c] içerik
-    for (let i = 0; i < group.length; i++) {
-      const toRow = group[i];
-      const toCellCount = toRow.cells.length;
-
-      for (let c = 1; c < toCellCount; c++) {
-        if (!toRow.cells[c]) continue;
-        const html = snap[i]?.[c] ?? toRow.cells[c].innerHTML; // kaynak yoksa dokunma
-        toRow.cells[c].innerHTML = html;
+    // c) ÜNİTE hücresini yeni ilk satıra yerleştir, rowspan’ı güncelle
+    if (unitCell) {
+      unitCell.rowSpan = group.length;
+      group[0].insertBefore(unitCell, group[0].firstChild);
+      // güvenlik: diğer satırlarda yanlışlıkla kalan 1. hücre olmasın
+      for (let i = 1; i < group.length; i++) {
+        if (startsUnit(group[i])) group[i].deleteCell(0);
       }
     }
+
+    group.forEach(tr => frag.appendChild(tr));
   }
+
+  // 3) TBody'yi yeni sırayla yaz
+  tbody.innerHTML = '';
+  tbody.appendChild(frag);
 }
 
 
