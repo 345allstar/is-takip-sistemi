@@ -61,8 +61,6 @@
 .center-cell { text-align:center; }
     /* Tıklanmış satır vurgusu */
 .tr-focus { outline: 2px solid #ef4444; outline-offset: -2px; }
-   /* === 3'lü kolonda satır hizası: eşit yükseklik + ellipsis === */
-:root { --row-h: 26px; }   /* istersen 24–30px oynatabilirsin */
 
 .cell-stack{display:flex;flex-direction:column;align-items:stretch}
 
@@ -331,37 +329,46 @@ function syncTripletHeightsForRow(tr){
     const rowsPerStack = stacks.map(s => Array.from(s.querySelectorAll('.list-row')));
     const maxLen = Math.max(...rowsPerStack.map(r => r.length));
 
-    // --- PAD EKSİK SATIRLAR (görünmez) ---
+    // Eksik olan hücreye görünmez pad satırlar ekle
     for (let s = 0; s < stacks.length; s++){
       const deficit = maxLen - rowsPerStack[s].length;
       for (let k = 0; k < deficit; k++){
         const pad = document.createElement('div');
-        pad.className = 'list-row pad';      // CSS'te görünmez kılacağız
+        pad.className = 'list-row pad';
         pad.innerHTML = '&nbsp;';
         stacks[s].appendChild(pad);
         rowsPerStack[s].push(pad);
       }
     }
 
-    // --- EŞİTLE ---
+    // Eşitleme: sadece min-height kullan, line-height'e dokunma
     for (let i = 0; i < maxLen; i++){
       let maxH = 0;
+
+      // 1) Ölçmeden önce sıfırla (önceki ölçülerin etkisini temizle)
       for (const rows of rowsPerStack){
         const el = rows[i];
-        el.style.height = 'auto';
-        el.style.lineHeight = '1.2';
+        el.style.height = '';        // clear
+        el.style.minHeight = '';     // clear
+        el.style.lineHeight = '1.2'; // doğal satır aralığı
+      }
+
+      // 2) Doğal yüksekliği ölç
+      for (const rows of rowsPerStack){
+        const el = rows[i];
         const h = el.getBoundingClientRect().height;
         if (h > maxH) maxH = h;
       }
+
+      // 3) Eşit min-height ver
       for (const rows of rowsPerStack){
         const el = rows[i];
-        el.style.height = maxH + 'px';
-        el.style.lineHeight = maxH + 'px';
+        el.style.minHeight = maxH + 'px';
       }
     }
   }
 }
-
+    
 function syncAllTriplets(){
   document.querySelectorAll('#tbody tr').forEach(syncTripletHeightsForRow);
 }
@@ -488,7 +495,7 @@ return `
 
       document.getElementById('rowCount').textContent = `${satir} satır`;
       // 4.6 Üçlü kolon satırlarını hizala (ilk yüklemede)
-requestAnimationFrame(syncAllTriplets);
+requestAnimationFrame(() => requestAnimationFrame(syncAllTriplets));
 
       // satıra tıklayınca kırmızı çerçeve
 tbody.addEventListener('click', (e)=>{
@@ -501,10 +508,11 @@ tbody.addEventListener('click', (e)=>{
 // Ekran boyutu değişince tekrar hizala (GLOBAL)
 window.addEventListener('resize', () => {
   document.querySelectorAll('#tbody .list-row').forEach(el => {
-    el.style.height = 'auto';
+    el.style.height = '';
+    el.style.minHeight = '';
     el.style.lineHeight = '1.2';
   });
-  requestAnimationFrame(syncAllTriplets);
+  requestAnimationFrame(() => requestAnimationFrame(syncAllTriplets));
 });
     // Başlangıç
     loadFor(BRANSLAR[0]);
