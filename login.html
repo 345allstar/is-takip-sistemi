@@ -150,6 +150,29 @@
     if(location.hash === '#kayit' || location.hash === '#register'){
       switchTab('register');
     }
+    // Giriş formu -> giriş başarılı say ve index'e git
+document.getElementById('form-login').addEventListener('submit', function (e) {
+  e.preventDefault();
+  // basit oturum işareti
+  localStorage.setItem('auth', 'true');
+
+  // (opsiyonel) e-posta/dep. bilgilerini saklamak isterseniz:
+  const emailOrUser = this.querySelector('[name="username"]').value;
+  localStorage.setItem('user', emailOrUser);
+
+  // index dosyanızın adı neyse onu yazın:
+  window.location.href = 'index (1).html';
+});
+
+// Kayıt formu -> kayıt başarılı say ve index'e git
+document.getElementById('form-register').addEventListener('submit', function (e) {
+  e.preventDefault();
+  localStorage.setItem('auth', 'true');
+  localStorage.setItem('user', this.querySelector('[name="email"]').value);
+  localStorage.setItem('department', this.querySelector('[name="department"]').value);
+
+  window.location.href = 'index (1).html';
+});
   </script>
 </body>
 </html>
