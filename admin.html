@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yönetim Paneli</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script defer src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    body{font-family:'Inter',sans-serif}
+    .card{box-shadow:0 10px 30px rgba(2,6,23,.08)}
+    .th{white-space:nowrap}
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <!-- Üst bar -->
+  <header class="sticky top-0 z-10 bg-white/90 backdrop-blur border-b">
+    <div class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <img src="logo.png" class="h-6" alt="logo" onerror="this.style.display='none'">
+        <h1 class="text-lg font-semibold">Yönetim Paneli</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="index (1).html" class="rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">Anasayfa'ya Dön</a>
+        <button onclick="logout()" class="rounded-lg bg-rose-500 px-3 py-2 text-sm font-semibold text-white hover:bg-rose-600">Çıkış Yap</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-6xl px-4 py-8">
+    <div class="card rounded-2xl bg-white p-6">
+      <h2 class="text-2xl font-semibold mb-6">Kullanıcı Yetki Yönetimi</h2>
+
+      <!-- Uyarı -->
+      <div id="env-warning" class="mb-4 hidden rounded-md border border-amber-200 bg-amber-50 p-3 text-amber-800 text-sm">
+        Supabase bilgileri bulunamadı. Tablo demo verisiyle gösteriliyor. <b>appConfig</b> bölümüne SUPABASE_URL ve SUPABASE_ANON_KEY girerseniz canlı veriyi yükler.
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full table-auto text-sm">
+          <thead>
+            <tr class="text-gray-500">
+              <th class="th px-4 py-3 text-left">AD SOYAD</th>
+              <th class="th px-4 py-3 text-left">E‑POSTA</th>
+              <th class="th px-4 py-3">ÇEKİM</th>
+              <th class="th px-4 py-3">İZLEME</th>
+              <th class="th px-4 py-3">ÖDEME</th>
+              <th class="th px-4 py-3">HATA BİLDİRİM</th>
+              <th class="th px-4 py-3">İSTATİSTİKLER</th>
+              <th class="th px-4 py-3">ADMIN</th>
+              <th class="th px-4 py-3 text-right">İŞLEMLER</th>
+            </tr>
+          </thead>
+          <tbody id="tbody" class="divide-y">
+            <!-- Rows render via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <template id="row-template">
+    <tr>
+      <td class="px-4 py-3 font-semibold text-gray-800"></td>
+      <td class="px-4 py-3 text-gray-600"></td>
+      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="cekim" class="h-4 w-4 text-indigo-600"></td>
+      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="izleme" class="h-4 w-4 text-indigo-600"></td>
+      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="odeme" class="h-4 w-4 text-indigo-600"></td>
+      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="hata_bildirim" class="h-4 w-4 text-indigo-600"></td>
+      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="istatistikler" class="h-4 w-4 text-indigo-600"></td>
+      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="admin" class="h-4 w-4 text-indigo-600"></td>
+      <td class="px-4 py-3 text-right">
+        <button class="save-btn rounded-lg bg-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-300">Kaydet</button>
+      </td>
+    </tr>
+  </template>
+
+  <script>
+    // ====== 1) UYGULAMA AYARLARI ======
+    // Supabase bilgilerinizi buraya girin. Yoksa demo veriyle çalışır.
+    const appConfig = {
+      SUPABASE_URL: '', // ör: 'https://xxxxx.supabase.co'
+      SUPABASE_ANON_KEY: '' // ör: 'eyJhbGciOiJI...'
+    };
+
+    // ====== 2) YARDIMCI ======
+    function logout(){
+      localStorage.removeItem('auth');
+      window.location.href = 'login.html';
+    }
+
+    function showToast(msg, ok=true){
+      const el = document.createElement('div');
+      el.className = `fixed bottom-4 right-4 rounded-lg px-4 py-2 text-sm shadow ${ok?'bg-emerald-600 text-white':'bg-rose-600 text-white'}`;
+      el.textContent = msg;
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(), 1800);
+    }
+
+    // ====== 3) VERİ KATMANI ======
+    let supabase = null;
+    let useDemo = false;
+
+    const demoUsers = [
+      {id:'1', full_name:'enes', email:'enesyardim@gmail.com'},
+      {id:'2', full_name:'sinem ş', email:'snemsenturk@gmail.com'},
+      {id:'3', full_name:'Burak Onay', email:'burakonay@yahoo.com'},
+      {id:'4', full_name:'ALİ', email:'allstar022024@gmail.com'},
+      {id:'5', full_name:'raşit güngör', email:'rasitgungor24@gmail.com'},
+      {id:'6', full_name:'İsim Yok', email:'sibel010333@gmail.com'},
+      {id:'7', full_name:'İsim Yok', email:'fatihglbdk@gmail.com'}
+    ];
+
+    const demoPerms = {
+      '1': { cekim:false, izleme:false, odeme:true, hata_bildirim:false, istatistikler:false, admin:false },
+      '2': { cekim:true,  izleme:false, odeme:false, hata_bildirim:true,  istatistikler:false, admin:false },
+      '3': { cekim:true,  izleme:false, odeme:false, hata_bildirim:true,  istatistikler:false, admin:false },
+      '4': { cekim:true,  izleme:false, odeme:false, hata_bildirim:true,  istatistikler:false, admin:false },
+      '5': { cekim:true,  izleme:false, odeme:false, hata_bildirim:true,  istatistikler:false, admin:false },
+      '6': { cekim:false, izleme:true,  odeme:false, hata_bildirim:false, istatistikler:false, admin:false },
+      '7': { cekim:false, izleme:false, odeme:false, hata_bildirim:false, istatistikler:false, admin:true  },
+    };
+
+    async function initClient(){
+      if(appConfig.SUPABASE_URL && appConfig.SUPABASE_ANON_KEY){
+        supabase = window.supabase.createClient(appConfig.SUPABASE_URL, appConfig.SUPABASE_ANON_KEY);
+      } else {
+        document.getElementById('env-warning').classList.remove('hidden');
+        useDemo = true;
+      }
+    }
+
+    async function fetchUsers(){
+      if(useDemo) return demoUsers;
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, full_name, email')
+        .order('full_name', { ascending: true });
+      if(error){ console.error(error); showToast('Kullanıcılar yüklenemedi', false); return []; }
+      return data;
+    }
+
+    async function fetchPerms(){
+      if(useDemo) return demoPerms;
+      const { data, error } = await supabase
+        .from('user_permissions')
+        .select('user_id, cekim, izleme, odeme, hata_bildirim, istatistikler, admin');
+      if(error){ console.error(error); showToast('Yetkiler yüklenemedi', false); return {}; }
+      // Map'e çevir
+      const map = {}; data.forEach(r=>{ map[r.user_id] = r; });
+      return map;
+    }
+
+    async function upsertPerm(userId, perms){
+      if(useDemo){ demoPerms[userId] = perms; return {ok:true}; }
+      const payload = { user_id:userId, ...perms };
+      const { error } = await supabase.from('user_permissions').upsert(payload).select();
+      if(error){ console.error(error); return {ok:false, error}; }
+      return {ok:true};
+    }
+
+    // ====== 4) ARAYÜZ ======
+    function renderRows(users, permMap){
+      const tbody = document.getElementById('tbody');
+      tbody.innerHTML = '';
+      const tpl = document.getElementById('row-template');
+      users.forEach(u=>{
+        const clone = tpl.content.cloneNode(true);
+        const tds = clone.querySelectorAll('td');
+        tds[0].textContent = u.full_name || '—';
+        tds[1].textContent = u.email || '—';
+        const defaults = {cekim:false, izleme:false, odeme:false, hata_bildirim:false, istatistikler:false, admin:false};
+        const p = { ...defaults, ...(permMap[u.id]||{}) };
+        clone.querySelectorAll('input[type="checkbox"]').forEach(inp=>{
+          inp.checked = !!p[inp.dataset.key];
+        });
+        clone.querySelector('.save-btn').addEventListener('click', async ()=>{
+          const row = clone.querySelectorAll('input[type="checkbox"]');
+          const perms = {};
+          row.forEach(inp=>{ perms[inp.dataset.key] = inp.checked; });
+          const res = await upsertPerm(u.id, perms);
+          showToast(res.ok? 'Kaydedildi' : 'Kaydedilemedi', res.ok);
+        });
+        tbody.appendChild(clone);
+      });
+    }
+
+    async function bootstrap(){
+      // basit sayfa koruma
+      if(!localStorage.getItem('auth')){ window.location.href='login.html'; return; }
+      await initClient();
+      const [users, permMap] = await Promise.all([fetchUsers(), fetchPerms()]);
+      renderRows(users, permMap);
+    }
+
+    bootstrap();
+  </script>
+</body>
+</html>
