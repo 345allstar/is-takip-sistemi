@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Giriş Yap • ÜçDörtBeş All Star</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    html, body { height: 100%; }
+    body { font-family: 'Inter', sans-serif; }
+    .form-card { box-shadow: 0 10px 30px rgba(2,6,23,.06); }
+    .tab-btn[aria-selected="true"]{ background-color:#eef2ff; color:#4338ca; }
+    .input{ @apply w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-700 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100; }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <div class="min-h-full grid place-items-center py-8 px-4">
+    <!-- Card -->
+    <div class="form-card w-full max-w-md rounded-2xl bg-white p-8">
+      <!-- Logo -->
+      <div class="flex flex-col items-center mb-6">
+        <!-- Değiştirilebilir logo -->
+        <img src="logo.png" alt="ÜçDörtBeş All Star" class="h-16 w-auto" onerror="this.style.display='none'">
+        <h1 class="mt-2 text-xl font-semibold text-gray-800">ÜçDörtBeş ALL STAR</h1>
+      </div>
+
+      <!-- Tabs -->
+      <div class="mb-6 grid grid-cols-2 gap-2 rounded-xl bg-gray-100 p-1">
+        <button id="tab-login" class="tab-btn rounded-lg px-4 py-2 text-sm font-semibold text-gray-600" aria-selected="true" onclick="switchTab('login')">Giriş Yap</button>
+        <button id="tab-register" class="tab-btn rounded-lg px-4 py-2 text-sm font-semibold text-gray-600" aria-selected="false" onclick="switchTab('register')">Kayıt Ol</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form id="form-login" class="space-y-4" action="#" method="post" autocomplete="on">
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-700">Kullanıcı Adı veya E‑posta</label>
+          <input type="text" name="username" required class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-700 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" placeholder="ornek@site.com" />
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-700">Şifre</label>
+          <div class="relative">
+            <input id="login-password" type="password" name="password" required class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 pr-12 text-gray-700 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" placeholder="••••••••" />
+            <button type="button" class="absolute inset-y-0 right-3 my-auto text-gray-500" aria-label="Şifreyi göster" onclick="togglePassword('login-password', this)">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="flex items-center justify-between">
+          <label class="inline-flex items-center gap-2 text-sm text-gray-600">
+            <input type="checkbox" name="remember" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+            Beni hatırla
+          </label>
+          <a href="#" class="text-sm font-medium text-indigo-600 hover:underline">Şifremi Unuttum</a>
+        </div>
+        <button type="submit" class="mt-2 w-full rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200">Giriş Yap</button>
+      </form>
+
+      <!-- REGISTER FORM -->
+      <form id="form-register" class="hidden space-y-4" action="#" method="post" autocomplete="on">
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-700">E‑posta</label>
+          <input type="email" name="email" required class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-700 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" placeholder="ornek@site.com" />
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-700">Şifre</label>
+          <div class="relative">
+            <input id="reg-password" type="password" name="password" required class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 pr-12 text-gray-700 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" placeholder="En az 8 karakter" />
+            <button type="button" class="absolute inset-y-0 right-3 my-auto text-gray-500" aria-label="Şifreyi göster" onclick="togglePassword('reg-password', this)">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-700">Departman</label>
+          <select name="department" required class="w-full appearance-none rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-700 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100">
+            <option value="" disabled selected>Seçiniz</option>
+            <option>Koordinatör</option>
+            <option>Yönetmen</option>
+            <option>Kurgu Birimi</option>
+            <option>Teknik İzleme</option>
+            <option>Akademik İzleme</option>
+            <option>Yazılım Birimi</option>
+            <option>Yönetim</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2">
+          <input id="remember-reg" type="checkbox" name="remember" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+          <label for="remember-reg" class="text-sm text-gray-600">Beni hatırla</label>
+        </div>
+        <button type="submit" class="mt-2 w-full rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200">Kayıt Ol</button>
+      </form>
+
+      <!-- Footer link -->
+      <p class="mt-6 text-center text-sm text-gray-500">
+        <span id="alt-text-register">Hesabınız yok mu?</span>
+        <button id="alt-link" type="button" class="font-semibold text-indigo-600 hover:underline" onclick="toggleForms()">Kayıt Olun</button>
+      </p>
+    </div>
+
+    <!-- Alt bilgi -->
+    <p class="mt-6 text-xs text-gray-400">© 2025 ÜçDörtBeş All Star</p>
+  </div>
+
+  <script>
+    function togglePassword(inputId, btn){
+      const input = document.getElementById(inputId);
+      const icon = btn.querySelector('i');
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      icon.classList.toggle('fa-eye');
+      icon.classList.toggle('fa-eye-slash');
+      btn.setAttribute('aria-label', isPassword ? 'Şifreyi gizle' : 'Şifreyi göster');
+    }
+
+    function switchTab(which){
+      const loginTab = document.getElementById('tab-login');
+      const registerTab = document.getElementById('tab-register');
+      const loginForm = document.getElementById('form-login');
+      const registerForm = document.getElementById('form-register');
+      const altText = document.getElementById('alt-text-register');
+      const altLink = document.getElementById('alt-link');
+
+      if(which === 'login'){
+        loginTab.setAttribute('aria-selected','true');
+        registerTab.setAttribute('aria-selected','false');
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+        altText.textContent = 'Hesabınız yok mu?';
+        altLink.textContent = 'Kayıt Olun';
+      } else {
+        loginTab.setAttribute('aria-selected','false');
+        registerTab.setAttribute('aria-selected','true');
+        loginForm.classList.add('hidden');
+        registerForm.classList.remove('hidden');
+        altText.textContent = 'Zaten hesabınız var mı?';
+        altLink.textContent = 'Giriş Yapın';
+      }
+    }
+
+    function toggleForms(){
+      const isLoginVisible = !document.getElementById('form-login').classList.contains('hidden');
+      switchTab(isLoginVisible ? 'register' : 'login');
+    }
+
+    // URL hash ile doğrudan forma geçiş (#kayit)
+    if(location.hash === '#kayit' || location.hash === '#register'){
+      switchTab('register');
+    }
+  </script>
+</body>
+</html>
