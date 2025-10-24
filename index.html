@@ -23,6 +23,12 @@
 </style>
 </head>
 <body class="bg-gradient-to-br from-gray-50 to-gray-100">
+<script>
+// basit koruma: auth yoksa login'e yönlendir
+if (!localStorage.getItem('auth')) {
+  window.location.href = 'login.html';
+}
+</script>
 
     <div class="min-h-screen flex flex-col items-center justify-center p-4">
 
