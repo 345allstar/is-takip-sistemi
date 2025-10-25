@@ -45,12 +45,13 @@
             <tr class="text-gray-500">
               <th class="th px-4 py-3 text-left">AD SOYAD</th>
               <th class="th px-4 py-3 text-left">E‑POSTA</th>
-              <th class="th px-4 py-3">ÇEKİM</th>
-              <th class="th px-4 py-3">İZLEME</th>
-              <th class="th px-4 py-3">ÖDEME</th>
-              <th class="th px-4 py-3">HATA BİLDİRİM</th>
-              <th class="th px-4 py-3">İSTATİSTİKLER</th>
-              <th class="th px-4 py-3">ADMIN</th>
+              <th class="th px-4 py-3">Koordinatör</th>
+              <th class="th px-4 py-3">Yönetmen</th>
+              <th class="th px-4 py-3">Kurgu</th>
+              <th class="th px-4 py-3">Teknik İzleme</th>
+              <th class="th px-4 py-3">Akademik İzleme</th>
+              <th class="th px-4 py-3">Yazılım</th>
+              <th class="th px-4 py-3">Admin</th>
               <th class="th px-4 py-3 text-right">İŞLEMLER</th>
             </tr>
           </thead>
@@ -66,11 +67,12 @@
     <tr>
       <td class="px-4 py-3 font-semibold text-gray-800"></td>
       <td class="px-4 py-3 text-gray-600"></td>
-      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="cekim" class="h-4 w-4 text-indigo-600"></td>
-      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="izleme" class="h-4 w-4 text-indigo-600"></td>
-      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="odeme" class="h-4 w-4 text-indigo-600"></td>
-      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="hata_bildirim" class="h-4 w-4 text-indigo-600"></td>
-      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="istatistikler" class="h-4 w-4 text-indigo-600"></td>
+      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="koord" class="h-4 w-4 text-indigo-600"></td>
+      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="yonetmen" class="h-4 w-4 text-indigo-600"></td>
+      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="kurgu" class="h-4 w-4 text-indigo-600"></td>
+      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="teknik_izleme" class="h-4 w-4 text-indigo-600"></td>
+      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="akademik_izleme" class="h-4 w-4 text-indigo-600"></td>
+      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="yazilim" class="h-4 w-4 text-indigo-600"></td>
       <td class="px-4 py-3 text-center"><input type="checkbox" data-key="admin" class="h-4 w-4 text-indigo-600"></td>
       <td class="px-4 py-3 text-right">
         <button class="save-btn rounded-lg bg-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-300">Kaydet</button>
@@ -115,27 +117,16 @@
     ];
 
     const demoPerms = {
-      '1': { cekim:false, izleme:false, odeme:true, hata_bildirim:false, istatistikler:false, admin:false },
-      '2': { cekim:true,  izleme:false, odeme:false, hata_bildirim:true,  istatistikler:false, admin:false },
-      '3': { cekim:true,  izleme:false, odeme:false, hata_bildirim:true,  istatistikler:false, admin:false },
-      '4': { cekim:true,  izleme:false, odeme:false, hata_bildirim:true,  istatistikler:false, admin:false },
-      '5': { cekim:true,  izleme:false, odeme:false, hata_bildirim:true,  istatistikler:false, admin:false },
-      '6': { cekim:false, izleme:true,  odeme:false, hata_bildirim:false, istatistikler:false, admin:false },
-      '7': { cekim:false, izleme:false, odeme:false, hata_bildirim:false, istatistikler:false, admin:true  },
+      '1': { koord:false, yonetmen:false, kurgu:true,  teknik_izleme:false, akademik_izleme:false, yazilim:false, admin:false },
+      '2': { koord:true,  yonetmen:false, kurgu:false, teknik_izleme:true,  akademik_izleme:false, yazilim:false, admin:false },
+      '3': { koord:true,  yonetmen:false, kurgu:false, teknik_izleme:true,  akademik_izleme:false, yazilim:false, admin:false },
+      '4': { koord:true,  yonetmen:false, kurgu:false, teknik_izleme:true,  akademik_izleme:false, yazilim:false, admin:false },
+      '5': { koord:true,  yonetmen:false, kurgu:false, teknik_izleme:true,  akademik_izleme:false, yazilim:false, admin:false },
+      '6': { koord:false, yonetmen:true,  kurgu:false, teknik_izleme:false, akademik_izleme:false, yazilim:false, admin:false },
+      '7': { koord:false, yonetmen:false, kurgu:false, teknik_izleme:false, akademik_izleme:false, yazilim:true,  admin:true  },
     };
 
-    async function initClient(){
-      if(appConfig.SUPABASE_URL && appConfig.SUPABASE_ANON_KEY){
-        supabase = window.supabase.createClient(appConfig.SUPABASE_URL, appConfig.SUPABASE_ANON_KEY);
-      } else {
-        document.getElementById('env-warning').classList.remove('hidden');
-        useDemo = true;
-      }
-    }
-
-    async function fetchUsers(){
-      if(useDemo) return demoUsers;
-      const { data, error } = await supabase
+    const { data, error } = await supabase
         .from('users')
         .select('id, full_name, email')
         .order('full_name', { ascending: true });
@@ -147,7 +138,7 @@
       if(useDemo) return demoPerms;
       const { data, error } = await supabase
         .from('user_permissions')
-        .select('user_id, cekim, izleme, odeme, hata_bildirim, istatistikler, admin');
+        .select('user_id, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, admin');
       if(error){ console.error(error); showToast('Yetkiler yüklenemedi', false); return {}; }
       // Map'e çevir
       const map = {}; data.forEach(r=>{ map[r.user_id] = r; });
@@ -172,7 +163,7 @@
         const tds = clone.querySelectorAll('td');
         tds[0].textContent = u.full_name || '—';
         tds[1].textContent = u.email || '—';
-        const defaults = {cekim:false, izleme:false, odeme:false, hata_bildirim:false, istatistikler:false, admin:false};
+        const defaults = {koord:false, yonetmen:false, kurgu:false, teknik_izleme:false, akademik_izleme:false, yazilim:false, admin:false};
         const p = { ...defaults, ...(permMap[u.id]||{}) };
         clone.querySelectorAll('input[type="checkbox"]').forEach(inp=>{
           inp.checked = !!p[inp.dataset.key];
