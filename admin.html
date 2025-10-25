@@ -128,10 +128,20 @@ async function fetchPerms(){
 }
 
 async function upsertPerm(userId, perms){
-  const payload = { user_id:userId, ...perms };
-  const { error } = await sb.from('user_permissions').upsert(payload).select();
-  if(error){ console.error(error); return {ok:false, error}; }
-  return {ok:true};
+  const payload = { user_id: userId, ...perms };
+
+  // user_id benzersiz; çakışmada güncellesin diye onConflict veriyoruz
+  const { data, error } = await sb
+    .from('user_permissions')
+    .upsert(payload, { onConflict: 'user_id' })
+    .select('user_id, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin')
+    .single();
+
+  if (error) {
+    console.error('upsert error:', error);
+    return { ok: false, error };
+  }
+  return { ok: true, data };
 }
 
 function renderRows(users, permMap){
@@ -153,12 +163,34 @@ function renderRows(users, permMap){
     });
 
     clone.querySelector('.save-btn').addEventListener('click', async ()=>{
-      const boxes = clone.querySelectorAll('input[type="checkbox"]');
-      const perms = {};
-      boxes.forEach(inp=> perms[inp.dataset.key] = inp.checked);
-      const res = await upsertPerm(u.id, perms);
-      showToast(res.ok? 'Kaydedildi' : 'Kaydedilemedi', res.ok);
-    });
+  const boxes = clone.querySelectorAll('input[type="checkbox"]');
+  const perms = {};
+  boxes.forEach(inp => perms[inp.dataset.key] = !!inp.checked);
+
+  const res = await upsertPerm(u.id, perms);
+  if(!res.ok){
+    showToast('Kaydedilemedi', false);
+    return;
+  }
+
+  // Kaydı gerçekten yazdığını doğrula (tekrar oku)
+  const { data: checkRow, error: checkErr } = await sb
+    .from('user_permissions')
+    .select('koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin')
+    .eq('user_id', u.id)
+    .maybeSingle();
+
+  if (checkErr) {
+    console.error('recheck error:', checkErr);
+    showToast('Kaydedildi (okuma hatası)', true);
+    return;
+  }
+
+  // Kutuları geri okunan değere göre güncelle (gözle görülür teyit)
+  boxes.forEach(inp => { inp.checked = !!checkRow[inp.dataset.key]; });
+
+  showToast('Kaydedildi', true);
+});
 
     tbody.appendChild(clone);
   });
