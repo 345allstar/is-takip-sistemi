@@ -48,7 +48,32 @@
     </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
+<!-- <body ...> satırının hemen altına yapıştır -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb = supabase.createClient(
+  "https://nwxgigtsadesqjgflblr.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4"
+);
 
+// Bu sayfa için gerekli yetki
+const PAGE_KEY = 'teknik_izleme';
+
+(async function guard(){
+  if(!localStorage.getItem('auth')) { location.href='login.html'; return; }
+  const email = localStorage.getItem('user');
+  if(!email){ location.href='login.html'; return; }
+
+  const { data: u } = await sb.from('users').select('id').eq('email', email).maybeSingle();
+  if(!u){ location.href='no-access.html'; return; }
+
+  const { data: p } = await sb.from('user_permissions')
+    .select('admin, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik')
+    .eq('user_id', u.id).maybeSingle();
+
+  if(!p || (!p[PAGE_KEY] && !p.admin)) { location.href='no-access.html'; }
+})();
+</script>
     <div id="notification-container"></div>
 
     <div class="min-h-screen flex flex-col">
