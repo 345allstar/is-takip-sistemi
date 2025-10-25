@@ -31,27 +31,6 @@ const sb = supabase.createClient(
 })();
 </script>
 
-  <!-- <body ...> satırının hemen altına yapıştır -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-
-// Bu sayfa için gerekli yetki
-const PAGE_KEY = 'admin';
-
-(async function guard(){
-  if(!localStorage.getItem('auth')) { location.href='login.html'; return; }
-  const email = localStorage.getItem('user');
-  if(!email){ location.href='login.html'; return; }
-
-  const { data: u } = await sb.from('users').select('id').eq('email', email).maybeSingle();
-  if(!u){ location.href='no-access.html'; return; }
-
-  const { data: p } = await sb.from('user_permissions')
-    .select('admin, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik')
-    .eq('user_id', u.id).maybeSingle();
-
-  if(!p || (!p[PAGE_KEY] && !p.admin)) { location.href='no-access.html'; }
-})();
 </script>
 
   <!-- Üst bar -->
@@ -80,19 +59,21 @@ const PAGE_KEY = 'admin';
       <div class="overflow-x-auto">
         <table class="w-full table-auto text-sm">
           <thead>
-            <tr class="text-gray-500">
-              <th class="th px-4 py-3 text-left">AD SOYAD</th>
-              <th class="th px-4 py-3 text-left">E‑POSTA</th>
-              <th class="th px-4 py-3">Koordinatör</th>
-              <th class="th px-4 py-3">Yönetmen</th>
-              <th class="th px-4 py-3">Kurgu</th>
-              <th class="th px-4 py-3">Teknik İzleme</th>
-              <th class="th px-4 py-3">Akademik İzleme</th>
-              <th class="th px-4 py-3">Yazılım</th>
-              <th class="th px-4 py-3">Admin</th>
-              <th class="th px-4 py-3 text-right">İŞLEMLER</th>
-            </tr>
-          </thead>
+  <tr class="text-gray-500">
+    <th class="th px-4 py-3 text-left">AD SOYAD</th>
+    <th class="th px-4 py-3 text-left">E-POSTA</th>
+    <th class="th px-4 py-3">Koordinatör</th>
+    <th class="th px-4 py-3">Yönetmen</th>
+    <th class="th px-4 py-3">Kurgu</th>
+    <th class="th px-4 py-3">Teknik İzleme</th>
+    <th class="th px-4 py-3">Akademik İzleme</th>
+    <th class="th px-4 py-3">Yazılım</th>
+    <th class="th px-4 py-3">İstatistik</th>
+    <th class="th px-4 py-3">Admin</th>
+    <th class="th px-4 py-3 text-right">İŞLEMLER</th>
+  </tr>
+</thead>
+
           <tbody id="tbody" class="divide-y">
             <!-- Rows render via JS -->
           </tbody>
@@ -101,132 +82,24 @@ const PAGE_KEY = 'admin';
     </div>
   </main>
 
-  <template id="row-template">
-    <tr>
-      <td class="px-4 py-3 font-semibold text-gray-800"></td>
-      <td class="px-4 py-3 text-gray-600"></td>
-      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="koord" class="h-4 w-4 text-indigo-600"></td>
-      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="yonetmen" class="h-4 w-4 text-indigo-600"></td>
-      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="kurgu" class="h-4 w-4 text-indigo-600"></td>
-      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="teknik_izleme" class="h-4 w-4 text-indigo-600"></td>
-      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="akademik_izleme" class="h-4 w-4 text-indigo-600"></td>
-      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="yazilim" class="h-4 w-4 text-indigo-600"></td>
-      <td class="px-4 py-3 text-center"><input type="checkbox" data-key="admin" class="h-4 w-4 text-indigo-600"></td>
-      <td class="px-4 py-3 text-right">
-        <button class="save-btn rounded-lg bg-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-300">Kaydet</button>
-      </td>
-    </tr>
-  </template>
+ <template id="row-template">
+  <tr>
+    <td class="px-4 py-3 font-semibold text-gray-800"></td>
+    <td class="px-4 py-3 text-gray-600"></td>
+    <td class="px-4 py-3 text-center"><input type="checkbox" data-key="koord" class="h-4 w-4 text-indigo-600"></td>
+    <td class="px-4 py-3 text-center"><input type="checkbox" data-key="yonetmen" class="h-4 w-4 text-indigo-600"></td>
+    <td class="px-4 py-3 text-center"><input type="checkbox" data-key="kurgu" class="h-4 w-4 text-indigo-600"></td>
+    <td class="px-4 py-3 text-center"><input type="checkbox" data-key="teknik_izleme" class="h-4 w-4 text-indigo-600"></td>
+    <td class="px-4 py-3 text-center"><input type="checkbox" data-key="akademik_izleme" class="h-4 w-4 text-indigo-600"></td>
+    <td class="px-4 py-3 text-center"><input type="checkbox" data-key="yazilim" class="h-4 w-4 text-indigo-600"></td>
+    <td class="px-4 py-3 text-center"><input type="checkbox" data-key="istatistik" class="h-4 w-4 text-indigo-600"></td>
+    <td class="px-4 py-3 text-center"><input type="checkbox" data-key="admin" class="h-4 w-4 text-indigo-600"></td>
+    <td class="px-4 py-3 text-right">
+      <button class="save-btn rounded-lg bg-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-300">Kaydet</button>
+    </td>
+  </tr>
+</template>
 
-  <script>
-    // ====== 1) UYGULAMA AYARLARI ======
-    // Supabase bilgilerinizi buraya girin. Yoksa demo veriyle çalışır.
-    const appConfig = {
-      SUPABASE_URL: '', // ör: 'https://xxxxx.supabase.co'
-      SUPABASE_ANON_KEY: '' // ör: 'eyJhbGciOiJI...'
-    };
-
-    // ====== 2) YARDIMCI ======
-    function logout(){
-      localStorage.removeItem('auth');
-      window.location.href = 'login.html';
-    }
-
-    function showToast(msg, ok=true){
-      const el = document.createElement('div');
-      el.className = `fixed bottom-4 right-4 rounded-lg px-4 py-2 text-sm shadow ${ok?'bg-emerald-600 text-white':'bg-rose-600 text-white'}`;
-      el.textContent = msg;
-      document.body.appendChild(el);
-      setTimeout(()=>el.remove(), 1800);
-    }
-
-    // ====== 3) VERİ KATMANI ======
-    let supabase = null;
-    let useDemo = false;
-
-    const demoUsers = [
-      {id:'1', full_name:'enes', email:'enesyardim@gmail.com'},
-      {id:'2', full_name:'sinem ş', email:'snemsenturk@gmail.com'},
-      {id:'3', full_name:'Burak Onay', email:'burakonay@yahoo.com'},
-      {id:'4', full_name:'ALİ', email:'allstar022024@gmail.com'},
-      {id:'5', full_name:'raşit güngör', email:'rasitgungor24@gmail.com'},
-      {id:'6', full_name:'İsim Yok', email:'sibel010333@gmail.com'},
-      {id:'7', full_name:'İsim Yok', email:'fatihglbdk@gmail.com'}
-    ];
-
-    const demoPerms = {
-      '1': { koord:false, yonetmen:false, kurgu:true,  teknik_izleme:false, akademik_izleme:false, yazilim:false, admin:false },
-      '2': { koord:true,  yonetmen:false, kurgu:false, teknik_izleme:true,  akademik_izleme:false, yazilim:false, admin:false },
-      '3': { koord:true,  yonetmen:false, kurgu:false, teknik_izleme:true,  akademik_izleme:false, yazilim:false, admin:false },
-      '4': { koord:true,  yonetmen:false, kurgu:false, teknik_izleme:true,  akademik_izleme:false, yazilim:false, admin:false },
-      '5': { koord:true,  yonetmen:false, kurgu:false, teknik_izleme:true,  akademik_izleme:false, yazilim:false, admin:false },
-      '6': { koord:false, yonetmen:true,  kurgu:false, teknik_izleme:false, akademik_izleme:false, yazilim:false, admin:false },
-      '7': { koord:false, yonetmen:false, kurgu:false, teknik_izleme:false, akademik_izleme:false, yazilim:true,  admin:true  },
-    };
-
-    const { data, error } = await supabase
-        .from('users')
-        .select('id, full_name, email')
-        .order('full_name', { ascending: true });
-      if(error){ console.error(error); showToast('Kullanıcılar yüklenemedi', false); return []; }
-      return data;
-    }
-
-    async function fetchPerms(){
-      if(useDemo) return demoPerms;
-      const { data, error } = await supabase
-        .from('user_permissions')
-        .select('user_id, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin');
-      if(error){ console.error(error); showToast('Yetkiler yüklenemedi', false); return {}; }
-      // Map'e çevir
-      const map = {}; data.forEach(r=>{ map[r.user_id] = r; });
-      return map;
-    }
-
-    async function upsertPerm(userId, perms){
-      if(useDemo){ demoPerms[userId] = perms; return {ok:true}; }
-      const payload = { user_id:userId, ...perms };
-      const { error } = await sb.from('user_permissions').upsert(payload).select();
-      if(error){ console.error(error); return {ok:false, error}; }
-      return {ok:true};
-    }
-
-    // ====== 4) ARAYÜZ ======
-    function renderRows(users, permMap){
-      const tbody = document.getElementById('tbody');
-      tbody.innerHTML = '';
-      const tpl = document.getElementById('row-template');
-      users.forEach(u=>{
-        const clone = tpl.content.cloneNode(true);
-        const tds = clone.querySelectorAll('td');
-        tds[0].textContent = u.full_name || '—';
-        tds[1].textContent = u.email || '—';
-        const defaults = {koord:false, yonetmen:false, kurgu:false, teknik_izleme:false, akademik_izleme:false, yazilim:false, istatistik:false, admin:false};
-        const p = { ...defaults, ...(permMap[u.id]||{}) };
-        clone.querySelectorAll('input[type="checkbox"]').forEach(inp=>{
-          inp.checked = !!p[inp.dataset.key];
-        });
-        clone.querySelector('.save-btn').addEventListener('click', async ()=>{
-          const row = clone.querySelectorAll('input[type="checkbox"]');
-          const perms = {};
-          row.forEach(inp=>{ perms[inp.dataset.key] = inp.checked; });
-          const res = await upsertPerm(u.id, perms);
-          showToast(res.ok? 'Kaydedildi' : 'Kaydedilemedi', res.ok);
-        });
-        tbody.appendChild(clone);
-      });
-    }
-
-    async function bootstrap(){
-      // basit sayfa koruma
-      if(!localStorage.getItem('auth')){ window.location.href='login.html'; return; }
-      await initClient();
-      const [users, permMap] = await Promise.all([fetchUsers(), fetchPerms()]);
-      renderRows(users, permMap);
-    }
-
-    bootstrap();
-  </script>
   <script>
 function showToast(msg, ok=true){
   const el = document.createElement('div');
@@ -236,18 +109,31 @@ function showToast(msg, ok=true){
   setTimeout(()=>el.remove(), 1500);
 }
 
-// kullanıcıları ve izinleri çek
-async function loadData(){
-  const { data: users, error: e1 } = await sb.from('users')
-    .select('id, full_name, email').order('full_name');
-  if(e1){ showToast('Kullanıcılar yüklenemedi', false); return; }
+// Kullanıcıları ve izinleri çek
+async function fetchUsers(){
+  const { data, error } = await sb
+    .from('users')
+    .select('id, full_name, email')
+    .order('full_name', { ascending: true });
+  if(error){ console.error(error); showToast('Kullanıcılar yüklenemedi', false); return []; }
+  return data || [];
+}
 
-  const { data: perms, error: e2 } = await sb.from('user_permissions')
+async function fetchPerms(){
+  const { data, error } = await sb
+    .from('user_permissions')
     .select('user_id, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin');
-  if(e2){ showToast('Yetkiler yüklenemedi', false); return; }
+  if(error){ console.error(error); showToast('Yetkiler yüklenemedi', false); return {}; }
+  const map = {};
+  (data||[]).forEach(r=>{ map[r.user_id] = r; });
+  return map;
+}
 
-  const map = Object.fromEntries((perms||[]).map(r=>[r.user_id, r]));
-  renderRows(users||[], map);
+async function upsertPerm(userId, perms){
+  const payload = { user_id:userId, ...perms };
+  const { error } = await sb.from('user_permissions').upsert(payload).select();
+  if(error){ console.error(error); return {ok:false, error}; }
+  return {ok:true};
 }
 
 function renderRows(users, permMap){
@@ -265,25 +151,36 @@ function renderRows(users, permMap){
     const p = { ...defaults, ...(permMap[u.id]||{}) };
 
     clone.querySelectorAll('input[type="checkbox"]').forEach(inp=>{
-      const key = inp.dataset.key;        // koord, yonetmen, ...
-      inp.checked = !!p[key];
+      inp.checked = !!p[inp.dataset.key];
     });
 
     clone.querySelector('.save-btn').addEventListener('click', async ()=>{
-      const box = clone.querySelectorAll('input[type="checkbox"]');
+      const boxes = clone.querySelectorAll('input[type="checkbox"]');
       const perms = {};
-      box.forEach(inp => perms[inp.dataset.key] = inp.checked);
-
-      const payload = { user_id:u.id, ...perms };
-      const { error } = await sb.from('user_permissions').upsert(payload).select();
-      showToast(error ? 'Kaydedilemedi' : 'Kaydedildi', !error);
+      boxes.forEach(inp=> perms[inp.dataset.key] = inp.checked);
+      const res = await upsertPerm(u.id, perms);
+      showToast(res.ok? 'Kaydedildi' : 'Kaydedilemedi', res.ok);
     });
 
     tbody.appendChild(clone);
   });
 }
 
-window.addEventListener('DOMContentLoaded', loadData);
+async function bootstrap(){
+  // login yoksa çıkar
+  if(!localStorage.getItem('auth')){ window.location.href='login.html'; return; }
+
+  // Admin guard (admin değilse at)
+  const email = localStorage.getItem('user');
+  const { data: u } = await sb.from('users').select('id').eq('email', email).maybeSingle();
+  const { data: p } = await sb.from('user_permissions').select('admin').eq('user_id', u?.id).maybeSingle();
+  if(!p?.admin){ window.location.href='no-access.html'; return; }
+
+  const [users, permMap] = await Promise.all([fetchUsers(), fetchPerms()]);
+  renderRows(users, permMap);
+}
+
+window.addEventListener('DOMContentLoaded', bootstrap);
 </script>
 </body>
 </html>
