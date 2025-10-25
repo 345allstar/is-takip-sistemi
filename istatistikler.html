@@ -141,7 +141,7 @@
 </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
-  <!-- <body ...> satırının hemen altına yapıştır -->
+ <!-- <body ...> satırının hemen altına yapıştır -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const sb = supabase.createClient(
@@ -150,7 +150,7 @@ const sb = supabase.createClient(
 );
 
 // Bu sayfa için gerekli yetki
-const PAGE_KEY = 'DEGISTIR';
+const PAGE_KEY = 'istatistik';
 
 (async function guard(){
   if(!localStorage.getItem('auth')) { location.href='login.html'; return; }
@@ -164,9 +164,10 @@ const PAGE_KEY = 'DEGISTIR';
     .select('admin, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik')
     .eq('user_id', u.id).maybeSingle();
 
-  if(!p || (!p[PAGE_KEY = 'istatistik'] && !p.admin)) { location.href='no-access.html'; }
+  if(!p || (!p[PAGE_KEY] && !p.admin)) { location.href='no-access.html'; }
 })();
 </script>
+
   <!-- HEADER -->
   <header class="bg-white shadow-sm">
   <div class="mx-auto max-w-none w-full px-4 lg:px-8 py-3 flex items-center gap-3">
