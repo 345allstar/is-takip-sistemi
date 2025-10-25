@@ -98,7 +98,8 @@ const sb = supabase.createClient(
   </tr>
 </template>
 
-  <script>
+ <script>
+/* küçük yardımcılar */
 function showToast(msg, ok=true){
   const el = document.createElement('div');
   el.className = `fixed bottom-4 right-4 rounded-lg px-4 py-2 text-sm shadow ${ok?'bg-emerald-600 text-white':'bg-rose-600 text-white'}`;
@@ -106,17 +107,14 @@ function showToast(msg, ok=true){
   document.body.appendChild(el);
   setTimeout(()=>el.remove(), 1500);
 }
+function logout(){ localStorage.removeItem('auth'); localStorage.removeItem('user'); location.href='login.html'; }
 
-// Kullanıcıları ve izinleri çek
+/* verileri çek */
 async function fetchUsers(){
-  const { data, error } = await sb
-    .from('users')
-    .select('id, full_name, email')
-    .order('full_name', { ascending: true });
+  const { data, error } = await sb.from('users').select('id, full_name, email').order('full_name', { ascending: true });
   if(error){ console.error(error); showToast('Kullanıcılar yüklenemedi', false); return []; }
   return data || [];
 }
-
 async function fetchPerms(){
   const { data, error } = await sb
     .from('user_permissions')
@@ -127,62 +125,42 @@ async function fetchPerms(){
   return map;
 }
 
+/* kaydet — varsa UPDATE, yoksa INSERT; sonra geri oku */
 async function upsertPerm(userId, perms){
   const payload = { user_id: userId, ...perms };
   console.log('[SAVE] payload →', payload);
 
-  // 1) Bu kullanıcı için satır var mı?
+  // Satır var mı?
   const { data: existsRow, error: existsErr } = await sb
     .from('user_permissions')
     .select('user_id')
     .eq('user_id', userId)
     .maybeSingle();
-
-  if (existsErr) {
-    console.error('[SAVE] exists check error:', existsErr);
-    return { ok:false, error: existsErr };
-  }
+  if (existsErr) { console.error('[SAVE] exists check error:', existsErr); return { ok:false, error: existsErr }; }
 
   let writeErr = null;
-
   if (existsRow) {
-    // 2a) VARSA: UPDATE
-    const { error } = await sb
-      .from('user_permissions')
-      .update(perms)              // sadece alanlar
-      .eq('user_id', userId);
-    writeErr = error || null;
-    console.log('[SAVE] update →', error ?? 'ok');
+    const { error } = await sb.from('user_permissions').update(perms).eq('user_id', userId);
+    writeErr = error || null; console.log('[SAVE] update →', error ?? 'ok');
   } else {
-    // 2b) YOKSA: INSERT
-    const { error } = await sb
-      .from('user_permissions')
-      .insert(payload);
-    writeErr = error || null;
-    console.log('[SAVE] insert →', error ?? 'ok');
+    const { error } = await sb.from('user_permissions').insert(payload);
+    writeErr = error || null; console.log('[SAVE] insert →', error ?? 'ok');
   }
+  if (writeErr) { console.error('[SAVE] write error:', writeErr); return { ok:false, error: writeErr }; }
 
-  if (writeErr) {
-    console.error('[SAVE] write error:', writeErr);
-    return { ok:false, error: writeErr };
-  }
-
-  // 3) GERİ OKU (gerçekten yazılmış mı)
+  // Geri oku
   const { data: checkRow, error: checkErr } = await sb
     .from('user_permissions')
     .select('user_id, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin')
     .eq('user_id', userId)
     .maybeSingle();
-
-  if (checkErr) {
-    console.error('[SAVE] recheck error:', checkErr);
-    return { ok:true, data:null, note:'saved-but-recheck-failed' };
-  }
+  if (checkErr) { console.error('[SAVE] recheck error:', checkErr); return { ok:true, data:null }; }
 
   console.log('[SAVE] recheck row →', checkRow);
   return { ok:true, data: checkRow };
 }
 
+/* tabloyu çiz */
 function renderRows(users, permMap){
   const tbody = document.getElementById('tbody');
   const tpl = document.getElementById('row-template');
@@ -197,71 +175,41 @@ function renderRows(users, permMap){
     const defaults = { koord:false, yonetmen:false, kurgu:false, teknik_izleme:false, akademik_izleme:false, yazilim:false, istatistik:false, admin:false };
     const p = { ...defaults, ...(permMap[u.id]||{}) };
 
-    // başlangıç checkbox durumları
+    // checkbox başlangıcı
     clone.querySelectorAll('input[type="checkbox"]').forEach(inp=>{
       inp.checked = !!p[inp.dataset.key];
     });
 
-    // Kaydet butonu
+    // KAYDET
     clone.querySelector('.save-btn').addEventListener('click', async ()=>{
       const boxes = clone.querySelectorAll('input[type="checkbox"]');
       const perms = {};
       boxes.forEach(inp => perms[inp.dataset.key] = !!inp.checked);
 
-      // veritabanına yaz
       const res = await upsertPerm(u.id, perms);
-      if(!res.ok){
-        showToast('Kaydedilemedi', false);
-        return;
-      }
+      if(!res.ok){ showToast('Kaydedilemedi', false); return; }
 
-      // geri okunan değerle eşitle (gerçekten kaydolduğunu göster)
-      if (res.data) {
-        boxes.forEach(inp => { inp.checked = !!res.data[inp.dataset.key]; });
-      }
+      // geri okunan değerle eşitle
+      if (res.data) boxes.forEach(inp => { inp.checked = !!res.data[inp.dataset.key]; });
       showToast('Kaydedildi', true);
     });
 
     tbody.appendChild(clone);
   });
-  
-  // Kaydı gerçekten yazdığını doğrula (tekrar oku)
-  const { data: checkRow, error: checkErr } = await sb
-    .from('user_permissions')
-    .select('koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin')
-    .eq('user_id', u.id)
-    .maybeSingle();
-
-  if (checkErr) {
-    console.error('recheck error:', checkErr);
-    showToast('Kaydedildi (okuma hatası)', true);
-    return;
-  }
-
-  // Kutuları geri okunan değere göre güncelle (gözle görülür teyit)
-  boxes.forEach(inp => { inp.checked = !!checkRow[inp.dataset.key]; });
-
-  showToast('Kaydedildi', true);
-});
-
-    tbody.appendChild(clone);
-  });
 }
 
+/* giriş kontrolü + veri yükleme */
 async function bootstrap(){
-  // login yoksa çıkar
-  if(!localStorage.getItem('auth')){ window.location.href='login.html'; return; }
+  if(!localStorage.getItem('auth')){ location.href='login.html'; return; }
 
-  // Admin guard (admin değilse at)
   const email = localStorage.getItem('user');
   const { data: u } = await sb.from('users').select('id').eq('email', email).maybeSingle();
   const { data: p } = await sb.from('user_permissions').select('admin').eq('user_id', u?.id).maybeSingle();
-  if(!p?.admin){ window.location.href='no-access.html'; return; }
+  if(!p?.admin){ location.href='no-access.html'; return; }
 
   const [users, permMap] = await Promise.all([fetchUsers(), fetchPerms()]);
   renderRows(users, permMap);
 }
-
 window.addEventListener('DOMContentLoaded', bootstrap);
 </script>
 </body>
