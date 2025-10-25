@@ -16,7 +16,8 @@
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- <body ...> satırının hemen altına yapıştır -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const sb = supabase.createClient(
   "https://nwxgigtsadesqjgflblr.supabase.co",
@@ -24,7 +25,7 @@ const sb = supabase.createClient(
 );
 
 // Bu sayfa için gerekli yetki
-const PAGE_KEY = 'DEGISTIR';
+const PAGE_KEY = 'admin';
 
 (async function guard(){
   if(!localStorage.getItem('auth')) { location.href='login.html'; return; }
@@ -38,9 +39,10 @@ const PAGE_KEY = 'DEGISTIR';
     .select('admin, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik')
     .eq('user_id', u.id).maybeSingle();
 
-  if(!p || (!p[PAGE_KEY = 'admin'] && !p.admin)) { location.href='no-access.html'; }
+  if(!p || (!p[PAGE_KEY] && !p.admin)) { location.href='no-access.html'; }
 })();
 </script>
+
   <!-- Üst bar -->
   <header class="sticky top-0 z-10 bg-white/90 backdrop-blur border-b">
     <div class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
