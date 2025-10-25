@@ -33,7 +33,7 @@ const sb = supabase.createClient(
 
   <!-- Üst bar -->
   <header class="sticky top-0 z-10 bg-white/90 backdrop-blur border-b">
-    <div class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
+    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-2">
         <img src="logo.png" class="h-6" alt="logo" onerror="this.style.display='none'">
         <h1 class="text-lg font-semibold">Yönetim Paneli</h1>
@@ -45,7 +45,7 @@ const sb = supabase.createClient(
     </div>
   </header>
 
-  <main class="mx-auto max-w-6xl px-4 py-8">
+  <main class="mx-auto max-w-7xl px-4 py-8">
     <div class="card rounded-2xl bg-white p-6">
       <h2 class="text-2xl font-semibold mb-6">Kullanıcı Yetki Yönetimi</h2>
 
@@ -54,21 +54,21 @@ const sb = supabase.createClient(
         Supabase bilgileri bulunamadı. Tablo demo verisiyle gösteriliyor. <b>appConfig</b> bölümüne SUPABASE_URL ve SUPABASE_ANON_KEY girerseniz canlı veriyi yükler.
       </div>
 
-      <div class="overflow-x-auto">
-        <table class="w-full table-auto text-sm">
+      <div>
+        <table class="w-full table-fixed text-[13px]">
           <thead>
   <tr class="text-gray-500">
-    <th class="th px-4 py-3 text-left">AD SOYAD</th>
-    <th class="th px-4 py-3 text-left">E-POSTA</th>
-    <th class="th px-4 py-3">Koordinatör</th>
-    <th class="th px-4 py-3">Yönetmen</th>
-    <th class="th px-4 py-3">Kurgu</th>
-    <th class="th px-4 py-3">Teknik İzleme</th>
-    <th class="th px-4 py-3">Akademik İzleme</th>
-    <th class="th px-4 py-3">Yazılım</th>
-    <th class="th px-4 py-3">İstatistik</th>
-    <th class="th px-4 py-3">Admin</th>
-    <th class="th px-4 py-3 text-right">İŞLEMLER</th>
+    <th class="th px-2 py-2 text-left">AD SOYAD</th>
+    <th class="th px-2 py-2 text-left">E-POSTA</th>
+    <th class="th px-2 py-2">Koordinatör</th>
+    <th class="th px-2 py-2">Yönetmen</th>
+    <th class="th px-2 py-2">Kurgu</th>
+    <th class="th px-2 py-2">Teknik İzleme</th>
+    <th class="th px-2 py-2">Akademik İzleme</th>
+    <th class="th px-2 py-2">Yazılım</th>
+    <th class="th px-2 py-2">İstatistik</th>
+    <th class="th px-2 py-2">Admin</th>
+    <th class="th px-2 py-2 text-right">İŞLEMLER</th>
   </tr>
 </thead>
 
