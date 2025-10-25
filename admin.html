@@ -16,6 +16,21 @@
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
+  <script>
+const sb = supabase.createClient(
+  "https://nwxgigtsadesqjgflblr.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4"
+);
+
+(async function guardAdmin(){
+  if(!localStorage.getItem('auth')) { location.href='login.html'; return; }
+  const email = localStorage.getItem('user');
+  const { data: u } = await sb.from('users').select('id').eq('email', email).maybeSingle();
+  const { data: p } = await sb.from('user_permissions').select('admin').eq('user_id', u?.id).maybeSingle();
+  if(!p?.admin){ location.href='no-access.html'; }
+})();
+</script>
+
   <!-- <body ...> satırının hemen altına yapıştır -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -216,5 +231,63 @@ const PAGE_KEY = 'admin';
 
     bootstrap();
   </script>
+  <script>
+function showToast(msg, ok=true){
+  const el = document.createElement('div');
+  el.className = `fixed bottom-4 right-4 rounded-lg px-4 py-2 text-sm shadow ${ok?'bg-emerald-600 text-white':'bg-rose-600 text-white'}`;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 1500);
+}
+
+// kullanıcıları ve izinleri çek
+async function loadData(){
+  const { data: users, error: e1 } = await sb.from('users')
+    .select('id, full_name, email').order('full_name');
+  if(e1){ showToast('Kullanıcılar yüklenemedi', false); return; }
+
+  const { data: perms, error: e2 } = await sb.from('user_permissions')
+    .select('user_id, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin');
+  if(e2){ showToast('Yetkiler yüklenemedi', false); return; }
+
+  const map = Object.fromEntries((perms||[]).map(r=>[r.user_id, r]));
+  renderRows(users||[], map);
+}
+
+function renderRows(users, permMap){
+  const tbody = document.getElementById('tbody');
+  const tpl = document.getElementById('row-template');
+  tbody.innerHTML = '';
+
+  users.forEach(u=>{
+    const clone = tpl.content.cloneNode(true);
+    const tds = clone.querySelectorAll('td');
+    tds[0].textContent = u.full_name || '—';
+    tds[1].textContent = u.email || '—';
+
+    const defaults = { koord:false, yonetmen:false, kurgu:false, teknik_izleme:false, akademik_izleme:false, yazilim:false, istatistik:false, admin:false };
+    const p = { ...defaults, ...(permMap[u.id]||{}) };
+
+    clone.querySelectorAll('input[type="checkbox"]').forEach(inp=>{
+      const key = inp.dataset.key;        // koord, yonetmen, ...
+      inp.checked = !!p[key];
+    });
+
+    clone.querySelector('.save-btn').addEventListener('click', async ()=>{
+      const box = clone.querySelectorAll('input[type="checkbox"]');
+      const perms = {};
+      box.forEach(inp => perms[inp.dataset.key] = inp.checked);
+
+      const payload = { user_id:u.id, ...perms };
+      const { error } = await sb.from('user_permissions').upsert(payload).select();
+      showToast(error ? 'Kaydedilemedi' : 'Kaydedildi', !error);
+    });
+
+    tbody.appendChild(clone);
+  });
+}
+
+window.addEventListener('DOMContentLoaded', loadData);
+</script>
 </body>
 </html>
