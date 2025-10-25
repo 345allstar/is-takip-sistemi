@@ -90,5 +90,42 @@ if (!localStorage.getItem('auth')) {
         </div>
 
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb = supabase.createClient(
+  "https://nwxgigtsadesqjgflblr.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4"
+);
+
+// Bu linklere göre yetki anahtarı
+const tileMap = {
+  "genel-cekim.html":       "koord",
+  "yonetmen-paneli.html":   "yonetmen",
+  "kurgu-kontrol.html":     "kurgu",
+  "teknik-izleme.html":     "teknik_izleme",
+  "akademik-izleme.html":   "akademik_izleme",
+  "yazilim-yukleme.html":   "yazilim",
+  "istatistikler.html":     "istatistik",
+  "admin.html":             "admin"
+};
+
+(async function filterTiles(){
+  const email = localStorage.getItem('user');
+  if(!email) return;
+
+  const { data: u } = await sb.from('users').select('id').eq('email', email).maybeSingle();
+  const { data: p } = await sb.from('user_permissions')
+    .select('admin, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik')
+    .eq('user_id', u?.id).maybeSingle();
+
+  document.querySelectorAll('a[href]').forEach(a=>{
+    const href = a.getAttribute('href');
+    const key = tileMap[href];
+    if(!key) return; // menü dışındaki linkler
+    const allowed = p?.admin || p?.[key];
+    if(!allowed) a.style.display = 'none';
+  });
+})();
+</script>
 </body>
 </html>
