@@ -127,17 +127,23 @@ async function fetchPerms(){
 
 /* kaydet — varsa UPDATE, yoksa INSERT; sonra geri oku */
 async function upsertPerm(userId, perms){
+  // Tek bir UPSERT: varsa update, yoksa insert
   const payload = { user_id: userId, ...perms };
-  console.log('[SAVE] payload →', payload);
+  console.log('[UPSERT] sending:', payload);
 
-  // Satır var mı?
-  const { data: existsRow, error: existsErr } = await sb
+  const { data, error } = await sb
     .from('user_permissions')
-    .select('user_id')
-    .eq('user_id', userId)
-    .maybeSingle();
-  if (existsErr) { console.error('[SAVE] exists check error:', existsErr); return { ok:false, error: existsErr }; }
+    .upsert(payload, { onConflict: 'user_id' })   // <- ÇAKIŞMADA GÜNCELLE
+    .select('user_id, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin')
+    .single();
 
+  if (error) {
+    console.error('[UPSERT] error:', error);
+    return { ok:false, error };
+  }
+  console.log('[UPSERT] ok, row:', data);
+  return { ok:true, data };
+}
   let writeErr = null;
   if (existsRow) {
     const { error } = await sb.from('user_permissions').update(perms).eq('user_id', userId);
@@ -181,18 +187,31 @@ function renderRows(users, permMap){
     });
 
     // KAYDET
-    clone.querySelector('.save-btn').addEventListener('click', async ()=>{
-      const boxes = clone.querySelectorAll('input[type="checkbox"]');
-      const perms = {};
-      boxes.forEach(inp => perms[inp.dataset.key] = !!inp.checked);
+   clone.querySelector('.save-btn').addEventListener('click', async ()=>{
+  const boxes = clone.querySelectorAll('input[type="checkbox"]');
+  const perms = {};
+  boxes.forEach(inp => perms[inp.dataset.key] = !!inp.checked);
 
-      const res = await upsertPerm(u.id, perms);
-      if(!res.ok){ showToast('Kaydedilemedi', false); return; }
+  // UPSERT + geri okuma
+  const res = await upsertPerm(u.id, perms);
 
-      // geri okunan değerle eşitle
-      if (res.data) boxes.forEach(inp => { inp.checked = !!res.data[inp.dataset.key]; });
-      showToast('Kaydedildi', true);
-    });
+  if(!res.ok){
+    showToast('Kaydedilemedi', false);
+    // HATA METNİNİ EKRANDA GÖSTER (debug için)
+    alert('Kaydet hatası:\n' + (res.error?.message || JSON.stringify(res.error)));
+    return;
+  }
+
+  if(!res.data){
+    showToast('Kaydedildi (teyit okunamadı)', true);
+    return;
+  }
+
+  // Geri okunan değerle kutuları eşitle (gözle teyit)
+  boxes.forEach(inp => { inp.checked = !!res.data[inp.dataset.key]; });
+
+  showToast('Kaydedildi', true);
+});
 
     tbody.appendChild(clone);
   });
