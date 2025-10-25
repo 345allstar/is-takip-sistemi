@@ -124,30 +124,16 @@ async function fetchPerms(){
 
 /* 1) satır yoksa oluştur (default false)  2) sonra güncelle  3) geri oku */
 async function savePerms(userId, perms){
-  // 1) INSERT (yoksa)
-  const ensurePayload = { user_id:userId, koord:false, yonetmen:false, kurgu:false, teknik_izleme:false, akademik_izleme:false, yazilim:false, istatistik:false, admin:false };
-  const { error: insErr } = await sb
+  const payload = { user_id: userId, ...perms };
+  const { data, error } = await sb
     .from('user_permissions')
-    .insert(ensurePayload, { returning:'minimal' })
-    .throwOnError();  // varsa hata fırlatır; var olan satır için conflict üretirse sessiz geçer
-
-  // 2) UPDATE (daima)
-  const { error: updErr } = await sb
-    .from('user_permissions')
-    .update(perms)
-    .eq('user_id', userId);
-  if (updErr) { throw updErr; }
-
-  // 3) geri oku
-  const { data: row, error: selErr } = await sb
-    .from('user_permissions')
+    .upsert(payload, { onConflict: 'user_id' })
     .select('koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin')
-    .eq('user_id', userId)
     .single();
-  if (selErr) { throw selErr; }
-
-  return row;
+  if (error) throw error;
+  return data;
 }
+
 
 /* tabloyu çiz */
 function renderRows(users, permMap){
@@ -170,27 +156,29 @@ function renderRows(users, permMap){
     });
 
     // KAYDET
-    clone.querySelector('.save-btn').addEventListener('click', async ()=>{
-      const btn = clone.querySelector('.save-btn');
-      btn.disabled = true;
-      try{
-        const boxes = clone.querySelectorAll('input[type="checkbox"]');
-        const perms = {}; boxes.forEach(inp => perms[inp.dataset.key] = !!inp.checked);
+   clone.querySelector('.save-btn').addEventListener('click', async (e)=>{
+  const btn = e.currentTarget;                    // butonun kendisi
+  const rowEl = btn.closest('tr');                // ilgili satır
+  const boxes = rowEl.querySelectorAll('input[type="checkbox"]');
 
-        const saved = await savePerms(u.id, perms);  // <- 1)insert 2)update 3)select
+  btn.disabled = true;
+  try{
+    const perms = {};
+    boxes.forEach(inp => perms[inp.dataset.key] = !!inp.checked);
 
-        // geri okunan değerle eşitle (gözle teyit)
-        boxes.forEach(inp => { inp.checked = !!saved[inp.dataset.key]; });
+    const saved = await savePerms(u.id, perms);   // UPSERT + select
 
-        showToast('Kaydedildi', true);
-      }catch(e){
-        console.error('SAVE ERROR:', e);
-        alert('Kaydet hatası: ' + (e?.message || JSON.stringify(e)));
-        showToast('Kaydedilemedi', false);
-      }finally{
-        btn.disabled = false;
-      }
-    });
+    // geri okunan değerle eşitle (gözle teyit)
+    boxes.forEach(inp => { inp.checked = !!saved[inp.dataset.key]; });
+    showToast('Kaydedildi', true);
+  }catch(e){
+    console.error('SAVE ERROR:', e);
+    alert('Kaydet hatası: ' + (e?.message || JSON.stringify(e)));
+    showToast('Kaydedilemedi', false);
+  }finally{
+    btn.disabled = false;
+  }
+});
 
     tbody.appendChild(clone);
   });
