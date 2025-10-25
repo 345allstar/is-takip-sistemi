@@ -16,7 +16,7 @@
     .tab-btn[aria-selected="true"]{ background-color:#eef2ff; color:#4338ca; }
     .input{ @apply w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-700 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100; }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 </head>
 <body class="bg-gray-50">
   <div class="min-h-full grid place-items-center py-8 px-4">
@@ -106,107 +106,57 @@
     <p class="mt-6 text-xs text-gray-400">© 2025 ÜçDörtBeş All Star</p>
   </div>
 
-  <script>
-    function togglePassword(inputId, btn){
-      const input = document.getElementById(inputId);
-      const icon = btn.querySelector('i');
-      const isPassword = input.type === 'password';
-      input.type = isPassword ? 'text' : 'password';
-      icon.classList.toggle('fa-eye');
-      icon.classList.toggle('fa-eye-slash');
-      btn.setAttribute('aria-label', isPassword ? 'Şifreyi gizle' : 'Şifreyi göster');
-    }
-
-    function switchTab(which){
-      const loginTab = document.getElementById('tab-login');
-      const registerTab = document.getElementById('tab-register');
-      const loginForm = document.getElementById('form-login');
-      const registerForm = document.getElementById('form-register');
-      const altText = document.getElementById('alt-text-register');
-      const altLink = document.getElementById('alt-link');
-
-      if(which === 'login'){
-        loginTab.setAttribute('aria-selected','true');
-        registerTab.setAttribute('aria-selected','false');
-        loginForm.classList.remove('hidden');
-        registerForm.classList.add('hidden');
-        altText.textContent = 'Hesabınız yok mu?';
-        altLink.textContent = 'Kayıt Olun';
-      } else {
-        loginTab.setAttribute('aria-selected','false');
-        registerTab.setAttribute('aria-selected','true');
-        loginForm.classList.add('hidden');
-        registerForm.classList.remove('hidden');
-        altText.textContent = 'Zaten hesabınız var mı?';
-        altLink.textContent = 'Giriş Yapın';
-      }
-    }
-
-    function toggleForms(){
-      const isLoginVisible = !document.getElementById('form-login').classList.contains('hidden');
-      switchTab(isLoginVisible ? 'register' : 'login');
-    }
-
-    // URL hash ile doğrudan forma geçiş (#kayit)
-    if(location.hash === '#kayit' || location.hash === '#register'){
-      switchTab('register');
-    }
-    // Giriş formu -> giriş başarılı say ve index'e git
-document.getElementById('form-login').addEventListener('submit', function (e) {
-  e.preventDefault();
-  // basit oturum işareti
-  localStorage.setItem('auth', 'true');
-
-  // (opsiyonel) e-posta/dep. bilgilerini saklamak isterseniz:
-  const emailOrUser = this.querySelector('[name="username"]').value;
-  localStorage.setItem('user', emailOrUser);
-
-  // index dosyanızın adı neyse onu yazın:
-  window.location.href = 'index.html';
-});
-
-// Kayıt formu -> kayıt başarılı say ve index'e git
-document.getElementById('form-register').addEventListener('submit', function (e) {
-  e.preventDefault();
-  localStorage.setItem('auth', 'true');
-  localStorage.setItem('user', this.querySelector('[name="email"]').value);
-  localStorage.setItem('department', this.querySelector('[name="department"]').value);
-
-  window.location.href = 'index.html';
-});
-
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
 const sb = supabase.createClient(
   "https://nwxgigtsadesqjgflblr.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4"
 );
 
-// Kayıt: users tablosuna upsert; sonra dashboard'a git
+// --- LOGIN (Giriş) ---
+document.getElementById('form-login').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = e.target.querySelector('[name="username"]').value.trim();
+
+  // Basit doğrulama: e-posta formatı bekleyelim
+  if (!email || !email.includes('@')) {
+    alert('Lütfen e-posta adresinizi girin.');
+    return;
+  }
+
+  // Kullanıcı yoksa oluştur (girişten de garanti altına alıyoruz)
+  await sb.from('users')
+    .upsert({ email, full_name: email.split('@')[0] }, { onConflict: 'email' })
+    .select('id')
+    .single();
+
+  localStorage.setItem('auth', 'true');
+  localStorage.setItem('user', email);
+  window.location.href = 'index.html';
+});
+
+// --- REGISTER (Kayıt) ---
 document.getElementById('form-register').addEventListener('submit', async (e) => {
   e.preventDefault();
   const email = e.target.querySelector('[name="email"]').value.trim();
   const department = e.target.querySelector('[name="department"]').value;
 
-  const { data, error } = await sb.from('users')
+  // 1) users tablosuna upsert
+  const { data: userRow, error } = await sb.from('users')
     .upsert({ email, full_name: email.split('@')[0], department }, { onConflict: 'email' })
     .select('id')
     .single();
+  if (error) { alert('Kayıt sırasında hata oldu.'); return; }
 
-  // Basit oturum işareti
+  // 2) user_permissions tablosunda kayıt yoksa ekle (tüm yetkiler false)
+  await sb.from('user_permissions')
+    .upsert({ user_id: userRow.id }, { onConflict: 'user_id' });
+
+  // 3) Oturum işareti ve yönlendirme
   localStorage.setItem('auth','true');
   localStorage.setItem('user', email);
-
-  // Girişten sonra index'e git
-  location.href = 'index.html';
+  window.location.href = 'index.html';
 });
-
-// Giriş: e-postayı sakla ve index'e git (auth sistemi eklemek istersen sonra bağlarız)
-document.getElementById('form-login').addEventListener('submit', (e) => {
-  e.preventDefault();
-  const emailOrUser = e.target.querySelector('[name="username"]').value.trim();
-  localStorage.setItem('auth','true');
-  localStorage.setItem('user', emailOrUser);
-  location.href = 'index.html';
-});
-  </script>
+</script>
 </body>
 </html>
