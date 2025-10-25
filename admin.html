@@ -197,28 +197,34 @@ function renderRows(users, permMap){
     const defaults = { koord:false, yonetmen:false, kurgu:false, teknik_izleme:false, akademik_izleme:false, yazilim:false, istatistik:false, admin:false };
     const p = { ...defaults, ...(permMap[u.id]||{}) };
 
+    // başlangıç checkbox durumları
     clone.querySelectorAll('input[type="checkbox"]').forEach(inp=>{
       inp.checked = !!p[inp.dataset.key];
     });
 
+    // Kaydet butonu
     clone.querySelector('.save-btn').addEventListener('click', async ()=>{
-  const boxes = clone.querySelectorAll('input[type="checkbox"]');
-  const perms = {};
-  boxes.forEach(inp => perms[inp.dataset.key] = !!inp.checked);
+      const boxes = clone.querySelectorAll('input[type="checkbox"]');
+      const perms = {};
+      boxes.forEach(inp => perms[inp.dataset.key] = !!inp.checked);
 
-  const res = await upsertPerm(u.id, perms);
+      // veritabanına yaz
+      const res = await upsertPerm(u.id, perms);
+      if(!res.ok){
+        showToast('Kaydedilemedi', false);
+        return;
+      }
 
-  if(!res.ok){
-    showToast('Kaydedilemedi', false);
-    return;
-  }
+      // geri okunan değerle eşitle (gerçekten kaydolduğunu göster)
+      if (res.data) {
+        boxes.forEach(inp => { inp.checked = !!res.data[inp.dataset.key]; });
+      }
+      showToast('Kaydedildi', true);
+    });
 
-  // Sunucudan geri okunan değer ile kutuları eşitle
-  if (res.data) {
-    boxes.forEach(inp => { inp.checked = !!res.data[inp.dataset.key]; });
-  }
-  showToast('Kaydedildi', true);
-});
+    tbody.appendChild(clone);
+  });
+  
   // Kaydı gerçekten yazdığını doğrula (tekrar oku)
   const { data: checkRow, error: checkErr } = await sb
     .from('user_permissions')
