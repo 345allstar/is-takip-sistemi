@@ -181,25 +181,36 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = 'index.html';
   });
 
-  // REGISTER
-  document.getElementById('form-register').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = e.target.querySelector('[name="email"]').value.trim();
-    const department = e.target.querySelector('[name="department"]').value;
+  // --- REGISTER (Kayıt) ---
+document.getElementById('form-register').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = e.target.querySelector('[name="email"]').value.trim();
+  const department = e.target.querySelector('[name="department"]').value;
 
-    const { data: userRow, error } = await sb.from('users')
-      .upsert({ email, full_name: email.split('@')[0], department }, { onConflict: 'email' })
-      .select('id')
-      .single();
-    if (error) { alert('Kayıt sırasında hata oldu.'); return; }
+  const { data: userRow, error } = await sb.from('users')
+    .upsert({ email, full_name: email.split('@')[0], department }, { onConflict: 'email' })
+    .select('id')
+    .single();
 
-    // user_permissions’ta yoksa boş satır oluştur (tüm yetkiler false)
-    await sb.from('user_permissions').upsert({ user_id: userRow.id }, { onConflict: 'user_id' });
+  if (error) {
+    console.error('Supabase users upsert error:', error);   // <— HATAYI KONSOLA YAZ
+    alert('Kayıt sırasında hata oldu.');
+    return;
+  }
 
-    localStorage.setItem('auth','true');
-    localStorage.setItem('user', email);
-    window.location.href = 'index.html';
-  });
+  const { error: permErr } = await sb.from('user_permissions')
+    .upsert({ user_id: userRow.id }, { onConflict: 'user_id' });
+
+  if (permErr) {
+    console.error('Supabase user_permissions upsert error:', permErr);   // <— HATAYI KONSOLA YAZ
+    alert('Yetki kaydı sırasında hata oldu.');
+    return;
+  }
+
+  localStorage.setItem('auth','true');
+  localStorage.setItem('user', email);
+  window.location.href = 'index.html';
+});
 });
 </script>
 </body>
