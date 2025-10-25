@@ -55,7 +55,7 @@
             <input type="checkbox" name="remember" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
             Beni hatırla
           </label>
-          <a href="#" class="text-sm font-medium text-indigo-600 hover:underline">Şifremi Unuttum</a>
+          <a id="forgot-link" href="#" class="text-sm font-medium text-indigo-600 hover:underline">Şifremi Unuttum</a>
         </div>
         <button type="submit" class="mt-2 w-full rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200">Giriş Yap</button>
       </form>
@@ -210,6 +210,20 @@ document.getElementById('form-register').addEventListener('submit', async (e) =>
   localStorage.setItem('auth','true');
   localStorage.setItem('user', email);
   window.location.href = 'index.html';
+  // Şifremi Unuttum (demo): email sor, users'ta var mı kontrol et
+document.getElementById('forgot-link').addEventListener('click', async (e) => {
+  e.preventDefault();
+  const email = prompt('Lütfen e-posta adresinizi girin:');
+  if (!email || !email.includes('@')) return;
+
+  const { data: u } = await sb.from('users').select('id').eq('email', email).maybeSingle();
+  if (!u) {
+    alert('Bu e-posta ile kayıt bulunamadı.');
+    return;
+  }
+  // Burada Supabase Auth kullanmadığımız için gerçek reset maili gönderemiyoruz.
+  // Bilgi amaçlı:
+  alert('Kayıt bulundu. Şifre sıfırlama için yönetici ile iletişime geçiniz.');
 });
 });
 </script>
