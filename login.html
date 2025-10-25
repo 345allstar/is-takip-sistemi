@@ -16,6 +16,7 @@
     .tab-btn[aria-selected="true"]{ background-color:#eef2ff; color:#4338ca; }
     .input{ @apply w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-700 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100; }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-50">
   <div class="min-h-full grid place-items-center py-8 px-4">
@@ -173,7 +174,39 @@ document.getElementById('form-register').addEventListener('submit', function (e)
 
   window.location.href = 'index (1).html';
 });
-  
+
+const sb = supabase.createClient(
+  "https://nwxgigtsadesqjgflblr.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4"
+);
+
+// Kayıt: users tablosuna upsert; sonra dashboard'a git
+document.getElementById('form-register').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = e.target.querySelector('[name="email"]').value.trim();
+  const department = e.target.querySelector('[name="department"]').value;
+
+  const { data, error } = await sb.from('users')
+    .upsert({ email, full_name: email.split('@')[0], department }, { onConflict: 'email' })
+    .select('id')
+    .single();
+
+  // Basit oturum işareti
+  localStorage.setItem('auth','true');
+  localStorage.setItem('user', email);
+
+  // Girişten sonra index'e git
+  location.href = 'index (2).html';
+});
+
+// Giriş: e-postayı sakla ve index'e git (auth sistemi eklemek istersen sonra bağlarız)
+document.getElementById('form-login').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const emailOrUser = e.target.querySelector('[name="username"]').value.trim();
+  localStorage.setItem('auth','true');
+  localStorage.setItem('user', emailOrUser);
+  location.href = 'index (2).html';
+});
   </script>
 </body>
 </html>
