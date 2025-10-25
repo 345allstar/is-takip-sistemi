@@ -98,7 +98,7 @@ const sb = supabase.createClient(
   </tr>
 </template>
 
- <script>
+<script>
 /* küçük yardımcılar */
 function showToast(msg, ok=true){
   const el = document.createElement('div');
@@ -107,7 +107,6 @@ function showToast(msg, ok=true){
   document.body.appendChild(el);
   setTimeout(()=>el.remove(), 1500);
 }
-function logout(){ localStorage.removeItem('auth'); localStorage.removeItem('user'); location.href='login.html'; }
 
 /* verileri çek */
 async function fetchUsers(){
@@ -120,31 +119,36 @@ async function fetchPerms(){
     .from('user_permissions')
     .select('user_id, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin');
   if(error){ console.error(error); showToast('Yetkiler yüklenemedi', false); return {}; }
-  const map = {};
-  (data||[]).forEach(r=>{ map[r.user_id] = r; });
-  return map;
+  const map = {}; (data||[]).forEach(r=>{ map[r.user_id] = r; }); return map;
 }
 
-/* kaydet — varsa UPDATE, yoksa INSERT; sonra geri oku */
-async function upsertPerm(userId, perms){
-  // Tek bir UPSERT: varsa update, yoksa insert
-  const payload = { user_id: userId, ...perms };
-  console.log('[UPSERT] sending:', payload);
-
-  const { data, error } = await sb
+/* 1) satır yoksa oluştur (default false)  2) sonra güncelle  3) geri oku */
+async function savePerms(userId, perms){
+  // 1) INSERT (yoksa)
+  const ensurePayload = { user_id:userId, koord:false, yonetmen:false, kurgu:false, teknik_izleme:false, akademik_izleme:false, yazilim:false, istatistik:false, admin:false };
+  const { error: insErr } = await sb
     .from('user_permissions')
-    .upsert(payload, { onConflict: 'user_id' })   // <- ÇAKIŞMADA GÜNCELLE
-    .select('user_id, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin')
-    .single();
+    .insert(ensurePayload, { returning:'minimal' })
+    .throwOnError();  // varsa hata fırlatır; var olan satır için conflict üretirse sessiz geçer
 
-  if (error) {
-    console.error('[UPSERT] error:', error);
-    return { ok:false, error };
-  }
-  console.log('[UPSERT] ok, row:', data);
-  return { ok:true, data };
+  // 2) UPDATE (daima)
+  const { error: updErr } = await sb
+    .from('user_permissions')
+    .update(perms)
+    .eq('user_id', userId);
+  if (updErr) { throw updErr; }
+
+  // 3) geri oku
+  const { data: row, error: selErr } = await sb
+    .from('user_permissions')
+    .select('koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin')
+    .eq('user_id', userId)
+    .single();
+  if (selErr) { throw selErr; }
+
+  return row;
 }
-  
+
 /* tabloyu çiz */
 function renderRows(users, permMap){
   const tbody = document.getElementById('tbody');
@@ -160,37 +164,33 @@ function renderRows(users, permMap){
     const defaults = { koord:false, yonetmen:false, kurgu:false, teknik_izleme:false, akademik_izleme:false, yazilim:false, istatistik:false, admin:false };
     const p = { ...defaults, ...(permMap[u.id]||{}) };
 
-    // checkbox başlangıcı
+    // checkboxları başlat
     clone.querySelectorAll('input[type="checkbox"]').forEach(inp=>{
       inp.checked = !!p[inp.dataset.key];
     });
 
     // KAYDET
-   clone.querySelector('.save-btn').addEventListener('click', async ()=>{
-  const boxes = clone.querySelectorAll('input[type="checkbox"]');
-  const perms = {};
-  boxes.forEach(inp => perms[inp.dataset.key] = !!inp.checked);
+    clone.querySelector('.save-btn').addEventListener('click', async ()=>{
+      const btn = clone.querySelector('.save-btn');
+      btn.disabled = true;
+      try{
+        const boxes = clone.querySelectorAll('input[type="checkbox"]');
+        const perms = {}; boxes.forEach(inp => perms[inp.dataset.key] = !!inp.checked);
 
-  // UPSERT + geri okuma
-  const res = await upsertPerm(u.id, perms);
+        const saved = await savePerms(u.id, perms);  // <- 1)insert 2)update 3)select
 
-  if(!res.ok){
-    showToast('Kaydedilemedi', false);
-    // HATA METNİNİ EKRANDA GÖSTER (debug için)
-    alert('Kaydet hatası:\n' + (res.error?.message || JSON.stringify(res.error)));
-    return;
-  }
+        // geri okunan değerle eşitle (gözle teyit)
+        boxes.forEach(inp => { inp.checked = !!saved[inp.dataset.key]; });
 
-  if(!res.data){
-    showToast('Kaydedildi (teyit okunamadı)', true);
-    return;
-  }
-
-  // Geri okunan değerle kutuları eşitle (gözle teyit)
-  boxes.forEach(inp => { inp.checked = !!res.data[inp.dataset.key]; });
-
-  showToast('Kaydedildi', true);
-});
+        showToast('Kaydedildi', true);
+      }catch(e){
+        console.error('SAVE ERROR:', e);
+        alert('Kaydet hatası: ' + (e?.message || JSON.stringify(e)));
+        showToast('Kaydedilemedi', false);
+      }finally{
+        btn.disabled = false;
+      }
+    });
 
     tbody.appendChild(clone);
   });
