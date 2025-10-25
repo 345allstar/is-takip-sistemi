@@ -40,7 +40,7 @@ const sb = supabase.createClient(
 );
 
 // Bu sayfa için gerekli yetki
-const PAGE_KEY = 'DEGISTIR';
+const PAGE_KEY = 'kurgu';
 
 (async function guard(){
   if(!localStorage.getItem('auth')) { location.href='login.html'; return; }
@@ -54,7 +54,7 @@ const PAGE_KEY = 'DEGISTIR';
     .select('admin, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik')
     .eq('user_id', u.id).maybeSingle();
 
-  if(!p || (!p[PAGE_KEY = 'kurgu'] && !p.admin)) { location.href='no-access.html'; }
+  if(!p || (!p[PAGE_KEY] && !p.admin)) { location.href='no-access.html'; }
 })();
 </script>
     <div id="notification-container"></div>
