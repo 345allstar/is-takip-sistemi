@@ -29,6 +29,14 @@ if (!localStorage.getItem('auth')) {
   window.location.href = 'login.html';
 }
 </script>
+<!-- Üst sağ köşe: Çıkış -->
+<div class="fixed top-3 right-3 z-50">
+  <button
+    onclick="localStorage.removeItem('auth'); localStorage.removeItem('user'); window.location.href='login.html';"
+    class="rounded-lg bg-rose-500 text-white px-3 py-2 text-sm font-semibold hover:bg-rose-600 shadow">
+    Çıkış Yap
+  </button>
+</div>
 
     <div class="min-h-screen flex flex-col items-center justify-center p-4">
 
