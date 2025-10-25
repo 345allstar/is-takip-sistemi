@@ -34,10 +34,6 @@ const sb = supabase.createClient(
   <!-- <body ...> satırının hemen altına yapıştır -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const sb = supabase.createClient(
-  "https://nwxgigtsadesqjgflblr.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4"
-);
 
 // Bu sayfa için gerekli yetki
 const PAGE_KEY = 'admin';
@@ -180,7 +176,7 @@ const PAGE_KEY = 'admin';
       if(useDemo) return demoPerms;
       const { data, error } = await supabase
         .from('user_permissions')
-        .select('user_id, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, admin');
+        .select('user_id, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin');
       if(error){ console.error(error); showToast('Yetkiler yüklenemedi', false); return {}; }
       // Map'e çevir
       const map = {}; data.forEach(r=>{ map[r.user_id] = r; });
@@ -190,7 +186,7 @@ const PAGE_KEY = 'admin';
     async function upsertPerm(userId, perms){
       if(useDemo){ demoPerms[userId] = perms; return {ok:true}; }
       const payload = { user_id:userId, ...perms };
-      const { error } = await supabase.from('user_permissions').upsert(payload).select();
+      const { error } = await sb.from('user_permissions').upsert(payload).select();
       if(error){ console.error(error); return {ok:false, error}; }
       return {ok:true};
     }
@@ -205,7 +201,7 @@ const PAGE_KEY = 'admin';
         const tds = clone.querySelectorAll('td');
         tds[0].textContent = u.full_name || '—';
         tds[1].textContent = u.email || '—';
-        const defaults = {koord:false, yonetmen:false, kurgu:false, teknik_izleme:false, akademik_izleme:false, yazilim:false, admin:false};
+        const defaults = {koord:false, yonetmen:false, kurgu:false, teknik_izleme:false, akademik_izleme:false, yazilim:false, istatistik:false, admin:false};
         const p = { ...defaults, ...(permMap[u.id]||{}) };
         clone.querySelectorAll('input[type="checkbox"]').forEach(inp=>{
           inp.checked = !!p[inp.dataset.key];
