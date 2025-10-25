@@ -196,7 +196,7 @@ document.getElementById('form-register').addEventListener('submit', async (e) =>
   localStorage.setItem('user', email);
 
   // Girişten sonra index'e git
-  location.href = 'index (2).html';
+  location.href = 'index.html';
 });
 
 // Giriş: e-postayı sakla ve index'e git (auth sistemi eklemek istersen sonra bağlarız)
@@ -205,7 +205,7 @@ document.getElementById('form-login').addEventListener('submit', (e) => {
   const emailOrUser = e.target.querySelector('[name="username"]').value.trim();
   localStorage.setItem('auth','true');
   localStorage.setItem('user', emailOrUser);
-  location.href = 'index (2).html';
+  location.href = 'index.html';
 });
   </script>
 </body>
