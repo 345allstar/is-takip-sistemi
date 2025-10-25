@@ -144,28 +144,7 @@ async function upsertPerm(userId, perms){
   console.log('[UPSERT] ok, row:', data);
   return { ok:true, data };
 }
-  let writeErr = null;
-  if (existsRow) {
-    const { error } = await sb.from('user_permissions').update(perms).eq('user_id', userId);
-    writeErr = error || null; console.log('[SAVE] update →', error ?? 'ok');
-  } else {
-    const { error } = await sb.from('user_permissions').insert(payload);
-    writeErr = error || null; console.log('[SAVE] insert →', error ?? 'ok');
-  }
-  if (writeErr) { console.error('[SAVE] write error:', writeErr); return { ok:false, error: writeErr }; }
-
-  // Geri oku
-  const { data: checkRow, error: checkErr } = await sb
-    .from('user_permissions')
-    .select('user_id, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin')
-    .eq('user_id', userId)
-    .maybeSingle();
-  if (checkErr) { console.error('[SAVE] recheck error:', checkErr); return { ok:true, data:null }; }
-
-  console.log('[SAVE] recheck row →', checkRow);
-  return { ok:true, data: checkRow };
-}
-
+  
 /* tabloyu çiz */
 function renderRows(users, permMap){
   const tbody = document.getElementById('tbody');
