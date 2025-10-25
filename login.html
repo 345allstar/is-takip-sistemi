@@ -173,6 +173,40 @@ document.getElementById('form-register').addEventListener('submit', function (e)
 
   window.location.href = 'index (1).html';
 });
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb = supabase.createClient(
+  "https://nwxgigtsadesqjgflblr.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4"
+);
+
+// Kayıt formu: users tablosuna ekle (yoksa)
+document.getElementById('form-register').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = e.target.querySelector('[name="email"]').value.trim();
+  const department = e.target.querySelector('[name="department"]').value;
+
+  // users: upsert by email
+  const { data: u } = await sb.from('users')
+    .upsert({ email, full_name: email.split('@')[0], department })
+    .select('id').single();
+
+  // basit oturum işareti
+  localStorage.setItem('auth','true');
+  localStorage.setItem('user', email);
+
+  // index’e git
+  location.href = 'index (2).html';
+});
+
+// Giriş formu: sadece localStorage işareti (kendi auth'unuz varsa bağlayabilirsiniz)
+document.getElementById('form-login').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const emailOrUser = e.target.querySelector('[name="username"]').value.trim();
+  localStorage.setItem('auth','true');
+  localStorage.setItem('user', emailOrUser);
+  location.href = 'index (2).html';
+});  
   </script>
 </body>
 </html>
