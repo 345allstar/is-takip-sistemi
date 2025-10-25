@@ -30,13 +30,19 @@ if (!localStorage.getItem('auth')) {
 }
 </script>
 <!-- Üst sağ köşe: Çıkış -->
-<div class="fixed top-3 right-3 z-50">
+<div class="fixed top-3 right-3 z-50 flex gap-2">
+  <a id="admin-btn"
+     href="admin.html"
+     class="rounded-lg bg-indigo-600 text-white px-3 py-2 text-sm font-semibold hover:bg-indigo-700 shadow">
+    Yönetim Paneli
+  </a>
   <button
     onclick="localStorage.removeItem('auth'); localStorage.removeItem('user'); window.location.href='login.html';"
     class="rounded-lg bg-rose-500 text-white px-3 py-2 text-sm font-semibold hover:bg-rose-600 shadow">
     Çıkış Yap
   </button>
 </div>
+
 
     <div class="min-h-screen flex flex-col items-center justify-center p-4">
 
@@ -133,6 +139,21 @@ const tileMap = {
     const allowed = p?.admin || p?.[key];
     if(!allowed) a.style.display = 'none';
   });
+})();
+</script>
+    <script>
+(async function hideAdminIfNot(){
+  try{
+    const sb = supabase.createClient(
+      "https://nwxgigtsadesqjgflblr.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4"
+    );
+    const email = localStorage.getItem('user');
+    if(!email) { document.getElementById('admin-btn').style.display='none'; return; }
+    const { data: u } = await sb.from('users').select('id').eq('email', email).maybeSingle();
+    const { data: p } = await sb.from('user_permissions').select('admin').eq('user_id', u?.id).maybeSingle();
+    if(!p?.admin) document.getElementById('admin-btn').style.display='none';
+  }catch(e){ /* sessiz geç */ }
 })();
 </script>
 </body>
