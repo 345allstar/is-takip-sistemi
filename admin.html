@@ -129,19 +129,58 @@ async function fetchPerms(){
 
 async function upsertPerm(userId, perms){
   const payload = { user_id: userId, ...perms };
+  console.log('[SAVE] payload →', payload);
 
-  // user_id benzersiz; çakışmada güncellesin diye onConflict veriyoruz
-  const { data, error } = await sb
+  // 1) Bu kullanıcı için satır var mı?
+  const { data: existsRow, error: existsErr } = await sb
     .from('user_permissions')
-    .upsert(payload, { onConflict: 'user_id' })
-    .select('user_id, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin')
-    .single();
+    .select('user_id')
+    .eq('user_id', userId)
+    .maybeSingle();
 
-  if (error) {
-    console.error('upsert error:', error);
-    return { ok: false, error };
+  if (existsErr) {
+    console.error('[SAVE] exists check error:', existsErr);
+    return { ok:false, error: existsErr };
   }
-  return { ok: true, data };
+
+  let writeErr = null;
+
+  if (existsRow) {
+    // 2a) VARSA: UPDATE
+    const { error } = await sb
+      .from('user_permissions')
+      .update(perms)              // sadece alanlar
+      .eq('user_id', userId);
+    writeErr = error || null;
+    console.log('[SAVE] update →', error ?? 'ok');
+  } else {
+    // 2b) YOKSA: INSERT
+    const { error } = await sb
+      .from('user_permissions')
+      .insert(payload);
+    writeErr = error || null;
+    console.log('[SAVE] insert →', error ?? 'ok');
+  }
+
+  if (writeErr) {
+    console.error('[SAVE] write error:', writeErr);
+    return { ok:false, error: writeErr };
+  }
+
+  // 3) GERİ OKU (gerçekten yazılmış mı)
+  const { data: checkRow, error: checkErr } = await sb
+    .from('user_permissions')
+    .select('user_id, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (checkErr) {
+    console.error('[SAVE] recheck error:', checkErr);
+    return { ok:true, data:null, note:'saved-but-recheck-failed' };
+  }
+
+  console.log('[SAVE] recheck row →', checkRow);
+  return { ok:true, data: checkRow };
 }
 
 function renderRows(users, permMap){
@@ -168,11 +207,18 @@ function renderRows(users, permMap){
   boxes.forEach(inp => perms[inp.dataset.key] = !!inp.checked);
 
   const res = await upsertPerm(u.id, perms);
+
   if(!res.ok){
     showToast('Kaydedilemedi', false);
     return;
   }
 
+  // Sunucudan geri okunan değer ile kutuları eşitle
+  if (res.data) {
+    boxes.forEach(inp => { inp.checked = !!res.data[inp.dataset.key]; });
+  }
+  showToast('Kaydedildi', true);
+});
   // Kaydı gerçekten yazdığını doğrula (tekrar oku)
   const { data: checkRow, error: checkErr } = await sb
     .from('user_permissions')
