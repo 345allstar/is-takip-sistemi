@@ -143,11 +143,7 @@ function switchTab(which){
     altLink.textContent = 'Giriş Yapın';
   }
 }
-
-function toggleForms(){
-  const isLoginVisible = !document.getElementById('form-login').classList.contains('hidden');
-  switchTab(isLoginVisible ? 'register' : 'login');
-}
+function toggleForms(){ switchTab(document.getElementById('form-login').classList.contains('hidden') ? 'login' : 'register'); }
 
 // ---- Supabase + formlar ----
 document.addEventListener('DOMContentLoaded', () => {
@@ -156,75 +152,56 @@ document.addEventListener('DOMContentLoaded', () => {
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eGdpZ3RzYWRlc3FqZ2ZsYmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNTc0NjIsImV4cCI6MjA3NTYzMzQ2Mn0.fXEsCigwmLvQBq8_X-s_AbjJ1maioProPjPh-nNn1f4"
   );
 
-  // URL #kayit ile direk kayıt sekmesine geç
+  // URL #kayit ise direkt Kayıt sekmesine geç
   if(location.hash === '#kayit' || location.hash === '#register'){ switchTab('register'); }
 
   // LOGIN
   document.getElementById('form-login').addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = e.target.querySelector('[name="username"]').value.trim();
+    if (!email || !email.includes('@')) { alert('Lütfen e-posta adresinizi girin.'); return; }
 
-    // e-posta bekleyelim (yetkiler e-posta ile çalışıyor)
-    if (!email || !email.includes('@')) {
-      alert('Lütfen e-posta adresinizi girin (ornek@site.com).');
-      return;
-    }
-
-    // kullanıcı yoksa oluştur (emin olalım)
     await sb.from('users')
       .upsert({ email, full_name: email.split('@')[0] }, { onConflict: 'email' })
-      .select('id')
-      .single();
+      .select('id').single();
 
     localStorage.setItem('auth','true');
     localStorage.setItem('user', email);
     window.location.href = 'index.html';
   });
 
-  // --- REGISTER (Kayıt) ---
-document.getElementById('form-register').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const email = e.target.querySelector('[name="email"]').value.trim();
-  const department = e.target.querySelector('[name="department"]').value;
+  // REGISTER
+  document.getElementById('form-register').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = e.target.querySelector('[name="email"]').value.trim();
+    const department = e.target.querySelector('[name="department"]').value;
 
-  const { data: userRow, error } = await sb.from('users')
-    .upsert({ email, full_name: email.split('@')[0], department }, { onConflict: 'email' })
-    .select('id')
-    .single();
+    const { data: userRow, error } = await sb.from('users')
+      .upsert({ email, full_name: email.split('@')[0], department }, { onConflict: 'email' })
+      .select('id').single();
 
-  if (error) {
-    console.error('Supabase users upsert error:', error);   // <— HATAYI KONSOLA YAZ
-    alert('Kayıt sırasında hata oldu.');
-    return;
-  }
+    if (error) { console.error('users upsert error:', error); alert('Kayıt sırasında hata oldu.'); return; }
 
-  const { error: permErr } = await sb.from('user_permissions')
-    .upsert({ user_id: userRow.id }, { onConflict: 'user_id' });
+    const { error: permErr } = await sb.from('user_permissions')
+      .upsert({ user_id: userRow.id }, { onConflict: 'user_id' });
 
-  if (permErr) {
-    console.error('Supabase user_permissions upsert error:', permErr);   // <— HATAYI KONSOLA YAZ
-    alert('Yetki kaydı sırasında hata oldu.');
-    return;
-  }
+    if (permErr) { console.error('user_permissions upsert error:', permErr); alert('Yetki kaydı sırasında hata.'); return; }
 
-  localStorage.setItem('auth','true');
-  localStorage.setItem('user', email);
-  window.location.href = 'index.html';
-  // Şifremi Unuttum (demo): email sor, users'ta var mı kontrol et
-document.getElementById('forgot-link').addEventListener('click', async (e) => {
-  e.preventDefault();
-  const email = prompt('Lütfen e-posta adresinizi girin:');
-  if (!email || !email.includes('@')) return;
+    localStorage.setItem('auth','true');
+    localStorage.setItem('user', email);
+    window.location.href = 'index.html';
+  });
 
-  const { data: u } = await sb.from('users').select('id').eq('email', email).maybeSingle();
-  if (!u) {
-    alert('Bu e-posta ile kayıt bulunamadı.');
-    return;
-  }
-  // Burada Supabase Auth kullanmadığımız için gerçek reset maili gönderemiyoruz.
-  // Bilgi amaçlı:
-  alert('Kayıt bulundu. Şifre sıfırlama için yönetici ile iletişime geçiniz.');
-});
+  // ŞİFREMİ UNUTTUM (demo)
+  document.getElementById('forgot-link').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const email = prompt('E-posta adresinizi girin:');
+    if (!email || !email.includes('@')) return;
+
+    const { data: u } = await sb.from('users').select('id').eq('email', email).maybeSingle();
+    if (!u) { alert('Bu e-posta ile kayıt bulunamadı.'); return; }
+    alert('Kayıt bulundu. Şifre sıfırlama için yöneticiyle iletişime geçiniz.');
+  });
 });
 </script>
 </body>
