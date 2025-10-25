@@ -40,7 +40,10 @@ const sb = supabase.createClient(
       </div>
       <div class="flex items-center gap-2">
         <a href="index.html" class="rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">Anasayfa'ya Dön</a>
-        <button onclick="logout()" class="rounded-lg bg-rose-500 px-3 py-2 text-sm font-semibold text-white hover:bg-rose-600">Çıkış Yap</button>
+        <button id="btn-logout" type="button"
+  class="rounded-lg bg-rose-500 text-white px-4 py-2 font-semibold hover:bg-rose-600">
+  Çıkış Yap
+</button>
       </div>
     </div>
   </header>
@@ -197,6 +200,19 @@ async function bootstrap(){
   renderRows(users, permMap);
 }
 window.addEventListener('DOMContentLoaded', bootstrap);
+  document.addEventListener('DOMContentLoaded', () => {
+  const out = document.getElementById('btn-logout');
+  if (out) {
+    out.addEventListener('click', (e) => {
+      e.preventDefault();
+      try {
+        localStorage.removeItem('auth');
+        localStorage.removeItem('user');
+      } catch (_) {}
+      window.location.href = 'login.html';
+    });
+  }
+});
 </script>
 </body>
 </html>
