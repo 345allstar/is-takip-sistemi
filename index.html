@@ -175,16 +175,17 @@ const tileMap = {
 
   const { data: u } = await sb.from('users').select('id').eq('email', email).maybeSingle();
   const { data: p } = await sb.from('user_permissions')
-    .select('admin, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik')
+    .select('admin, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, cekim_plani, ak_giris_cikis, ak_odeme, raporlama, hata_bildirim')
     .eq('user_id', u?.id).maybeSingle();
 
-  document.querySelectorAll('a[href]').forEach(a=>{
-    const href = a.getAttribute('href');
-    const key = tileMap[href];
-    if(!key) return; // menü dışındaki linkler
-    const allowed = p?.admin || p?.[key];
-    if(!allowed) a.style.display = 'none';
-  });
+ document.querySelectorAll('a[href]').forEach(a=>{
+  const href = a.getAttribute('href');
+  // Tam eşleşme yerine 'başlıyorsa' yaklaşımı:
+  const key = tileMap[href] || Object.keys(tileMap).find(k => href.startsWith(k)) && tileMap[Object.keys(tileMap).find(k => href.startsWith(k))];
+  if(!key) return; // menü dışındaki linkler
+  const allowed = p?.admin || p?.[key];
+  if(!allowed) a.style.display = 'none';
+});
 })();
 </script>
     <script>
