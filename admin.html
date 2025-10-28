@@ -70,6 +70,11 @@ const sb = supabase.createClient(
     <th class="th px-2 py-2">Akademik İzleme</th>
     <th class="th px-2 py-2">Yazılım</th>
     <th class="th px-2 py-2">İstatistik</th>
+    <th class="th px-2 py-2">Çekim Planı</th>
+    <th class="th px-2 py-2">Akad. İzleme Giriş-Çıkış</th>
+    <th class="th px-2 py-2">Akad. İzleme Ödeme</th>
+    <th class="th px-2 py-2">Raporlama</th>
+    <th class="th px-2 py-2">Hata Bildirim</th>
     <th class="th px-2 py-2">Admin</th>
     <th class="th px-2 py-2 text-right">İŞLEMLER</th>
   </tr>
@@ -94,6 +99,11 @@ const sb = supabase.createClient(
     <td class="px-4 py-3 text-center"><input type="checkbox" data-key="akademik_izleme" class="h-4 w-4 text-indigo-600"></td>
     <td class="px-4 py-3 text-center"><input type="checkbox" data-key="yazilim" class="h-4 w-4 text-indigo-600"></td>
     <td class="px-4 py-3 text-center"><input type="checkbox" data-key="istatistik" class="h-4 w-4 text-indigo-600"></td>
+    <td class="px-4 py-3 text-center"><input type="checkbox" data-key="cekim_plani" class="h-4 w-4 text-indigo-600"></td>
+<td class="px-4 py-3 text-center"><input type="checkbox" data-key="ak_giris_cikis" class="h-4 w-4 text-indigo-600"></td>
+<td class="px-4 py-3 text-center"><input type="checkbox" data-key="ak_odeme" class="h-4 w-4 text-indigo-600"></td>
+<td class="px-4 py-3 text-center"><input type="checkbox" data-key="raporlama" class="h-4 w-4 text-indigo-600"></td>
+<td class="px-4 py-3 text-center"><input type="checkbox" data-key="hata_bildirim" class="h-4 w-4 text-indigo-600"></td>
     <td class="px-4 py-3 text-center"><input type="checkbox" data-key="admin" class="h-4 w-4 text-indigo-600"></td>
     <td class="px-4 py-3 text-right">
       <button class="save-btn rounded-lg bg-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-300">Kaydet</button>
@@ -120,7 +130,7 @@ async function fetchUsers(){
 async function fetchPerms(){
   const { data, error } = await sb
     .from('user_permissions')
-    .select('user_id, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin');
+    .select('user_id, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin, cekim_plani, ak_giris_cikis, ak_odeme, raporlama, hata_bildirim');
   if(error){ console.error(error); showToast('Yetkiler yüklenemedi', false); return {}; }
   const map = {}; (data||[]).forEach(r=>{ map[r.user_id] = r; }); return map;
 }
@@ -131,7 +141,7 @@ async function savePerms(userId, perms){
   const { data, error } = await sb
     .from('user_permissions')
     .upsert(payload, { onConflict: 'user_id' })
-    .select('koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin')
+    .select('koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, admin, cekim_plani, ak_giris_cikis, ak_odeme, raporlama, hata_bildirim')
     .single();
   if (error) throw error;
   return data;
@@ -150,7 +160,10 @@ function renderRows(users, permMap){
     tds[0].textContent = u.full_name || '—';
     tds[1].textContent = u.email || '—';
 
-    const defaults = { koord:false, yonetmen:false, kurgu:false, teknik_izleme:false, akademik_izleme:false, yazilim:false, istatistik:false, admin:false };
+    const defaults = {
+  koord:false, yonetmen:false, kurgu:false, teknik_izleme:false, akademik_izleme:false, yazilim:false, istatistik:false, admin:false,
+  cekim_plani:false, ak_giris_cikis:false, ak_odeme:false, raporlama:false, hata_bildirim:false
+};
     const p = { ...defaults, ...(permMap[u.id]||{}) };
 
     // checkboxları başlat
