@@ -153,6 +153,7 @@ const sb = supabase.createClient(
 
 // Bu linklere göre yetki anahtarı
 const tileMap = {
+  // İç sayfalar
   "genel-cekim.html":       "koord",
   "yonetmen-paneli.html":   "yonetmen",
   "kurgu-kontrol.html":     "kurgu",
@@ -160,13 +161,14 @@ const tileMap = {
   "akademik-izleme.html":   "akademik_izleme",
   "yazilim-yukleme.html":   "yazilim",
   "istatistikler.html":     "istatistik",
-  "admin.html":             "admin"
-    // --- DIŞ LİNKLER ---
-  "https://allstar345.github.io/cekim-takip-programi/index.html":     "cekim_plani",
-  "https://allstar345.github.io/cekim-takip-programi/monitoring.html":"ak_giris_cikis",
-  "https://allstar345.github.io/cekim-takip-programi/payment.html":   "ak_odeme",
-  "https://allstar345.github.io/cekim-takip-programi/stats.html":     "raporlama",
-  "https://345allstar.github.io/hata-bildirim-sistemi/#":             "hata_bildirim"
+  "admin.html":             "admin",
+
+  // Dış linkler
+  "https://allstar345.github.io/cekim-takip-programi/index.html":      "cekim_plani",
+  "https://allstar345.github.io/cekim-takip-programi/monitoring.html": "ak_giris_cikis",
+  "https://allstar345.github.io/cekim-takip-programi/payment.html":    "ak_odeme",
+  "https://allstar345.github.io/cekim-takip-programi/stats.html":      "raporlama",
+  "https://345allstar.github.io/hata-bildirim-sistemi/#":              "hata_bildirim"
 };
 
 (async function filterTiles(){
@@ -178,10 +180,14 @@ const tileMap = {
     .select('admin, koord, yonetmen, kurgu, teknik_izleme, akademik_izleme, yazilim, istatistik, cekim_plani, ak_giris_cikis, ak_odeme, raporlama, hata_bildirim')
     .eq('user_id', u?.id).maybeSingle();
 
- document.querySelectorAll('a[href]').forEach(a=>{
+document.querySelectorAll('a[href]').forEach(a=>{
   const href = a.getAttribute('href');
-  // Tam eşleşme yerine 'başlıyorsa' yaklaşımı:
-  const key = tileMap[href] || Object.keys(tileMap).find(k => href.startsWith(k)) && tileMap[Object.keys(tileMap).find(k => href.startsWith(k))];
+  // Tam eşleşme yoksa, başı aynı olanı yakala
+  let key = tileMap[href];
+  if (!key) {
+    const match = Object.keys(tileMap).find(k => href.startsWith(k));
+    if (match) key = tileMap[match];
+  }
   if(!key) return; // menü dışındaki linkler
   const allowed = p?.admin || p?.[key];
   if(!allowed) a.style.display = 'none';
