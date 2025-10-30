@@ -534,6 +534,29 @@ if (toggleBtn) {
     initializePage();
 });
 </script>
+<script>
+(function () {
+  // Aynı sayfada zaten varsa ekleme
+  if (document.querySelector('[data-home-btn]')) return;
 
+  const btn = document.createElement('a');
+  btn.href = 'index.html';                // ana sayfan
+  btn.setAttribute('data-home-btn','1');
+  btn.textContent = "Anasayfa'ya Dön";
+
+  // tailwind tarzı stiller (dosyalarında Tailwind var)
+  btn.className =
+    'fixed top-3 right-3 z-[1000] rounded-lg border px-3 py-2 text-sm ' +
+    'bg-white/90 backdrop-blur hover:bg-white shadow';
+
+  // Admin sayfanda zaten üstte buton var; çakışmasın diye gizle
+  if (document.getElementById('btn-logout') || document.querySelector('#admin-btn') ) {
+    // admin için sağ üstte zaten butonlar var (örnek satırlar). :contentReference[oaicite:3]{index=3}
+    btn.style.display = 'none';
+  }
+
+  document.body.appendChild(btn);
+})();
+</script>
 </body>
 </html>
